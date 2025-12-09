@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/images/favicons/favicon-lightmode.png" id="favicon" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Velkommen til Hulen</title>
+    <script>
+      // Dynamisk favicon baseret på dark/light mode
+      const updateFavicon = () => {
+        const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const favicon = document.getElementById('favicon');
+        favicon.href = isDark
+          ? '/favicon-darkmode.png'
+          : '/favicon-lightmode.png';
+      };
+
+      // Opdater favicon ved load
+      updateFavicon();
+
+      // Lyt efter ændringer i color scheme
+      window.matchMedia('(prefers-color-scheme: dark)')
+        .addEventListener('change', updateFavicon);
+    </script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
