@@ -33,12 +33,13 @@ class AuthService {
 
                         // Generate JWT token
                         const token = jwt.sign(
-                            { username: user.username, role: user.role },
+                            { id: user.id, username: user.username, role: user.role },
                             JWT_SECRET,
                             { expiresIn: JWT_EXPIRY }
                         );
 
                         resolve({
+                            id: user.id,
                             username: user.username,
                             role: user.role,
                             token: token
@@ -66,20 +67,27 @@ class AuthService {
                     return resolve({ message: "Hvis emailen findes, er et reset link sendt" });
                 }
 
-                // Generate reset token
+                // Generate reset token - this will be sent to user
                 const resetToken = crypto.randomBytes(32).toString('hex');
+
+                // Hash token before storing in database for security
+                const hashedToken = crypto
+                    .createHash('sha256')
+                    .update(resetToken)
+                    .digest('hex');
+
                 const resetTokenExpires = new Date(Date.now() + config.resetTokenExpiryHours * 60 * 60 * 1000);
 
-                // Save token to database
+                // Save HASHED token to database
                 db.run(
                     'UPDATE users SET reset_token = ?, reset_token_expires = ? WHERE id = ?',
-                    [resetToken, resetTokenExpires.toISOString(), user.id],
+                    [hashedToken, resetTokenExpires.toISOString(), user.id],
                     (err) => {
                         if (err) {
                             return reject({ status: 500, message: "Server fejl" });
                         }
 
-                        // Send password reset email
+                        // Send UNHASHED token via email (user needs this to reset password)
                         emailService.sendPasswordResetEmail(user.username, user.email, resetToken)
                             .catch(err => console.error('Email send error:', err));
 
@@ -95,9 +103,15 @@ class AuthService {
      */
     async resetPassword(token, newPassword) {
         return new Promise((resolve, reject) => {
+            // Hash the incoming token to compare with database
+            const hashedToken = crypto
+                .createHash('sha256')
+                .update(token)
+                .digest('hex');
+
             db.get(
                 'SELECT * FROM users WHERE reset_token = ? AND reset_token_expires > ?',
-                [token, new Date().toISOString()],
+                [hashedToken, new Date().toISOString()],
                 async (err, user) => {
                     if (err) {
                         return reject({ status: 500, message: "Server fejl" });

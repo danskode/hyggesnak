@@ -1,13 +1,15 @@
 <script>
-    import { BASE_URL } from "../../stores/generalStore";
+    import { apiPost } from '../../lib/api.js';
+    import { API_ENDPOINTS } from '../../lib/constants.js';
     import { toast } from 'svelte-sonner';
     import { navigate, Link } from 'svelte-routing';
     import { onMount } from 'svelte';
+    import { validatePassword } from '../../lib/validators.js';
 
-    let newPassword = '';
-    let confirmPassword = '';
-    let loading = false;
-    let token = '';
+    let newPassword = $state('');
+    let confirmPassword = $state('');
+    let loading = $state(false);
+    let token = $state('');
 
     onMount(() => {
         // Hent token fra URL query parameter
@@ -28,28 +30,17 @@
             return;
         }
 
-        if (newPassword.length < 8) {
-            toast.error('Password skal være mindst 8 tegn med stort bogstav, lille bogstav og tal');
+        // Validate password strength on client side
+        const passwordValidation = validatePassword(newPassword);
+        if (!passwordValidation.valid) {
+            toast.error(passwordValidation.message);
             return;
         }
 
         loading = true;
 
         try {
-            const response = await fetch(`${$BASE_URL}/api/reset-password`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ token, newPassword })
-            });
-
-            const result = await response.json();
-
-            if (!response.ok) {
-                throw new Error(result.message || 'Reset fejlede');
-            }
-
+            await apiPost(API_ENDPOINTS.RESET_PASSWORD, { token, newPassword }, { skipAuthRedirect: true });
             toast.success('Password nulstillet! Du kan nu logge ind.');
             navigate('/login');
 
@@ -65,7 +56,7 @@
 
 <p>Indtast dit nye password nedenfor.</p>
 
-<form on:submit={handleSubmit}>
+<form onsubmit={handleSubmit}>
     <div>
         <label for="newPassword">Nyt password:</label>
         <input

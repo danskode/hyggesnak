@@ -1,39 +1,35 @@
 <script>
-    import { BASE_URL } from "../../stores/generalStore";
-    import { auth } from "../../stores/authStore";
+    import { auth } from "../../stores/authStore.svelte.js";
     import { toast } from 'svelte-sonner';
     import { navigate, Link } from 'svelte-routing';
+    import { apiPost } from '../../lib/api.js';
+    import { API_ENDPOINTS } from '../../lib/constants.js';
 
-    let username = '';
-    let password = '';
-    let loading = false;
+    let username = $state('');
+    let password = $state('');
+    let loading = $state(false);
 
     async function handleSubmit(event) {
         event.preventDefault();
         loading = true;
 
         try {
-            const response = await fetch(`${$BASE_URL}/api/login`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ username, password })
+            const result = await apiPost(API_ENDPOINTS.LOGIN, { username, password }, {
+                skipAuthRedirect: true // Don't redirect on auth error during login
             });
-
-            const result = await response.json();
-
-            if (!response.ok) {
-                throw new Error(result.message || 'Login fejlede');
-            }
 
             // Save user data and token in authStore
             auth.login(result.data);
 
-            toast.success(`Velkommen i hulen, ${result.data.username}!`);
+            toast.success(`Velkommen, ${result.data.username}!`);
 
-            // Redirect to home page ...
-            navigate('/');
+            // Redirect to admin for super admins
+            if ($auth.role === "SUPER_ADMIN") {
+                return navigate('/admin');
+            }
+
+            // Redirect to HyggesnakkeList for all others
+            navigate('/hyggesnakke');
 
         } catch (err) {
             toast.error(err.message || 'Login fejlede - prøv igen senere');
@@ -43,9 +39,9 @@
     }
 </script>
 
-<h1>Medlemmer kan logge ind i hulen</h1>
+<h1>Log ind for at hyggesnakke</h1>
 
-<form on:submit={handleSubmit}>
+<form onsubmit={handleSubmit}>
     <div>
         <label for="username">Navn:</label>
         <input type="text" id="username" bind:value={username} required />
@@ -57,7 +53,7 @@
     </div>
 
     <button type="submit" disabled={loading}>
-        {loading ? 'Logger ind...' : 'Log ind i hulen'}
+        {loading ? 'Logger ind...' : 'Log ind for at hyggesnakke'}
     </button>
 </form>
 

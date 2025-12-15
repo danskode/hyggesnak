@@ -1,10 +1,23 @@
 //==== Global error handler middleware ====//
 
 export const errorHandler = (err, req, res, next) => {
-    console.error('Error:', err);
+    // Log different details based on environment
+    const isDevelopment = process.env.NODE_ENV === 'development';
 
-    // Default error
-    let status = 500;
+    if (isDevelopment) {
+        // Full error details in development
+        // Use console.error with direct string concatenation to avoid JSON serialization issues
+        console.error('Error occurred:', err.message);
+        if (err.stack) {
+            console.error('Stack:', err.stack);
+        }
+    } else {
+        // Minimal logging in production
+        console.error('Error:', err.message, 'at', new Date().toISOString());
+    }
+
+    // Default error response
+    let status = err.status || 500;
     let message = 'Serverfejl';
 
     // JWT errors
@@ -16,5 +29,13 @@ export const errorHandler = (err, req, res, next) => {
         message = 'Token er udløbet';
     }
 
-    res.status(status).send({ message });
+    // Don't leak error details to client in production
+    if (!isDevelopment && status === 500) {
+        message = 'Der opstod en serverfejl. Prøv igen senere.';
+    }
+
+    res.status(status).send({
+        message,
+        ...(isDevelopment && { stack: err.stack }) // Include stack trace only in dev
+    });
 };

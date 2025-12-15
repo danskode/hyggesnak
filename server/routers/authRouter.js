@@ -60,8 +60,7 @@ router.post('/forgot-password', forgotPasswordLimiter, async (req, res) => {
     }
 });
 
-// Then user can reset password med token at this endpoint
-
+// Reset password with token
 router.post('/reset-password', resetPasswordLimiter, async (req, res) => {
     const { token, newPassword } = req.body;
 

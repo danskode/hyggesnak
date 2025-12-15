@@ -5,8 +5,21 @@ const isBrowser = typeof window !== 'undefined';
 
 export function persistentStore(key, initialValue) {
     // Get data from localStorage if it exists
-    const storedValue = isBrowser ? localStorage.getItem(key) : null;
-    const initial = storedValue ? JSON.parse(storedValue) : initialValue;
+    let storedValue = null;
+    try {
+        storedValue = isBrowser ? localStorage.getItem(key) : null;
+    } catch (e) {
+        console.error(`Error reading localStorage key "${key}":`, e);
+    }
+
+    let initial = initialValue;
+    if (storedValue) {
+        try {
+            initial = JSON.parse(storedValue);
+        } catch (e) {
+            console.error(`Error parsing localStorage value for "${key}":`, e);
+        }
+    }
 
     // Create the store
     const store = writable(initial);
@@ -14,10 +27,14 @@ export function persistentStore(key, initialValue) {
     // Subscribe to changes and sync to localStorage
     if (isBrowser) {
         store.subscribe(value => {
-            if (value === null || value === undefined) {
-                localStorage.removeItem(key);
-            } else {
-                localStorage.setItem(key, JSON.stringify(value));
+            try {
+                if (value === null || value === undefined) {
+                    localStorage.removeItem(key);
+                } else {
+                    localStorage.setItem(key, JSON.stringify(value));
+                }
+            } catch (e) {
+                console.error(`Error writing to localStorage key "${key}":`, e);
             }
         });
     }

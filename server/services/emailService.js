@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { Resend } from 'resend';
 import { getPasswordResetText, getPasswordResetHtml } from './templates/passwordResetEmail.js';
+import { config } from '../config/config.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -103,7 +104,7 @@ ${text}
     }
 
     async sendPasswordResetEmail(username, email, resetToken) {
-        const resetLink = `http://localhost:5173/reset-password?token=${resetToken}`;
+        const resetLink = `${config.clientUrl}/reset-password?token=${resetToken}`;
 
         return this.sendEmail({
             to: email,

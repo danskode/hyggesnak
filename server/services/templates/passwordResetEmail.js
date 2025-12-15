@@ -14,7 +14,7 @@ Linket udløber om 1 time.
 Hvis du ikke har anmodet om dette, kan du ignorere denne email.
 
 Med venlig hilsen
-Zappas hule
+Hyggesnakke.dk
     `.trim();
 }
 
@@ -58,7 +58,7 @@ export function getPasswordResetHtml(username, resetLink) {
 
         <p style="margin-top: 30px;">
             Med venlig hilsen<br>
-            <strong>Zappas hule</strong>
+            <strong>Hyggesnakke.dk</strong>
         </p>
     </div>
 </body>

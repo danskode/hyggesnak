@@ -16,8 +16,20 @@ export const authenticateToken = (req, res, next) => {
         req.user = verified;
         next();
     } catch (err) {
+        // Specific error handling for JWT errors
+        if (err.name === 'TokenExpiredError') {
+            return res.status(401).send({
+                message: "Token er udløbet. Log venligst ind igen."
+            });
+        } else if (err.name === 'JsonWebTokenError') {
+            return res.status(403).send({
+                message: "Ugyldig token"
+            });
+        }
+
+        // Unknown error - generic response
         return res.status(403).send({
-            message: "Ugyldig token"
+            message: "Autentificering fejlede"
         });
     }
 };

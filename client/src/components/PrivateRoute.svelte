@@ -1,10 +1,11 @@
 <script>
-    import { auth } from '../stores/authStore';
+    import { auth } from '../stores/authStore.svelte.js';
     import { navigate } from 'svelte-routing';
     import { onMount } from 'svelte';
     import { toast } from 'svelte-sonner';
 
-    let hasChecked = false;
+    let { children } = $props();
+    let hasChecked = $state(false);
 
     onMount(() => {
         checkAuth();
@@ -33,5 +34,5 @@
 </script>
 
 {#if $auth}
-    <slot />
+    {@render children()}
 {/if}
