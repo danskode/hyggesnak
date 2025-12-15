@@ -52,7 +52,7 @@
         <input type="password" id="password" bind:value={password} required />
     </div>
 
-    <button type="submit" disabled={loading}>
+    <button class="btn btn-primary btn-lg" type="submit" disabled={loading}>
         {loading ? 'Logger ind...' : 'Log ind for at hyggesnakke'}
     </button>
 </form>

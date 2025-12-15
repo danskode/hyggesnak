@@ -99,7 +99,7 @@ export function setupSocketHandlers(io) {
                 // Join the room
                 socket.join(`hyggesnak-${parsedId}`);
                 socket.currentHyggesnakId = parsedId;
-                console.log(`User ${socket.userId} joined hyggesnak-${parsedId}`);
+                // console.log(`User ${socket.userId} joined hyggesnak-${parsedId}`);
 
             } catch (err) {
                 console.error('Error joining hyggesnak:', err);
