@@ -1,8 +1,8 @@
-# Hyggesnak
+# Hyggesnakke
 
 💬 A chat app for friends and families focusing on privacy, security and to keep you close to the ones who matters and not meta or other big tech companies 💬
 
-![Mangler du en app til at holde kontakten med familien uden at skulle ?](client/public/images/content/hyggesnak.png "Hyggesnak - a chat app for friends and families")
+![Mangler du en app til at holde kontakten med familien uden at skulle ?](client/public/images/content/hyggesnak.png "Hyggesnakke - a chat app for friends and families")
 
 Do you wabnt to test it out? Well you can:
 
