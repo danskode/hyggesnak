@@ -252,30 +252,30 @@
 
 <div class="network-page">
     <div class="page-header">
-        <h1>Mit netværk</h1>
-        <p class="subtitle">Administrer dine netværksforbindelser</p>
+        <h1>Dit netværk</h1>
+        <p class="subtitle">Administrer dine kontakter</p>
     </div>
 
+    <!-- Section 1 -->
     <div class="page-content">
-        <!-- Section 1: Dine forbindelser -->
         <section class="connections-section">
             <div class="section-header">
-                <h2>Dine forbindelser ({connections.length})</h2>
+                <h2>Dine kontakter ({connections.length})</h2>
                 <input
                     type="text"
                     bind:value={searchQuery}
-                    placeholder="Søg efter forbindelser..."
+                    placeholder="Søg efter kontakter..."
                     class="search-input"
                 />
             </div>
 
             {#if loadingConnections}
-                <div class="empty-state">Henter forbindelser...</div>
+                <div class="empty-state">Henter kontakter...</div>
             {:else if filteredConnections.length === 0}
                 <div class="empty-state">
-                    <p>{searchQuery ? 'Ingen forbindelser matcher din søgning' : 'Du har ingen forbindelser endnu'}</p>
+                    <p>{searchQuery ? 'Ingen kontakter matcher din søgning' : 'Du har ingen kontakter endnu'}</p>
                     {#if !searchQuery}
-                        <p>Generer en kode eller forbind med andres kode for at starte!</p>
+                        <p>Generer en kode eller indtast en anden brugers kode nedenfor for at udvidde dit netværk!</p>
                     {/if}
                 </div>
             {:else}
@@ -307,12 +307,12 @@
             {/if}
         </section>
 
-        <!-- Section 2: Netværkskoder -->
+        <!-- Section 2 -->
         <section class="codes-section">
-            <h2>Netværkskoder</h2>
+            <h2>Udvid dit netværk</h2>
 
             <div class="code-subsection">
-                <h3>Din kode</h3>
+                <h3>Din hemmelige kode</h3>
                 <p class="description">Del denne kode med personer du vil tilføje til dit netværk</p>
 
                 {#if loadingCode}
@@ -323,14 +323,14 @@
                         <div class="code-info">
                             <p>Udløber: {new Date(myCode.expiresAt).toLocaleString('da-DK')}</p>
                         </div>
-                        <button class="btn-secondary btn-sm" onclick={revokeCode}>
+                        <button class="btn btn-danger btn-sm" onclick={revokeCode}>
                             Slet kode
                         </button>
                     </div>
                 {:else}
                     <div class="no-code">
                         <p>Du har ingen aktiv kode</p>
-                        <button class="btn-primary" onclick={generateCode} disabled={generatingCode}>
+                        <button class="btn btn-primary" onclick={generateCode} disabled={generatingCode}>
                             {generatingCode ? 'Genererer...' : 'Generer kode'}
                         </button>
                     </div>
@@ -340,20 +340,20 @@
             <div class="divider"></div>
 
             <div class="code-subsection">
-                <h3>Forbind med kode</h3>
-                <p class="description">Indtast en kode for at sende en netværksanmodning</p>
+                <h3>Forbind med en andens hemmelige kode</h3>
+                <p class="description">Har en anden bruger givet dig sin hemmelige kode? Indtast den for at sende en netværksanmodning</p>
 
                 <div class="connect-form">
                     <input
                         type="text"
                         bind:value={connectCode}
-                        placeholder="Indtast 6-cifret kode"
+                        placeholder="_ _ _ _ _ _"
                         maxlength="6"
                         pattern="[0-9]{6}"
                         class="code-input"
                     />
                     <button
-                        class="btn-primary"
+                        class="btn btn-primary"
                         onclick={connectWithCode}
                         disabled={connectingWithCode || connectCode.length !== 6}>
                         {connectingWithCode ? 'Forbinder...' : 'Send anmodning'}
@@ -362,13 +362,13 @@
             </div>
         </section>
 
-        <!-- Section 3: Invitationer -->
+        <!-- Section 3 -->
         <section class="invitations-section">
-            <h2>Invitationer</h2>
+            <h2>Anmodninger</h2>
 
             <div class="invitation-group">
                 <h3>
-                    Netværksanmodninger
+                    Venneanmodninger
                     {#if $networkInvitationsIncoming.length > 0}
                         <span class="badge">{$networkInvitationsIncoming.length}</span>
                     {/if}
@@ -376,12 +376,12 @@
 
                 {#if $networkInvitationsIncoming.length === 0 && $networkInvitationsOutgoing.length === 0}
                     <div class="empty-state">
-                        <p>Ingen netværksanmodninger</p>
+                        <p>Ingen ventende venneanmodninger</p>
                     </div>
                 {:else}
                     {#if $networkInvitationsIncoming.length > 0}
                         <div class="invitations-subgroup">
-                            <h4>Indgående anmodninger</h4>
+                            <h4>Modtagede anmodninger</h4>
                             <div class="invitation-list">
                                 {#each $networkInvitationsIncoming as invitation}
                                     <div class="invitation-card list-item">
@@ -397,10 +397,10 @@
                                             </div>
                                         </div>
                                         <div class="invitation-actions">
-                                            <button class="btn-success btn-sm" onclick={() => acceptInvitation(invitation.id)}>
+                                            <button class="btn btn-success btn-sm" onclick={() => acceptInvitation(invitation.id)}>
                                                 ✓ Acceptér
                                             </button>
-                                            <button class="btn-danger btn-sm" onclick={() => rejectInvitation(invitation.id)}>
+                                            <button class="btn btn-danger btn-sm" onclick={() => rejectInvitation(invitation.id)}>
                                                 ✕ Afvis
                                             </button>
                                         </div>
@@ -428,7 +428,7 @@
                                                 <p class="status">Afventer svar...</p>
                                             </div>
                                         </div>
-                                        <button class="btn-secondary btn-sm" onclick={() => cancelInvitation(invitation.id)}>
+                                        <button class="btn btn-secondary btn-sm" onclick={() => cancelInvitation(invitation.id)}>
                                             Annullér
                                         </button>
                                     </div>
@@ -443,7 +443,7 @@
 
             <div class="invitation-group">
                 <h3>
-                    Hyggesnak invitationer
+                    Invitationer til nye hyggesnakke
                     {#if $hyggesnakInvitations.length > 0}
                         <span class="badge">{$hyggesnakInvitations.length}</span>
                     {/if}
@@ -465,11 +465,11 @@
                                 </div>
                                 <div class="invitation-actions">
                                     <button
-                                        class="btn-success btn-sm"
+                                        class="btn btn-success btn-sm"
                                         onclick={() => acceptHyggesnakInvitation(invitation.id, invitation.hyggesnak.displayName)}>
                                         ✓ Acceptér
                                     </button>
-                                    <button class="btn-danger btn-sm" onclick={() => rejectHyggesnakInvitation(invitation.id)}>
+                                    <button class="btn btn-danger btn-sm" onclick={() => rejectHyggesnakInvitation(invitation.id)}>
                                         ✕ Afvis
                                     </button>
                                 </div>

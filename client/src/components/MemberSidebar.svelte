@@ -136,7 +136,7 @@
         {/each}
     </div>
 
-    <!-- Invite Section (replaces modal) -->
+    <!-- Invite Section -->
     {#if showInviteSection && currentUserRole === ROLES.OWNER}
         <div class="invite-section">
             <div class="invite-header">
@@ -149,7 +149,7 @@
                 {:else if networkConnections.length === 0}
                     <div class="invite-empty empty-state">
                         <p>Ingen tilgængelige forbindelser</p>
-                        <p>Alle dine netværksforbindelser er allerede medlemmer</p>
+                        <p>Alle dine venner er allerede medlemmer</p>
                     </div>
                 {:else}
                     <div class="invite-list">
@@ -346,5 +346,14 @@
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+    }
+
+    @media (max-width: 768px) {
+        .members-sidebar {
+            max-width: 20%;
+        }
+        .member-details {
+            display: none;
+        }
     }
 </style>

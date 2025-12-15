@@ -4,7 +4,7 @@
   --color-primary: #8FB08E;
   --color-primary-hover: #536952;
   --color-primary-dark: #536952;
-  --color-success: #28a745;
+  --color-success: #8FB08E;
   --color-success-hover: #218838;
   --color-success-bg: #d4edda;
   --color-danger: #D57859;
@@ -172,8 +172,7 @@ nav a:hover {
   text-decoration: none;
 }
 
-/* ===== Unified Button System ===== */
-/* Base Button Class - ONE button type with many states */
+/* ===== Unified Buttons ===== */
 .btn {
   /* Layout & Spacing */
   display: inline-flex;
@@ -224,7 +223,7 @@ nav a:hover {
 
 /* Button Variants */
 .btn-primary {
-  background: var(--gradient-primary);
+  background: var(--color-primary);
 }
 
 .btn-primary:hover:not(:disabled) {

@@ -92,7 +92,7 @@
 
 <div class="actions">
   <Link to="/hyggesnakke/create">
-    <button class="btn btn-primary">+ Opret ny hyggesnak</button>
+    <button class="btn btn-primary btn-lg">+ Opret ny hyggesnak</button>
   </Link>
 </div>
 
@@ -119,14 +119,14 @@
 
         <div class="card-actions">
           <button
-            class="btn btn-primary"
+            class="btn btn-primary btn-lg"
             onclick={() => selectAndNavigate(hyggesnak)}
           >
             Fortsæt hyggesnakken
           </button>
 
           <button
-            class="btn btn-danger"
+            class="btn btn-danger btn-sm"
             onclick={() => handleLeaveHyggesnak(hyggesnak)}
             disabled={leaving === hyggesnak.id}
           >

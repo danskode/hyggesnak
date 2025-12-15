@@ -308,7 +308,7 @@
         align-items: center;
         gap: var(--space-4);
         padding: var(--space-4) var(--space-6);
-        background: var(--gradient-primary);
+        background: var(--color-primary);
         color: white;
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
