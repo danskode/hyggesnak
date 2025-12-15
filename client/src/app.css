@@ -172,69 +172,78 @@ nav a:hover {
   text-decoration: none;
 }
 
-/* ===== Buttons ===== */
-button {
+/* ===== Unified Button System ===== */
+/* Base Button Class - ONE button type with many states */
+.btn {
+  /* Layout & Spacing */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
   padding: var(--space-3) var(--space-5);
+
+  /* Typography */
   font-size: 1rem;
   font-weight: 500;
   font-family: inherit;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+
+  /* Visual */
   border: none;
   border-radius: var(--radius-md);
-  cursor: pointer;
-  transition: all var(--transition-base);
   background-color: var(--color-primary);
   color: white;
+
+  /* Behavior */
+  cursor: pointer;
+  transition: all var(--transition-base);
+  user-select: none;
 }
 
-button:hover {
+.btn:hover:not(:disabled) {
   background-color: var(--color-primary-hover);
   transform: translateY(-1px);
 }
 
-button:active {
+.btn:active:not(:disabled) {
   transform: translateY(0);
 }
 
-button:disabled {
+.btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;
 }
 
-/* Button Variants */
-.btn-primary,
-button.primary {
-  background: var(--gradient-primary);
-  color: white;
-  border: none;
+.btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
-.btn-primary:hover,
-button.primary:hover {
+/* Button Variants */
+.btn-primary {
+  background: var(--gradient-primary);
+}
+
+.btn-primary:hover:not(:disabled) {
   background: var(--color-primary-dark);
 }
 
-.btn-success,
-button.success {
+.btn-success {
   background: var(--gradient-success);
-  color: white;
-  border: none;
 }
 
-.btn-success:hover,
-button.success:hover {
+.btn-success:hover:not(:disabled) {
   background: var(--color-success-hover);
 }
 
-.btn-danger,
-button.danger {
+.btn-danger {
   background-color: var(--color-danger);
-  color: white;
-  border: none;
 }
 
-.btn-danger:hover,
-button.danger:hover {
+.btn-danger:hover:not(:disabled) {
   background-color: var(--color-danger-hover);
 }
 
@@ -244,30 +253,91 @@ button.danger:hover {
   border: 1px solid var(--color-border);
 }
 
-.btn-secondary:hover {
+.btn-secondary:hover:not(:disabled) {
   background-color: #e9ecef;
-  transform: translateY(-1px);
+  border-color: var(--color-primary);
+}
+
+.btn-ghost {
+  background: rgba(255, 255, 255, 0.2);
+  color: inherit;
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.3);
 }
 
 .btn-icon {
   padding: var(--space-2) var(--space-3);
-  background: white;
+  background: var(--color-card-bg);
   border: 1px solid var(--color-border);
   color: var(--color-text);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
   min-width: 2rem;
 }
 
-.btn-icon:hover {
+.btn-icon:hover:not(:disabled) {
   background-color: var(--color-bg-secondary);
   border-color: var(--color-primary);
 }
 
+/* Size Modifiers */
 .btn-sm {
   padding: var(--space-2) var(--space-3);
   font-size: 0.875rem;
+}
+
+.btn-lg {
+  padding: var(--space-4) var(--space-6);
+  font-size: 1.125rem;
+}
+
+/* State & Behavior Modifiers */
+.btn-active {
+  background: var(--color-danger);
+  transform: none;
+}
+
+.btn-loading {
+  position: relative;
+  color: transparent;
+  pointer-events: none;
+}
+
+.btn-loading::after {
+  content: '';
+  position: absolute;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid currentColor;
+  border-radius: var(--radius-full);
+  border-top-color: transparent;
+  animation: spin 0.6s linear infinite;
+}
+
+.btn-scale:hover:not(:disabled) {
+  transform: scale(1.1);
+}
+
+.btn-wide {
+  padding-left: var(--space-6);
+  padding-right: var(--space-6);
+}
+
+.btn-full {
+  width: 100%;
+}
+
+.btn-danger-hover:hover:not(:disabled) {
+  background-color: var(--color-danger);
+  color: white;
+  border-color: var(--color-danger);
+}
+
+/* Animation for loading state */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ===== Forms ===== */

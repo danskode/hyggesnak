@@ -257,10 +257,10 @@
     </div>
 
     <div class="page-content">
-        <!-- Section 1: Mine forbindelser -->
+        <!-- Section 1: Dine forbindelser -->
         <section class="connections-section">
             <div class="section-header">
-                <h2>Mine forbindelser ({connections.length})</h2>
+                <h2>Dine forbindelser ({connections.length})</h2>
                 <input
                     type="text"
                     bind:value={searchQuery}
@@ -297,7 +297,7 @@
                                 </div>
                             </div>
                             <button
-                                class="btn-danger btn-sm"
+                                class="btn btn-danger btn-sm"
                                 onclick={() => removeConnection(connection.userId, connection.displayName || connection.username)}>
                                 Fjern
                             </button>

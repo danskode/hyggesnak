@@ -104,14 +104,14 @@
                             <div class="edit-actions">
                                 <button
                                     type="button"
-                                    class="save-btn"
+                                    class="btn btn-success btn-sm"
                                     onclick={() => saveEditMessage(message.id)}
                                 >
                                     Gem
                                 </button>
                                 <button
                                     type="button"
-                                    class="cancel-btn"
+                                    class="btn btn-secondary btn-sm"
                                     onclick={cancelEditMessage}
                                 >
                                     Annullér
@@ -136,14 +136,14 @@
                 {#if message.isOwn && !message.is_deleted && editingMessageId !== message.id}
                     <div class="message-actions">
                         <button
-                            class="action-btn edit-btn"
+                            class="btn btn-icon btn-scale"
                             onclick={() => startEditMessage(message)}
                             title="Redigér besked"
                         >
                             ✏️
                         </button>
                         <button
-                            class="action-btn delete-btn"
+                            class="btn btn-icon btn-scale"
                             onclick={() => handleDeleteMessage(message.id)}
                             title="Slet besked"
                         >
@@ -281,21 +281,7 @@
         opacity: 1;
     }
 
-    .action-btn {
-        /* Similar to global .btn-icon */
-        background: var(--color-card-bg);
-        border: 1px solid var(--color-border);
-        border-radius: var(--radius-lg);
-        padding: var(--space-1) var(--space-2);
-        cursor: pointer;
-        font-size: 0.875rem;
-        transition: all var(--transition-base);
-    }
-
-    .action-btn:hover {
-        background: var(--color-bg-secondary);
-        transform: scale(1.1);
-    }
+    /* Global .btn-icon and .btn-scale styles apply */
 
     .edit-mode {
         margin-top: var(--space-2);
@@ -314,32 +300,5 @@
         margin-top: var(--space-2);
     }
 
-    .save-btn,
-    .cancel-btn {
-        padding: var(--space-2) var(--space-3);
-        border: none;
-        border-radius: var(--radius-md);
-        cursor: pointer;
-        font-size: 0.875rem;
-        font-weight: 500;
-        transition: all var(--transition-base);
-    }
-
-    .save-btn {
-        background: var(--color-success);
-        color: white;
-    }
-
-    .save-btn:hover {
-        background: var(--color-success-hover);
-    }
-
-    .cancel-btn {
-        background: var(--color-text-secondary);
-        color: white;
-    }
-
-    .cancel-btn:hover {
-        opacity: 0.8;
-    }
+    /* Global .btn-success and .btn-secondary styles apply */
 </style>

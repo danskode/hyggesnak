@@ -125,14 +125,11 @@
 
             <button
                 type="submit"
+                class="btn btn-primary btn-wide"
+                class:btn-loading={sending}
                 disabled={sending || disabled || !value.trim() || isOverLimit}
-                class="send-btn"
             >
-                {#if sending}
-                    Sender...
-                {:else}
-                    Send
-                {/if}
+                Send
             </button>
         </div>
     </form>
@@ -221,32 +218,5 @@
         font-weight: 700;
     }
 
-    .send-btn {
-        padding: var(--space-2) var(--space-6);
-        background: var(--gradient-primary);
-        color: white;
-        border: none;
-        border-radius: var(--radius-lg);
-        font-size: 1rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all var(--transition-base);
-        box-shadow: var(--shadow-md);
-    }
-
-    .send-btn:hover:not(:disabled) {
-        transform: translateY(-1px);
-        box-shadow: var(--shadow-lg);
-    }
-
-    .send-btn:active:not(:disabled) {
-        transform: translateY(0);
-    }
-
-    .send-btn:disabled {
-        background: var(--color-text-secondary);
-        cursor: not-allowed;
-        opacity: 0.6;
-        box-shadow: none;
-    }
+    /* Global .btn-primary, .btn-wide, and .btn-loading styles apply */
 </style>

@@ -284,7 +284,7 @@
     .chat-page {
         display: flex;
         flex-direction: column;
-        height: calc(100vh - 120px);
+        height: calc(90vh - 120px);
         max-width: 1400px;
         margin: 0 auto;
         background: white;
@@ -356,7 +356,7 @@
 
     @media (max-width: 768px) {
         .chat-page {
-            height: 100vh;
+            height: 70vh;
             border-radius: 0;
             max-width: 100%;
         }

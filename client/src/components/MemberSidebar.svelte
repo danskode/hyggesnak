@@ -92,10 +92,10 @@
 
         {#if currentUserRole === ROLES.OWNER}
             <button
-                class="invite-btn btn-success"
+                class="btn btn-success"
+                class:btn-active={showInviteSection}
                 onclick={toggleInviteSection}
                 title="Invitér nye medlemmer"
-                class:active={showInviteSection}
             >
                 {showInviteSection ? '✕' : '➕'} Invitér
             </button>
@@ -125,7 +125,7 @@
                 <!-- Action buttons -->
                 {#if currentUserRole === ROLES.OWNER && member.id !== currentUserId}
                     <button
-                        class="member-action-btn remove-btn btn-icon"
+                        class="btn btn-icon btn-danger-hover"
                         onclick={() => handleRemoveMember(member.id, sanitizeDisplayName(member.display_name || member.username))}
                         title="Fjern medlem"
                     >
@@ -166,7 +166,7 @@
                                     </div>
                                 </div>
                                 <button
-                                    class="invite-send-btn btn-success btn-sm"
+                                    class="btn btn-success btn-sm"
                                     onclick={() => sendInvitation(connection.userId, connection.displayName || connection.username)}
                                     disabled={sendingInvites.has(connection.userId)}
                                 >
@@ -208,9 +208,7 @@
         color: var(--color-text);
     }
 
-    .invite-btn.active {
-        background: var(--color-danger);
-    }
+    /* Global .btn-success and .btn-active styles apply */
 
     .members-list {
         flex: 1;
@@ -270,11 +268,7 @@
         margin-top: var(--space-1);
     }
 
-    .remove-btn:hover {
-        background: var(--color-danger);
-        color: white;
-        border-color: var(--color-danger);
-    }
+    /* Global .btn-icon and .btn-danger-hover styles apply */
 
     .invite-section {
         border-top: 2px solid var(--color-border);

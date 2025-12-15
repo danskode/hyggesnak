@@ -85,13 +85,14 @@
       await loadHyggesnakke();
     });
   });
+
 </script>
 
-<h1>{$auth.display_name || $auth.username}s hyggesnakke</h1>
+<h1>Dine hyggesnakke</h1>
 
 <div class="actions">
   <Link to="/hyggesnakke/create">
-    <button class="primary">+ Opret ny hyggesnak</button>
+    <button class="btn btn-primary">+ Opret ny hyggesnak</button>
   </Link>
 </div>
 
@@ -118,14 +119,14 @@
 
         <div class="card-actions">
           <button
-            class="primary"
+            class="btn btn-primary"
             onclick={() => selectAndNavigate(hyggesnak)}
           >
             Fortsæt hyggesnakken
           </button>
 
           <button
-            class="danger"
+            class="btn btn-danger"
             onclick={() => handleLeaveHyggesnak(hyggesnak)}
             disabled={leaving === hyggesnak.id}
           >
@@ -139,7 +140,7 @@
   <div class="empty-state">
     <p>Du er ikke medlem af nogen hyggesnakke endnu.</p>
     <Link to="/hyggesnakke/create">
-      <button class="primary">Opret din første hyggesnak</button>
+      <button class="btn btn-primary">Opret din første hyggesnak</button>
     </Link>
   </div>
 {/if}

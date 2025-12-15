@@ -126,7 +126,7 @@
           {/if}
         </Link>
       {/if}
-      <button class="log-out-btn"onclick={handleLogout}>Log ud</button>
+      <button class="btn btn-ghost" onclick={handleLogout}>Log ud</button>
     {:else}
       <Link to="/">Home</Link>
       <Link to="/login">Login</Link>
@@ -208,28 +208,7 @@
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
   }
 
-  button {
-    background: rgba(255, 255, 255, 0.2);
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 0.375rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  button.log-out-btn {
-    color: #8FB08E;
-  }
-
-  button.log-out-btn:hover {
-    color: #213547;
-  }
-
-  button:hover {
-    background: rgba(255, 255, 255, 0.3);
-  }
+  /* Global .btn-ghost styles apply */
 
   @media (max-width: 768px) {
     header {

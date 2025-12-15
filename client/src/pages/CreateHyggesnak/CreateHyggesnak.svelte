@@ -95,10 +95,10 @@
     </div>
 
     <div class="form-actions">
-      <button type="submit" class="primary" disabled={creating}>
+      <button type="submit" class="btn btn-primary" disabled={creating}>
         {creating ? 'Opretter...' : 'Opret hyggesnak'}
       </button>
-      <button type="button" onclick={handleCancel} disabled={creating}>
+      <button type="button" class="btn btn-secondary" onclick={handleCancel} disabled={creating}>
         Annuller
       </button>
     </div>
