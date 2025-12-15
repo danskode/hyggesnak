@@ -1,8 +1,5 @@
 <script>
     //==== Reusable Avatar Component ====//
-    // Displays user initials in a circular avatar
-    // Optional crown icon for owners
-    // Online status indicator via background color
 
     import { getInitials, stringToColor } from '../lib/utils.js';
     import { sanitizeDisplayName } from '../lib/sanitize.js';

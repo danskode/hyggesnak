@@ -1,4 +1,4 @@
-// Client-side validation utilities (matches server-side validation)
+//================= Client-side validation utilities (matches server-side validation) ===============//
 import { MESSAGE_MAX_LENGTH, NETWORK_CODE_LENGTH, DISPLAY_NAME_MAX_LENGTH } from './constants.js';
 
 // Password validation

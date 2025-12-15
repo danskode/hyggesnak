@@ -1,11 +1,12 @@
 import { get } from 'svelte/store';
 import { persistentStore } from '../lib/persistentStore.js';
 
-// Create persistent stores for hyggesnakke
+//======= Create persistent stores for hyggesnakke =======//
+
 const hyggesnakkeListStore = persistentStore('hyggesnakke', []);
 const currentHyggesnakStore = persistentStore('currentHyggesnak', null);
 
-// Helper functions for hyggesnakke list
+// For hyggesnakke list
 export const hyggesnakke = {
     subscribe: hyggesnakkeListStore.subscribe,
 
@@ -35,7 +36,7 @@ export const hyggesnakke = {
     }
 };
 
-// Helper functions for current hyggesnak
+// For current hyggesnak
 export const currentHyggesnak = {
     subscribe: currentHyggesnakStore.subscribe,
 

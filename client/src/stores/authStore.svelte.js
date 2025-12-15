@@ -2,10 +2,11 @@ import { get } from 'svelte/store';
 import { persistentStore } from '../lib/persistentStore.js';
 import { hyggesnakke, currentHyggesnak } from './hyggesnakStore.svelte.js';
 
-// Create persistent auth store
+//============== Create persistent auth store ==================//
+
 const authStore = persistentStore('auth', null);
 
-// Helper functions to use in components and pages
+// To use in components and pages
 export const auth = {
     subscribe: authStore.subscribe,
 

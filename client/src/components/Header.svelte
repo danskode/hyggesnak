@@ -93,7 +93,7 @@
   <div class="site-header">
     <img
       src={logoSrc}
-      alt="Club Zappa Logo"
+      alt="Hyggesnakke Logo"
       class="site-logo"
     />
     <h1 class="site-title">Hyggesnakke</h1>

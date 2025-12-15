@@ -3,12 +3,7 @@ import { persistentStore } from '../lib/persistentStore.js';
 import { apiGet } from '../lib/api.js';
 import { API_ENDPOINTS } from '../lib/constants.js';
 
-/**
- * Store for managing all invitation-related state:
- * - Network invitations (incoming/outgoing)
- * - Hyggesnak invitations
- * - Notification badge counts
- */
+//============= Store for managing all invitation-related state: Network invitations (incoming/outgoing, Hyggesnak invitations, Notification badge counts =============//
 
 // Network invitations
 export const networkInvitationsIncoming = writable([]);
@@ -28,9 +23,7 @@ export const totalPendingInvitations = derived(
 // Loading states
 export const invitationsLoading = writable(false);
 
-/**
- * Fetch all invitations from the server
- */
+// Fetch all invitations from the server
 export async function fetchAllInvitations() {
     invitationsLoading.set(true);
 
@@ -61,58 +54,44 @@ export async function fetchAllInvitations() {
     }
 }
 
-/**
- * Add a new network invitation (incoming)
- */
+// Add a new network invitation (incoming)
 export function addNetworkInvitationIncoming(invitation) {
     const current = get(networkInvitationsIncoming);
     networkInvitationsIncoming.set([...current, invitation]);
 }
 
-/**
- * Remove a network invitation (incoming) by ID
- */
+// Remove a network invitation (incoming) by ID
 export function removeNetworkInvitationIncoming(invitationId) {
     const current = get(networkInvitationsIncoming);
     networkInvitationsIncoming.set(current.filter(inv => inv.id !== invitationId));
 }
 
-/**
- * Remove a network invitation (outgoing) by ID
- */
+// Remove a network invitation (outgoing) by ID
 export function removeNetworkInvitationOutgoing(invitationId) {
     const current = get(networkInvitationsOutgoing);
     networkInvitationsOutgoing.set(current.filter(inv => inv.id !== invitationId));
 }
 
-/**
- * Add a new hyggesnak invitation
- */
+// Add a new hyggesnak invitation
 export function addHyggesnakInvitation(invitation) {
     const current = get(hyggesnakInvitations);
     hyggesnakInvitations.set([...current, invitation]);
 }
 
-/**
- * Remove a hyggesnak invitation by ID
- */
+// Remove a hyggesnak invitation by ID
 export function removeHyggesnakInvitation(invitationId) {
     const current = get(hyggesnakInvitations);
     hyggesnakInvitations.set(current.filter(inv => inv.id !== invitationId));
 }
 
-/**
- * Clear all invitations (on logout)
- */
+// Clear all invitations (on logout)
 export function clearAllInvitations() {
     networkInvitationsIncoming.set([]);
     networkInvitationsOutgoing.set([]);
     hyggesnakInvitations.set([]);
 }
 
-/**
- * Helper to check if there are any pending invitations
- */
+// Check if there are any pending invitations
 export function hasPendingInvitations() {
     const count = get(totalPendingInvitations);
     return count > 0;

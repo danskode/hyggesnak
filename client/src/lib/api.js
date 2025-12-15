@@ -1,12 +1,12 @@
-// Centralized API utility for consistent error handling and request management
-// Handles authentication, error responses, and provides a clean interface for API calls
+//============ Centralized API utility for consistent error handling and request management ===============//
+
 import { get } from 'svelte/store';
 import { auth } from '../stores/authStore.svelte.js';
 import { navigate } from 'svelte-routing';
 import { toast } from 'svelte-sonner';
 import { BASE_URL } from './constants.js';
 
-// Custom API Error class for better error handling
+// Custom API Error class
 export class APIError extends Error {
     constructor(message, status, data = null) {
         super(message);
@@ -66,7 +66,7 @@ export async function apiRequest(url, options = {}, config = {}) {
                     toast.error('Din session er udløbet. Log venligst ind igen.');
                 }
                 auth.logout();
-                navigate('/login');
+                navigate('/');
             }
             throw new APIError(
                 data.message || 'Unauthorized',

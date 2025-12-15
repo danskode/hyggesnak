@@ -2,7 +2,6 @@
   import { Router, Route } from 'svelte-routing';
   import { Toaster } from 'svelte-sonner';
   import Home from './pages/Home/Home.svelte';
-  import Members from './pages/Members/Members.svelte';
   import HyggesnakList from './pages/HyggesnakList/HyggesnakList.svelte';
   import CreateHyggesnak from './pages/CreateHyggesnak/CreateHyggesnak.svelte';
   import Chat from './pages/Chat/Chat.svelte';
@@ -23,13 +22,8 @@
   <Header />
 
   <main>
-    <Route path='/'><Home /></Route>
-
-    <!-- Legacy members route - redirects to hyggesnak-scoped route -->
-    <Route path='/members'>
-      <PrivateRoute>
-        <Members />
-      </PrivateRoute>
+    <Route path='/'>
+      <Home />
     </Route>
 
     <!-- Hyggesnak routes -->

@@ -1,11 +1,6 @@
 //==== Date Formatting Utilities ====//
 
-/**
- * Format date in Danish locale
- * @param {string|Date} dateString - Date to format
- * @param {Object} options - Intl.DateTimeFormat options
- * @returns {string} Formatted date
- */
+// Format date in Danish locale
 export function formatDate(dateString, options = {}) {
     if (!dateString) return '';
 
@@ -19,11 +14,7 @@ export function formatDate(dateString, options = {}) {
     return new Date(dateString).toLocaleDateString('da-DK', defaultOptions);
 }
 
-/**
- * Format date and time in Danish locale
- * @param {string|Date} dateString - Date to format
- * @returns {string} Formatted date and time
- */
+// Format date and time in Danish locale
 export function formatDateTime(dateString) {
     if (!dateString) return '';
 
@@ -36,11 +27,7 @@ export function formatDateTime(dateString) {
     });
 }
 
-/**
- * Format time only in Danish locale
- * @param {string|Date} dateString - Date to format
- * @returns {string} Formatted time
- */
+// Format time only in Danish locale
 export function formatTime(dateString) {
     if (!dateString) return '';
 
@@ -50,11 +37,7 @@ export function formatTime(dateString) {
     });
 }
 
-/**
- * Format relative time (e.g., "2 timer siden", "i går")
- * @param {string|Date} dateString - Date to format
- * @returns {string} Relative time string
- */
+// Format relative time (e.g., "2 timer siden", "i går")
 export function formatRelativeTime(dateString) {
     if (!dateString) return '';
 
@@ -74,11 +57,7 @@ export function formatRelativeTime(dateString) {
     return formatDate(dateString);
 }
 
-/**
- * Check if date is today
- * @param {string|Date} dateString - Date to check
- * @returns {boolean} True if date is today
- */
+// Check if date is today
 export function isToday(dateString) {
     if (!dateString) return false;
 
@@ -86,16 +65,11 @@ export function isToday(dateString) {
     const today = new Date();
 
     return date.getDate() === today.getDate() &&
-           date.getMonth() === today.getMonth() &&
-           date.getFullYear() === today.getFullYear();
+        date.getMonth() === today.getMonth() &&
+        date.getFullYear() === today.getFullYear();
 }
 
-/**
- * Check if date is within last N days
- * @param {string|Date} dateString - Date to check
- * @param {number} days - Number of days
- * @returns {boolean} True if within last N days
- */
+// Check if date is within last N days
 export function isWithinDays(dateString, days) {
     if (!dateString) return false;
 

@@ -100,7 +100,6 @@
                                 bind:value={editContent}
                                 maxlength={MESSAGE_MAX_LENGTH}
                                 placeholder="Redigér din besked..."
-                                autofocus
                             ></textarea>
                             <div class="edit-actions">
                                 <button

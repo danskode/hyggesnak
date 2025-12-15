@@ -1,11 +1,6 @@
 //==== General Utility Functions ====//
 
-/**
- * Get initials from a name
- * @param {string} name - Full name or display name
- * @param {number} maxInitials - Maximum number of initials to return (default: 2)
- * @returns {string} Initials in uppercase
- */
+// Get initials from a name
 export function getInitials(name, maxInitials = 1) {
     if (!name) return '?';
 
@@ -17,12 +12,7 @@ export function getInitials(name, maxInitials = 1) {
         .slice(0, maxInitials);
 }
 
-/**
- * Debounce function - delays execution until after wait milliseconds
- * @param {Function} fn - Function to debounce
- * @param {number} delay - Delay in milliseconds
- * @returns {Function} Debounced function
- */
+// Debounce function - delays execution until after wait milliseconds
 export function debounce(fn, delay = 300) {
     let timeoutId;
     return function (...args) {
@@ -31,23 +21,13 @@ export function debounce(fn, delay = 300) {
     };
 }
 
-/**
- * Truncate text to a maximum length
- * @param {string} text - Text to truncate
- * @param {number} maxLength - Maximum length
- * @param {string} suffix - Suffix to add (default: '...')
- * @returns {string} Truncated text
- */
+// Truncate text to a maximum length
 export function truncate(text, maxLength, suffix = '...') {
     if (!text || text.length <= maxLength) return text;
     return text.slice(0, maxLength - suffix.length) + suffix;
 }
 
-/**
- * Format file size in human-readable format
- * @param {number} bytes - File size in bytes
- * @returns {string} Formatted size (e.g., "1.5 MB")
- */
+// Format file size in human-readable format
 export function formatFileSize(bytes) {
     if (bytes === 0) return '0 Bytes';
 
@@ -58,11 +38,7 @@ export function formatFileSize(bytes) {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
-/**
- * Generate a random color from a string (useful for avatars)
- * @param {string} str - String to generate color from
- * @returns {string} HSL color string
- */
+// Generate a random color from a string (useful for avatars)
 export function stringToColor(str) {
     if (!str) return 'hsl(0, 50%, 50%)';
 

@@ -3,7 +3,7 @@ import { toast } from 'svelte-sonner';
 import { createSocket, disconnectSocket } from './socket.js';
 import { SOCKET_EVENTS } from './constants.js';
 
-// Composable hook for managing Socket.IO connections in Svelte components
+//============= Composable hook for managing Socket.IO connections in Svelte components =============//
 
 export function useSocket(callbacks = {}) {
     let socket = $state(null);

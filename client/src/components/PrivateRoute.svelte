@@ -13,8 +13,7 @@
         // Watch for auth changes
         const unsubscribe = auth.subscribe(value => {
             if (hasChecked && !value) {
-                toast.error('Du skal være logget ind for at se denne side');
-                navigate('/login', { replace: true });
+                navigate('/', { replace: true });
             }
         });
 

@@ -205,10 +205,6 @@
         color: var(--color-text);
     }
 
-    .invite-btn {
-        /* Global .btn-success styles apply */
-    }
-
     .invite-btn.active {
         background: var(--color-danger);
     }
@@ -271,17 +267,12 @@
         margin-top: var(--space-1);
     }
 
-    .member-action-btn {
-        /* Global .btn-icon styles apply */
-    }
-
     .remove-btn:hover {
         background: var(--color-danger);
         color: white;
         border-color: var(--color-danger);
     }
 
-    /* Invite Section (replaces modal) */
     .invite-section {
         border-top: 2px solid var(--color-border);
         background: var(--color-bg-secondary);

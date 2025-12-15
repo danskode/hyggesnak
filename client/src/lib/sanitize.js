@@ -1,4 +1,4 @@
-// Sanitization utilities using DOMPurify - Protects against XSS attacks in user-generated content
+//============= Sanitization utilities using DOMPurify - Protects against XSS attacks in user-generated content =================//
 
 import DOMPurify from 'dompurify';
 
