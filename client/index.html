@@ -6,13 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Hyggesnakke - start en hyggesnak med din familie og venner (ikke en masse reklamesælgere)</title>
     <script>
-      // Dynamisk favicon baseret på dark/light mode
+      // Dynamic favicon based on dark/light mode
       const updateFavicon = () => {
         const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         const favicon = document.getElementById('favicon');
         favicon.href = isDark
-          ? '/favicon-darkmode.png'
-          : '/favicon-lightmode.png';
+          ? '/images/favicons/favicon-darkmode.png'
+          : '/images/favicons/favicon-lightmode.png';
       };
 
       // Opdater favicon ved load

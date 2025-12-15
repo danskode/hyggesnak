@@ -31,9 +31,9 @@ export async function generateNetworkCode(userId) {
         throw new Error('Kunne ikke generere unik kode. Prøv igen.');
     }
 
-    // Calculate expiry (24 hours from now)
+    // Calculate expiry (1 hours from now)
     const expiresAt = new Date();
-    expiresAt.setHours(expiresAt.getHours() + 24);
+    expiresAt.setHours(expiresAt.getHours() + 1);
 
     // Insert code
     await dbRun(
