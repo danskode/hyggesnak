@@ -737,7 +737,6 @@ footer p {
   align-items: center;
   justify-content: center;
   border-radius: var(--radius-full);
-  background: var(--gradient-primary);
   color: white;
   font-weight: 700;
   flex-shrink: 0;

@@ -13,6 +13,7 @@
     removeHyggesnakInvitation,
     clearAllInvitations
   } from '../stores/invitationsStore.svelte.js';
+  import { onlineUsers } from '../stores/onlineUsersStore.svelte.js';
 
   let isDarkMode = $state(false);
   let socket = null;
@@ -68,6 +69,18 @@
       socket.on('hyggesnak:invitation:rejected', ({ invitationId }) => {
         removeHyggesnakInvitation(invitationId);
       });
+
+      socket.on('users:online', (userIds) => {
+        onlineUsers.set(userIds);
+      });
+
+      socket.on('user:online', ({ userId }) => {
+        onlineUsers.add(userId);
+      });
+
+      socket.on('user:offline', ({ userId }) => {
+        onlineUsers.remove(userId);
+      });
     }
   });
 
@@ -81,6 +94,7 @@
 
   function handleLogout() {
     clearAllInvitations();
+    onlineUsers.clear();
     auth.logout();
     toast.success('Du er nu logget ud');
     navigate('/');

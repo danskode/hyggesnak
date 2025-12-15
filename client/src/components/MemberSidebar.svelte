@@ -3,6 +3,7 @@
     import { sanitizeDisplayName } from '../lib/sanitize.js';
     import { ROLES, API_ENDPOINTS } from '../lib/constants.js';
     import { apiGet, apiPost } from '../lib/api.js';
+    import { onlineUsers } from '../stores/onlineUsersStore.svelte.js';
     import Avatar from './Avatar.svelte';
 
     let {
@@ -109,6 +110,7 @@
                         name={sanitizeDisplayName(member.display_name || member.username)}
                         showCrown={member.role === ROLES.OWNER}
                         size="medium"
+                        isOnline={$onlineUsers.has(member.id)}
                     />
                     <div class="member-details">
                         <div class="member-name">
@@ -157,6 +159,7 @@
                                     <Avatar
                                         name={connection.displayName || connection.username}
                                         size="small"
+                                        isOnline={$onlineUsers.has(connection.userId)}
                                     />
                                     <div class="invite-name">
                                         {connection.displayName || connection.username}

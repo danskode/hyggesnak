@@ -17,6 +17,7 @@
         addHyggesnakInvitation,
         removeHyggesnakInvitation
     } from '../../stores/invitationsStore.svelte.js';
+    import { onlineUsers } from '../../stores/onlineUsersStore.svelte.js';
     import Avatar from '../../components/Avatar.svelte';
 
     //==== State ====//
@@ -285,6 +286,7 @@
                                 <Avatar
                                     name={connection.displayName || connection.username}
                                     size="medium"
+                                    isOnline={$onlineUsers.has(connection.userId)}
                                 />
                                 <div class="user-info">
                                     <h3>{sanitizeDisplayName(connection.displayName || connection.username)}</h3>
@@ -387,6 +389,7 @@
                                             <Avatar
                                                 name={invitation.fromUser.displayName || invitation.fromUser.username}
                                                 size="medium"
+                                                isOnline={$onlineUsers.has(invitation.fromUser.id)}
                                             />
                                             <div class="user-info">
                                                 <h3>{sanitizeDisplayName(invitation.fromUser.displayName || invitation.fromUser.username)}</h3>
@@ -417,6 +420,7 @@
                                             <Avatar
                                                 name={invitation.toUser.displayName || invitation.toUser.username}
                                                 size="medium"
+                                                isOnline={$onlineUsers.has(invitation.toUser.id)}
                                             />
                                             <div class="user-info">
                                                 <h3>{sanitizeDisplayName(invitation.toUser.displayName || invitation.toUser.username)}</h3>

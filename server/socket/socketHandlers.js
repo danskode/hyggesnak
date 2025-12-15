@@ -4,13 +4,23 @@ import db from '../database/db.js';
 
 // Helper function to emit invitation events to specific user
 export function emitToUser(io, userId, eventName, data) {
-    // Find all sockets for this user and emit the event
     const sockets = io.sockets.sockets;
     for (const [socketId, socket] of sockets) {
         if (socket.userId === userId) {
             socket.emit(eventName, data);
         }
     }
+}
+
+function getOnlineUsers(io) {
+    const onlineUserIds = new Set();
+    const sockets = io.sockets.sockets;
+    for (const [socketId, socket] of sockets) {
+        if (socket.userId && socket.userRole !== 'SUPER_ADMIN') {
+            onlineUserIds.add(socket.userId);
+        }
+    }
+    return Array.from(onlineUserIds);
 }
 
 export function setupSocketHandlers(io) {
@@ -54,8 +64,11 @@ export function setupSocketHandlers(io) {
     });
 
     io.on('connection', (socket) => {
+        if (socket.userRole !== 'SUPER_ADMIN') {
+            socket.emit('users:online', getOnlineUsers(io));
+            socket.broadcast.emit('user:online', { userId: socket.userId });
+        }
 
-        // Join hyggesnak room
         socket.on('join-hyggesnak', async (hyggesnakId) => {
             try {
                 // Validate input
@@ -168,20 +181,26 @@ export function setupSocketHandlers(io) {
             }
         });
 
-        // Handle disconnect
         socket.on('disconnect', (reason) => {
-
-            // Clean up all rooms for this socket
             if (socket.currentHyggesnakId) {
                 socket.leave(`hyggesnak-${socket.currentHyggesnakId}`);
             }
 
-            // Force leave all rooms (safety measure)
             socket.rooms.forEach(room => {
                 if (room !== socket.id) {
                     socket.leave(room);
                 }
             });
+
+            if (socket.userRole !== 'SUPER_ADMIN') {
+                const stillOnline = Array.from(io.sockets.sockets.values()).some(
+                    s => s.userId === socket.userId && s.id !== socket.id
+                );
+
+                if (!stillOnline) {
+                    socket.broadcast.emit('user:offline', { userId: socket.userId });
+                }
+            }
         });
     });
 }
