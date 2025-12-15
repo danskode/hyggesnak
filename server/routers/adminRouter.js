@@ -5,8 +5,7 @@ import * as adminService from '../services/adminService.js';
 
 const router = Router();
 
-//==== Admin Middleware ====//
-// All admin routes require authentication and SUPER_ADMIN role
+//==== Admin Middleware - require authentication and SUPER_ADMIN role ====//
 
 router.use(authenticateToken, requireSuperAdmin);
 

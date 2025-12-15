@@ -1,5 +1,4 @@
-// JWT Configuration
-// All authentication-related configuration should be centralized here
+// JWT Configuration - all authentication-related configuration to be centralized here
 
 // JWT_SECRET is set in .env file
 if (!process.env.JWT_SECRET) {

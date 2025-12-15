@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { authenticateToken } from '../middleware/authMiddleware.js';
-import { hyggesnakContextMiddleware, requireHyggesnakOwner } from '../middleware/hyggesnakContextMiddleware.js';
+import { requireHyggesnakContext, requireHyggesnakOwner } from '../middleware/hyggesnakContextMiddleware.js';
 import { membersReadLimiter, membersCreateLimiter, membersDeleteLimiter } from '../middleware/rateLimitersMiddleware.js';
 import db from '../database/db.js';
 import { sanitizeString, validateDisplayName, sanitizeDisplayName } from '../utils/validators.js';
@@ -9,7 +9,7 @@ const router = Router();
 
 //==== GET /api/hyggesnakke/:hyggesnakId/members - List hyggesnak members ====//
 
-router.get('/hyggesnakke/:hyggesnakId/members', authenticateToken, hyggesnakContextMiddleware, membersReadLimiter, (req, res) => {
+router.get('/hyggesnakke/:hyggesnakId/members', authenticateToken, requireHyggesnakContext, membersReadLimiter, (req, res) => {
     const query = `
         SELECT
             u.id,
@@ -36,7 +36,7 @@ router.get('/hyggesnakke/:hyggesnakId/members', authenticateToken, hyggesnakCont
 
 //==== PUT /api/hyggesnakke/:hyggesnakId/members/me/display-name - Update own display name ====//
 
-router.put('/hyggesnakke/:hyggesnakId/members/me/display-name', authenticateToken, hyggesnakContextMiddleware, membersCreateLimiter, (req, res) => {
+router.put('/hyggesnakke/:hyggesnakId/members/me/display-name', authenticateToken, requireHyggesnakContext, membersCreateLimiter, (req, res) => {
     let { display_name } = req.body;
 
     // Sanitize display name
@@ -54,7 +54,7 @@ router.put('/hyggesnakke/:hyggesnakId/members/me/display-name', authenticateToke
     db.run(
         'UPDATE users SET display_name = ? WHERE id = ?',
         [display_name, req.user.id],
-        function(err) {
+        function (err) {
             if (err) {
                 console.error('Database error:', err);
                 return res.status(500).send({ message: "Serverfejl" });
@@ -91,7 +91,7 @@ router.put('/hyggesnakke/:hyggesnakId/members/me/display-name', authenticateToke
 
 //==== PUT /api/hyggesnakke/:hyggesnakId/members/:userId/role - Change member role (owner only) ====//
 
-router.put('/hyggesnakke/:hyggesnakId/members/:userId/role', authenticateToken, hyggesnakContextMiddleware, requireHyggesnakOwner, membersCreateLimiter, (req, res) => {
+router.put('/hyggesnakke/:hyggesnakId/members/:userId/role', authenticateToken, requireHyggesnakContext, requireHyggesnakOwner, membersCreateLimiter, (req, res) => {
     const userId = parseInt(req.params.userId, 10);
     let { role } = req.body;
 
@@ -141,7 +141,7 @@ function updateRole(userId, hyggesnakId, role, res) {
     db.run(
         'UPDATE hyggesnak_memberships SET role = ? WHERE user_id = ? AND hyggesnak_id = ?',
         [role, userId, hyggesnakId],
-        function(err) {
+        function (err) {
             if (err) {
                 console.error('Database error:', err);
                 return res.status(500).send({ message: "Serverfejl" });
@@ -178,7 +178,7 @@ function updateRole(userId, hyggesnakId, role, res) {
 
 //==== DELETE /api/hyggesnakke/:hyggesnakId/members/:userId - Remove member from hyggesnak ====//
 
-router.delete('/hyggesnakke/:hyggesnakId/members/:userId', authenticateToken, hyggesnakContextMiddleware, membersDeleteLimiter, (req, res) => {
+router.delete('/hyggesnakke/:hyggesnakId/members/:userId', authenticateToken, requireHyggesnakContext, membersDeleteLimiter, (req, res) => {
     const userId = parseInt(req.params.userId, 10);
     const hyggesnakId = parseInt(req.params.hyggesnakId, 10);
 
@@ -256,7 +256,7 @@ function performMembershipRemoval(userId, hyggesnakId, res) {
         db.run(
             'DELETE FROM hyggesnak_memberships WHERE user_id = ? AND hyggesnak_id = ?',
             [userId, hyggesnakId],
-            function(err) {
+            function (err) {
                 if (err) {
                     console.error('Database error:', err);
                     return res.status(500).send({ message: "Serverfejl" });

@@ -7,9 +7,7 @@ import { JWT_SECRET, JWT_EXPIRY } from '../config/auth.js';
 import { config } from '../config/config.js';
 
 class AuthService {
-    /**
-     * Login user and generate JWT token
-     */
+    // Login user and generate JWT token
     async login(username, password) {
         return new Promise((resolve, reject) => {
             db.get(
@@ -52,9 +50,7 @@ class AuthService {
         });
     }
 
-    /**
-     * Request password reset - generate and save token
-     */
+    // Request password reset - generate and save token
     async requestPasswordReset(email) {
         return new Promise((resolve, reject) => {
             db.get('SELECT * FROM users WHERE email = ?', [email], (err, user) => {
@@ -98,9 +94,7 @@ class AuthService {
         });
     }
 
-    /**
-     * Reset password with token
-     */
+    // Reset password with token
     async resetPassword(token, newPassword) {
         return new Promise((resolve, reject) => {
             // Hash the incoming token to compare with database

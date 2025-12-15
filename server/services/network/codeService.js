@@ -3,12 +3,7 @@ import { dbGet, dbRun } from '../../database/queryHelpers.js';
 
 //==== Network Invite Code Management ====//
 
-/**
- * Generate a new 6-digit network invite code
- * Automatically revokes any existing active codes for the user
- * @param {number} userId - User ID generating the code
- * @returns {Promise<{code: string, expiresAt: Date}>}
- */
+// Generate a new 6-digit network invite code
 export async function generateNetworkCode(userId) {
     // Revoke any existing active codes
     await revokeUserCodes(userId);
@@ -50,11 +45,7 @@ export async function generateNetworkCode(userId) {
     return { code, expiresAt };
 }
 
-/**
- * Get user's current active network code
- * @param {number} userId
- * @returns {Promise<{code: string, created_at: Date, expires_at: Date} | null>}
- */
+// Get user's current active network code
 export async function getUserActiveCode(userId) {
     return await dbGet(
         `SELECT code, created_at, expires_at
@@ -67,11 +58,7 @@ export async function getUserActiveCode(userId) {
     );
 }
 
-/**
- * Revoke all active codes for a user
- * @param {number} userId
- * @returns {Promise<void>}
- */
+// Revoke all active codes for a user
 export async function revokeUserCodes(userId) {
     await dbRun(
         'UPDATE network_invite_codes SET is_active = 0 WHERE created_by = ? AND is_active = 1',
@@ -79,15 +66,11 @@ export async function revokeUserCodes(userId) {
     );
 }
 
-/**
- * Validate a network invite code
- * @param {string} code
- * @returns {Promise<{valid: boolean, codeData?: object, error?: string}>}
- */
+// Validate a network invite code
 export async function validateNetworkCode(code) {
     // Validate format
     if (!/^[0-9]{6}$/.test(code)) {
-        return { valid: false, error: 'Ugyldig kode format. Koden skal være 6 cifre.' };
+        return { valid: false, error: 'Ugyldig format. Koden skal være 6 cifre.' };
     }
 
     // Get code data

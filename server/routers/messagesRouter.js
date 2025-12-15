@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { authenticateToken } from '../middleware/authMiddleware.js';
-import { hyggesnakContextMiddleware } from '../middleware/hyggesnakContextMiddleware.js';
+import { requireHyggesnakContext } from '../middleware/hyggesnakContextMiddleware.js';
 import db from '../database/db.js';
 import { sanitizeString } from '../utils/validators.js';
 
@@ -8,7 +8,7 @@ const router = Router();
 
 //==== GET /api/hyggesnakke/:hyggesnakId/messages - Get messages for hyggesnak ====//
 
-router.get('/hyggesnakke/:hyggesnakId/messages', authenticateToken, hyggesnakContextMiddleware, (req, res) => {
+router.get('/hyggesnakke/:hyggesnakId/messages', authenticateToken, requireHyggesnakContext, (req, res) => {
     const { limit = 50, before_id, after_id } = req.query;
     const hyggesnakId = req.params.hyggesnakId;
 
@@ -71,7 +71,7 @@ router.get('/hyggesnakke/:hyggesnakId/messages', authenticateToken, hyggesnakCon
 
 //==== POST /api/hyggesnakke/:hyggesnakId/messages - Send new message ====//
 
-router.post('/hyggesnakke/:hyggesnakId/messages', authenticateToken, hyggesnakContextMiddleware, (req, res) => {
+router.post('/hyggesnakke/:hyggesnakId/messages', authenticateToken, requireHyggesnakContext, (req, res) => {
     let { content } = req.body;
 
     // Validate content first (before sanitization to check real length)
@@ -98,7 +98,7 @@ router.post('/hyggesnakke/:hyggesnakId/messages', authenticateToken, hyggesnakCo
         VALUES (?, ?, ?)
     `;
 
-    db.run(query, [hyggesnakId, userId, content.trim()], function(err) {
+    db.run(query, [hyggesnakId, userId, content.trim()], function (err) {
         if (err) {
             console.error('Database error creating message:', err);
             return res.status(500).send({ message: "Serverfejl ved oprettelse af besked" });
@@ -195,7 +195,7 @@ router.put('/messages/:messageId', authenticateToken, (req, res) => {
                 WHERE id = ?
             `;
 
-            db.run(updateQuery, [content.trim(), messageId], function(err) {
+            db.run(updateQuery, [content.trim(), messageId], function (err) {
                 if (err) {
                     console.error('Database error updating message:', err);
                     return res.status(500).send({ message: "Serverfejl ved opdatering af besked" });
@@ -271,7 +271,7 @@ router.delete('/messages/:messageId', authenticateToken, (req, res) => {
             db.run(
                 'UPDATE messages SET is_deleted = 1 WHERE id = ?',
                 [messageId],
-                function(err) {
+                function (err) {
                     if (err) {
                         console.error('Database error deleting message:', err);
                         return res.status(500).send({ message: "Serverfejl ved sletning af besked" });

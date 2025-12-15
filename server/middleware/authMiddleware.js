@@ -29,7 +29,7 @@ export const authenticateToken = (req, res, next) => {
 
         // Unknown error - generic response
         return res.status(403).send({
-            message: "Autentificering fejlede"
+            message: "Autentificering fejlede ..."
         });
     }
 };

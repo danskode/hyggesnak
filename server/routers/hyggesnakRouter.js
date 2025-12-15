@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { authenticateToken } from '../middleware/authMiddleware.js';
-import { hyggesnakContextMiddleware, requireHyggesnakAdmin } from '../middleware/hyggesnakContextMiddleware.js';
+import { requireHyggesnakContext, requireHyggesnakOwner } from '../middleware/hyggesnakContextMiddleware.js';
 import { membersReadLimiter, membersCreateLimiter, membersDeleteLimiter } from '../middleware/rateLimitersMiddleware.js';
 import db from '../database/db.js';
 import { validateHyggesnakName, validateDisplayName, sanitizeString, sanitizeDisplayName } from '../utils/validators.js';
@@ -154,7 +154,7 @@ router.post('/hyggesnakke', authenticateToken, membersCreateLimiter, async (req,
 
 //==== GET /api/hyggesnakke/:id - Get hyggesnak details ====//
 
-router.get('/hyggesnakke/:hyggesnakId', authenticateToken, hyggesnakContextMiddleware, membersReadLimiter, (req, res) => {
+router.get('/hyggesnakke/:hyggesnakId', authenticateToken, requireHyggesnakContext, membersReadLimiter, (req, res) => {
     // Context middleware already verified membership, so we can use req.hyggesnak
     const query = `
         SELECT
@@ -189,7 +189,7 @@ router.get('/hyggesnakke/:hyggesnakId', authenticateToken, hyggesnakContextMiddl
 
 //==== PUT /api/hyggesnakke/:id - Update hyggesnak display_name (admin only) ====//
 
-router.put('/hyggesnakke/:hyggesnakId', authenticateToken, hyggesnakContextMiddleware, requireHyggesnakAdmin, membersCreateLimiter, (req, res) => {
+router.put('/hyggesnakke/:hyggesnakId', authenticateToken, requireHyggesnakContext, requireHyggesnakOwner, membersCreateLimiter, (req, res) => {
     let { display_name } = req.body;
 
     // Sanitize display name
@@ -241,7 +241,7 @@ router.put('/hyggesnakke/:hyggesnakId', authenticateToken, hyggesnakContextMiddl
 
 //==== DELETE /api/hyggesnakke/:id - Delete hyggesnak (Owner only) ====//
 
-router.delete('/hyggesnakke/:hyggesnakId', authenticateToken, hyggesnakContextMiddleware, requireHyggesnakAdmin, membersDeleteLimiter, (req, res) => {
+router.delete('/hyggesnakke/:hyggesnakId', authenticateToken, requireHyggesnakContext, requireHyggesnakOwner, membersDeleteLimiter, (req, res) => {
     const hyggesnakId = parseInt(req.params.hyggesnakId, 10);
 
     // Get hyggesnak details before deletion

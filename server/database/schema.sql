@@ -1,5 +1,4 @@
--- Hyggesnak Database Schema
--- Clean schema without migrations - for fresh installs only
+-- Hyggesnakke Database Schema
 
 -- ============================================
 -- 1. Users Table

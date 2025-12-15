@@ -2,12 +2,7 @@ import { dbGet, dbAll, dbRun } from '../../database/queryHelpers.js';
 
 //==== Network Connection Management ====//
 
-/**
- * Check if two users are connected in the network
- * @param {number} userId1
- * @param {number} userId2
- * @returns {Promise<boolean>}
- */
+// Check to see if two users are connected
 export async function areUsersConnected(userId1, userId2) {
     const user1 = Math.min(userId1, userId2);
     const user2 = Math.max(userId1, userId2);
@@ -20,11 +15,7 @@ export async function areUsersConnected(userId1, userId2) {
     return !!connection;
 }
 
-/**
- * Get all network connections for a user
- * @param {number} userId
- * @returns {Promise<Array>}
- */
+// Get all network connections for a user
 export async function getNetworkConnections(userId) {
     return await dbAll(
         `SELECT
@@ -48,15 +39,10 @@ export async function getNetworkConnections(userId) {
     );
 }
 
-/**
- * Remove a network connection
- * @param {number} userId1
- * @param {number} userId2
- * @returns {Promise<void>}
- */
+// Remove a network connection
 export async function removeNetworkConnection(userId1, userId2) {
     if (userId1 === userId2) {
-        throw new Error('Kan ikke fjerne forbindelse til dig selv');
+        throw new Error('Du kan altså ikke fjerne forbindelse til dig selv');
     }
 
     const user1 = Math.min(userId1, userId2);

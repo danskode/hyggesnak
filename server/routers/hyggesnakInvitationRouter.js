@@ -10,9 +10,7 @@ const router = Router();
 // All routes require authentication
 router.use(authenticateToken);
 
-// ============================================
-// Hyggesnak Invitation Management (OWNER)
-// ============================================
+// ======= Hyggesnak Invitation Management (OWNER) ============//
 
 // POST /api/hyggesnakke/:hyggesnakId/invite
 router.post('/hyggesnakke/:hyggesnakId/invite',

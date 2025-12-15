@@ -1,19 +1,9 @@
 import db from '../database/db.js';
 import { areUsersConnected } from './networkService.js';
 
-/**
- * Hyggesnak Invitation Service
- * Handles hyggesnak invitation workflow (send, accept, reject)
- * Replaces the old immediate-join invite code system with approval-based invitations
- */
+//================ Hyggesnak Invitation Service - Handles hyggesnak invitation workflow (send, accept, reject) =============//
 
-/**
- * Send a hyggesnak invitation to a network connection
- * @param {number} hyggesnakId
- * @param {number} invitedUserId - User being invited
- * @param {number} invitedByUserId - User sending the invitation (must be OWNER)
- * @returns {Promise<{invitationId: number, hyggesnak: object, invitedUser: object}>}
- */
+// Send a hyggesnak invitation to a network connection
 export async function sendHyggesnakInvitation(hyggesnakId, invitedUserId, invitedByUserId) {
     // Verify inviter is owner of the hyggesnak
     const membership = await new Promise((resolve, reject) => {
@@ -114,7 +104,7 @@ export async function sendHyggesnakInvitation(hyggesnakId, invitedUserId, invite
                 `INSERT INTO hyggesnak_invitations (hyggesnak_id, invited_user_id, invited_by_user_id)
                  VALUES (?, ?, ?)`,
                 [hyggesnakId, invitedUserId, invitedByUserId],
-                function(err) {
+                function (err) {
                     if (err) reject(err);
                     else resolve(this.lastID);
                 }
@@ -149,11 +139,7 @@ export async function sendHyggesnakInvitation(hyggesnakId, invitedUserId, invite
     return { invitationId, hyggesnak, invitedUser };
 }
 
-/**
- * Get pending hyggesnak invitations for a user
- * @param {number} userId
- * @returns {Promise<Array>}
- */
+// Get pending hyggesnak invitations for a user
 export async function getPendingInvitations(userId) {
     return new Promise((resolve, reject) => {
         db.all(
@@ -181,11 +167,7 @@ export async function getPendingInvitations(userId) {
     });
 }
 
-/**
- * Get pending invitations for a specific hyggesnak (OWNER only)
- * @param {number} hyggesnakId
- * @returns {Promise<Array>}
- */
+// Get pending invitations for a specific hyggesnak (OWNER only)
 export async function getHyggesnakPendingInvitations(hyggesnakId) {
     return new Promise((resolve, reject) => {
         db.all(
@@ -209,13 +191,7 @@ export async function getHyggesnakPendingInvitations(hyggesnakId) {
     });
 }
 
-/**
- * Accept a hyggesnak invitation
- * Creates membership and marks invitation as accepted
- * @param {number} invitationId
- * @param {number} userId - User accepting (must be the invited user)
- * @returns {Promise<{hyggesnak: object}>}
- */
+// Accept a hyggesnak invitation
 export async function acceptHyggesnakInvitation(invitationId, userId) {
     // Get invitation
     const invitation = await new Promise((resolve, reject) => {
@@ -319,11 +295,7 @@ export async function acceptHyggesnakInvitation(invitationId, userId) {
     });
 }
 
-/**
- * Reject a hyggesnak invitation
- * @param {number} invitationId
- * @param {number} userId - User rejecting (must be the invited user)
- */
+// Reject a hyggesnak invitation
 export async function rejectHyggesnakInvitation(invitationId, userId) {
     const invitation = await new Promise((resolve, reject) => {
         db.get(
@@ -362,12 +334,7 @@ export async function rejectHyggesnakInvitation(invitationId, userId) {
     });
 }
 
-/**
- * Cancel a pending hyggesnak invitation (OWNER only)
- * @param {number} invitationId
- * @param {number} hyggesnakId
- * @param {number} userId - User canceling (must be OWNER)
- */
+// Cancel a pending hyggesnak invitation (OWNER only)
 export async function cancelHyggesnakInvitation(invitationId, hyggesnakId, userId) {
     // Verify user is owner
     const membership = await new Promise((resolve, reject) => {
@@ -402,7 +369,7 @@ export async function cancelHyggesnakInvitation(invitationId, hyggesnakId, userI
     }
 
     if (invitation.hyggesnak_id !== hyggesnakId) {
-        throw new Error('Invitation tilhører ikke denne hyggesnak');
+        throw new Error('Hmm, den invitation kan du ikke bruge her ...');
     }
 
     if (invitation.status !== 'PENDING') {

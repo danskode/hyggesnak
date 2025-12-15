@@ -12,14 +12,7 @@ import { ValidationError, NotFoundError, ConflictError } from '../utils/errors.j
 
 //==== User Management Functions ====//
 
-/**
- * Get paginated list of users with optional search
- * @param {Object} params - Query parameters
- * @param {number} params.page - Page number (default: 1)
- * @param {number} params.limit - Items per page (default: 50)
- * @param {string} params.search - Search term for username/email
- * @returns {Promise<Object>} Users with pagination metadata
- */
+// Get paginated list of users with optional search
 export async function getUsers({ page = 1, limit = 50, search = '' }) {
     const offset = (page - 1) * limit;
 
@@ -64,16 +57,7 @@ export async function getUsers({ page = 1, limit = 50, search = '' }) {
     };
 }
 
-/**
- * Create a new user
- * @param {Object} userData - User data
- * @param {string} userData.username - Username
- * @param {string} userData.display_name - Display name (optional)
- * @param {string} userData.email - Email address
- * @param {string} userData.password - Plain text password
- * @param {string} userData.role - User role (USER or SUPER_ADMIN)
- * @returns {Promise<Object>} Created user
- */
+// Create a new user
 export async function createUser({ username, display_name, email, password, role = 'USER' }) {
     // Validate username
     const usernameValidation = validateUsername(username);
@@ -134,15 +118,7 @@ export async function createUser({ username, display_name, email, password, role
     }
 }
 
-/**
- * Update user details
- * @param {number} userId - User ID to update
- * @param {Object} updates - Fields to update
- * @param {string} updates.display_name - New display name
- * @param {string} updates.email - New email
- * @param {string} updates.role - New role
- * @returns {Promise<Object>} Updated user
- */
+// Update user details
 export async function updateUser(userId, updates) {
     // Verify user exists
     const user = await dbGet('SELECT id FROM users WHERE id = ?', [userId]);
@@ -211,12 +187,7 @@ export async function updateUser(userId, updates) {
     return updatedUser;
 }
 
-/**
- * Delete a user
- * @param {number} userId - User ID to delete
- * @param {number} currentUserId - ID of admin performing the deletion
- * @returns {Promise<Object>} Deleted user info
- */
+// Delete a user
 export async function deleteUser(userId, currentUserId) {
     // Verify user exists
     const user = await dbGet('SELECT id, username FROM users WHERE id = ?', [userId]);
@@ -238,14 +209,7 @@ export async function deleteUser(userId, currentUserId) {
 
 //==== Hyggesnak Management Functions ====//
 
-/**
- * Get paginated list of hyggesnakke with optional search
- * @param {Object} params - Query parameters
- * @param {number} params.page - Page number (default: 1)
- * @param {number} params.limit - Items per page (default: 50)
- * @param {string} params.search - Search term for name/display_name
- * @returns {Promise<Object>} Hyggesnakke with pagination metadata
- */
+// Get paginated list of hyggesnakke with optional search
 export async function getHyggesnakke({ page = 1, limit = 50, search = '' }) {
     const offset = (page - 1) * limit;
 
@@ -291,11 +255,7 @@ export async function getHyggesnakke({ page = 1, limit = 50, search = '' }) {
     };
 }
 
-/**
- * Get hyggesnak details with members
- * @param {number} hyggesnakId - Hyggesnak ID
- * @returns {Promise<Object>} Hyggesnak with members
- */
+// Get hyggesnak details with members
 export async function getHyggesnakDetails(hyggesnakId) {
     // Get hyggesnak details
     const hyggesnak = await dbGet(
@@ -329,11 +289,7 @@ export async function getHyggesnakDetails(hyggesnakId) {
     };
 }
 
-/**
- * Delete a hyggesnak
- * @param {number} hyggesnakId - Hyggesnak ID to delete
- * @returns {Promise<Object>} Deleted hyggesnak info
- */
+// Delete a hyggesnak
 export async function deleteHyggesnak(hyggesnakId) {
     // Verify hyggesnak exists
     const hyggesnak = await dbGet(
@@ -353,10 +309,7 @@ export async function deleteHyggesnak(hyggesnakId) {
 
 //==== System Statistics Functions ====//
 
-/**
- * Get system statistics
- * @returns {Promise<Object>} System statistics
- */
+// Get system statistics
 export async function getSystemStats() {
     // Get total users
     const { totalUsers } = await dbGet('SELECT COUNT(*) as totalUsers FROM users');

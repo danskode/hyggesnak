@@ -13,9 +13,7 @@ const router = Router();
 // All network routes require authentication
 router.use(authenticateToken);
 
-// ============================================
-// Network Invite Code Endpoints
-// ============================================
+// ========== Network Invite Code Endpoints =================//
 
 // POST /api/network/generate-code - Generate a new 6-digit network invite code
 router.post('/generate-code', networkCodeGenerateLimiter, async (req, res, next) => {
@@ -76,9 +74,7 @@ router.delete('/my-code', async (req, res, next) => {
     }
 });
 
-// ============================================
-// Network Connection Endpoints
-// ============================================
+// ============ Network Connection Endpoints ================//
 
 // POST /api/network/connect
 router.post('/connect', networkConnectLimiter, async (req, res, next) => {
@@ -86,7 +82,7 @@ router.post('/connect', networkConnectLimiter, async (req, res, next) => {
         const { code } = req.body;
 
         if (!code || typeof code !== 'string') {
-            const error = new Error('Netværkskode er påkrævet');
+            const error = new Error('Unik vennekode påkrævet');
             error.status = 400;
             return next(error);
         }
@@ -109,7 +105,7 @@ router.post('/connect', networkConnectLimiter, async (req, res, next) => {
         }
 
         res.status(201).send({
-            message: `Netværksanmodning sendt til ${result.toUser.display_name || result.toUser.username}`,
+            message: `Venneanmodning sendt til ${result.toUser.display_name || result.toUser.username}`,
             data: {
                 invitationId: result.invitationId,
                 toUser: {
@@ -143,7 +139,7 @@ router.get('/connections', async (req, res, next) => {
         });
     } catch (error) {
         error.status = 500;
-        error.message = 'Kunne ikke hente netværksforbindelser';
+        error.message = 'Kunne ikke hente venner';
         next(error);
     }
 });
@@ -166,18 +162,16 @@ router.delete('/connections/:userId', async (req, res, next) => {
         emitToUser(io, targetUserId, 'network:connection:removed', { removedUserId: req.user.id });
 
         res.send({
-            message: 'Netværksforbindelse fjernet'
+            message: 'Relation fjernet'
         });
     } catch (error) {
         error.status = error.status || 500;
-        error.message = error.message || 'Kunne ikke fjerne netværksforbindelse';
+        error.message = error.message || 'Kunne ikke fjerne relationen';
         next(error);
     }
 });
 
-// ============================================
-// Network Invitation Endpoints
-// ============================================
+// =========== Network Invitation Endpoints ==============//
 
 // GET /api/network/invitations/incoming
 router.get('/invitations/incoming', async (req, res, next) => {
@@ -200,7 +194,7 @@ router.get('/invitations/incoming', async (req, res, next) => {
         });
     } catch (error) {
         error.status = 500;
-        error.message = 'Kunne ikke hente netværksinvitationer';
+        error.message = 'Kunne ikke hente venneinvitationer';
         next(error);
     }
 });
@@ -226,7 +220,7 @@ router.get('/invitations/outgoing', async (req, res, next) => {
         });
     } catch (error) {
         error.status = 500;
-        error.message = 'Kunne ikke hente udgående invitationer';
+        error.message = 'Kunne ikke hente udgående venneinvitationer';
         next(error);
     }
 });
@@ -303,7 +297,7 @@ router.put('/invitations/:id/reject', invitationResponseLimiter, async (req, res
         const invitationId = parseInt(req.params.id, 10);
 
         if (isNaN(invitationId) || invitationId <= 0) {
-            const error = new Error('Ugyldigt invitation ID');
+            const error = new Error('Ugyldigt invitations-ID');
             error.status = 400;
             return next(error);
         }
@@ -328,7 +322,7 @@ router.put('/invitations/:id/reject', invitationResponseLimiter, async (req, res
         });
     } catch (error) {
         error.status = error.status || 500;
-        error.message = error.message || 'Kunne ikke afvise invitation';
+        error.message = error.message || 'Kunne ikke afvise invitationen';
         next(error);
     }
 });
@@ -347,7 +341,7 @@ router.delete('/invitations/:id/cancel', async (req, res, next) => {
         await networkService.cancelNetworkInvitation(invitationId, req.user.id);
 
         res.send({
-            message: 'Netværksanmodning annulleret'
+            message: 'Venneanmodning annulleret'
         });
     } catch (error) {
         error.status = error.status || 500;

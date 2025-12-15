@@ -5,7 +5,6 @@ import { loginLimiter, forgotPasswordLimiter, resetPasswordLimiter } from '../mi
 
 const router = Router();
 
-
 //==== Login route ====//
 
 router.post('/login', loginLimiter, async (req, res) => {

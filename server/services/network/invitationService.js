@@ -4,12 +4,7 @@ import { areUsersConnected } from './connectionService.js';
 
 //==== Network Invitation Management ====//
 
-/**
- * Create a network invitation using an invite code
- * @param {number} fromUserId - User sending the invitation
- * @param {string} code - 6-digit invite code
- * @returns {Promise<{invitationId: number, toUser: object}>}
- */
+// Create a network invitation using an invite code
 export async function createNetworkInvitation(fromUserId, code) {
     // Validate code
     const validation = await validateNetworkCode(code);
@@ -39,7 +34,7 @@ export async function createNetworkInvitation(fromUserId, code) {
     );
 
     if (existingPendingInvitation) {
-        throw new Error('Du har allerede sendt en anmodning til denne bruger');
+        throw new Error('Du har allerede sendt en venneanmodning til denne bruger');
     }
 
     // Create invitation and mark code as used in transaction
@@ -51,7 +46,7 @@ export async function createNetworkInvitation(fromUserId, code) {
             [fromUserId, toUserId]
         );
 
-        // Mark code as used (deactivate it)
+        // Mark code as used = deactivate it
         await dbRun(
             `UPDATE network_invite_codes
              SET is_active = 0
@@ -71,11 +66,7 @@ export async function createNetworkInvitation(fromUserId, code) {
     return result;
 }
 
-/**
- * Get incoming network invitations for a user
- * @param {number} userId
- * @returns {Promise<Array>}
- */
+// Get incoming network invitations for a user
 export async function getIncomingInvitations(userId) {
     return await dbAll(
         `SELECT
@@ -92,11 +83,7 @@ export async function getIncomingInvitations(userId) {
     );
 }
 
-/**
- * Get outgoing network invitations for a user
- * @param {number} userId
- * @returns {Promise<Array>}
- */
+// Get outgoing network invitations for a user
 export async function getOutgoingInvitations(userId) {
     return await dbAll(
         `SELECT
@@ -113,13 +100,7 @@ export async function getOutgoingInvitations(userId) {
     );
 }
 
-/**
- * Accept a network invitation
- * Creates bidirectional network connection and marks invitation as accepted
- * @param {number} invitationId
- * @param {number} userId - User accepting (must be the recipient)
- * @returns {Promise<{connectionId: number, user: object}>}
- */
+// Accept a network invitation
 export async function acceptNetworkInvitation(invitationId, userId) {
     // Get invitation
     const invitation = await dbGet(
@@ -134,17 +115,17 @@ export async function acceptNetworkInvitation(invitationId, userId) {
     }
 
     if (invitation.to_user_id !== userId) {
-        throw new Error('Du kan kun acceptere invitationer sendt til dig');
+        throw new Error('Invitation ikke fundet');
     }
 
     if (invitation.status !== 'PENDING') {
-        throw new Error('Denne invitation er allerede behandlet');
+        throw new Error('Invitation ikke fundet');
     }
 
     // Check if already connected (race condition protection)
     const alreadyConnected = await areUsersConnected(invitation.from_user_id, invitation.to_user_id);
     if (alreadyConnected) {
-        throw new Error('I er allerede forbundet');
+        throw new Error('I er allerede i hinandens netværk!');
     }
 
     // Use transaction for atomicity
@@ -179,12 +160,7 @@ export async function acceptNetworkInvitation(invitationId, userId) {
     return result;
 }
 
-/**
- * Reject a network invitation
- * @param {number} invitationId
- * @param {number} userId - User rejecting (must be the recipient)
- * @returns {Promise<{fromUserId: number}>}
- */
+// Reject a network invitation
 export async function rejectNetworkInvitation(invitationId, userId) {
     const invitation = await dbGet(
         'SELECT id, from_user_id, to_user_id, status FROM network_invitations WHERE id = ?',
@@ -196,11 +172,11 @@ export async function rejectNetworkInvitation(invitationId, userId) {
     }
 
     if (invitation.to_user_id !== userId) {
-        throw new Error('Du kan kun afvise invitationer sendt til dig');
+        throw new Error('Invitation ikke fundet');
     }
 
     if (invitation.status !== 'PENDING') {
-        throw new Error('Denne invitation er allerede behandlet');
+        throw new Error('Invitation ikke fundet');
     }
 
     await dbRun(
@@ -213,12 +189,7 @@ export async function rejectNetworkInvitation(invitationId, userId) {
     return { fromUserId: invitation.from_user_id };
 }
 
-/**
- * Cancel an outgoing network invitation
- * @param {number} invitationId
- * @param {number} userId - User canceling (must be the sender)
- * @returns {Promise<void>}
- */
+// Cancel an outgoing network invitation
 export async function cancelNetworkInvitation(invitationId, userId) {
     const invitation = await dbGet(
         'SELECT id, from_user_id, to_user_id, status FROM network_invitations WHERE id = ?',
@@ -230,7 +201,7 @@ export async function cancelNetworkInvitation(invitationId, userId) {
     }
 
     if (invitation.from_user_id !== userId) {
-        throw new Error('Du kan kun annullere invitationer du har sendt');
+        throw new Error('Invitation ikke fundet');
     }
 
     if (invitation.status !== 'PENDING') {

@@ -1,12 +1,9 @@
 import db from '../database/db.js';
 
-/**
- * Hyggesnak Context Middleware
- * Validates that the authenticated user is a member of the requested hyggesnak.
- * Must be used AFTER authenticateToken middleware.
-**/
+// Hyggesnak Context Middleware: Validates that the authenticated user is a member of the requested hyggesnak.
+// Must be used AFTER authenticateToken middleware.
 export const requireHyggesnakContext = (req, res, next) => {
-    // 1. Extract hyggesnak ID from route params
+
     const hyggesnakId = parseInt(req.params.hyggesnakId, 10);
 
     if (isNaN(hyggesnakId) || hyggesnakId <= 0) {
@@ -15,14 +12,12 @@ export const requireHyggesnakContext = (req, res, next) => {
         });
     }
 
-    // 2. Verify user is authenticated (should be guaranteed by authenticateToken)
     if (!req.user || !req.user.id) {
         return res.status(401).send({
             message: "Du skal være logget ind"
         });
     }
 
-    // 3. Check if user is member and connected to all members
     const membershipQuery = `
         SELECT
             h.id,
@@ -97,7 +92,3 @@ export const requireHyggesnakOwner = (req, res, next) => {
 
     next();
 };
-
-// Backwards compatibility alias
-export const hyggesnakContextMiddleware = requireHyggesnakContext;
-export const requireHyggesnakAdmin = requireHyggesnakOwner;

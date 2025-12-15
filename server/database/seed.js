@@ -4,7 +4,7 @@ import { config } from '../config/config.js';
 
 // Prevent seeding in production
 if (process.env.NODE_ENV === 'production') {
-    console.error('❌ CANNOT RUN SEED IN PRODUCTION! Exiting...');
+    console.error('CANNOT RUN SEED IN PRODUCTION! Exiting...');
     process.exit(1);
 }
 
@@ -21,34 +21,33 @@ const users = [
         username: 'john',
         display_name: 'John (Admin)',
         password: process.env.SEED_ADMIN_PASSWORD || 'Familien1!',
-        email: 'john@hyggesnak.dk',
+        email: 'john@hyggesnakke.dk',
         role: 'SUPER_ADMIN'
     },
     {
         username: 'mor',
         display_name: 'Mor 👩🏼‍🚀',
         password: process.env.SEED_PASSWORD || 'Familien1!',
-        email: 'mor@hyggesnak.dk',
+        email: 'mor@hyggesnakke.dk',
         role: 'USER'
     },
     {
         username: 'far',
         display_name: 'Farmand 👨🏻‍🍼',
         password: process.env.SEED_PASSWORD || 'Familien1!',
-        email: 'far@hyggesnak.dk',
+        email: 'far@hyggesnakke.dk',
         role: 'USER'
     },
     {
         username: 'lillebror',
         display_name: 'Lillebror 👦🏻',
         password: process.env.SEED_PASSWORD || 'Familien1!',
-        email: 'lillebror@hyggesnak.dk',
+        email: 'lillebror@hyggesnakke.dk',
         role: 'USER'
     }
 ];
 
 // Memberships: [userId, hyggesnakId, role]
-// Will be populated after users and hyggesnakke are created
 const memberships = [
     // Mor is owner of all hyggesnakke
     [2, 1, 'OWNER'],  // Mor -> Familien (OWNER)
@@ -64,7 +63,6 @@ const memberships = [
 ];
 
 // Network connections: [userId1, userId2]
-// Note: user_id_1 must be < user_id_2 for consistency
 // John (SUPER_ADMIN) is NOT part of the network system
 const networkConnections = [
     [2, 3], // Mor <-> Far (both in Familien and Vennegruppen)
@@ -73,12 +71,10 @@ const networkConnections = [
 ];
 
 async function seedDatabase() {
-    console.log('⚠️  SEEDING DATABASE WITH DEVELOPMENT DATA');
+    console.log('SEEDING DATABASE WITH DEVELOPMENT DATA');
     console.log('This should ONLY be run in development!');
     console.log('Environment:', process.env.NODE_ENV || 'development');
     console.log('');
-
-    // Wait for database initialization and migrations to complete
     console.log('Waiting for database initialization...');
     await dbReady;
     console.log('Database ready! Starting seed...\n');
