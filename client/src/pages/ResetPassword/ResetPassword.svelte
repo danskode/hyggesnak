@@ -1,10 +1,10 @@
 <script>
-    import { apiPost } from '../../lib/api.js';
-    import { API_ENDPOINTS } from '../../lib/constants.js';
+    import { apiPost } from '../../lib/api/api.js';
+    import { API_ENDPOINTS } from '../../lib/utils/constants.js';
     import { toast } from 'svelte-sonner';
     import { navigate, Link } from 'svelte-routing';
     import { onMount } from 'svelte';
-    import { validatePassword } from '../../lib/validators.js';
+    import { validatePassword } from '../../lib/utils/validators.js';
 
     let newPassword = $state('');
     let confirmPassword = $state('');

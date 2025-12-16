@@ -1,7 +1,5 @@
-import { get } from 'svelte/store';
-import { persistentStore } from '../lib/persistentStore.js';
-import { hyggesnakke, currentHyggesnak } from './hyggesnakStore.svelte.js';
-import { apiGet } from '../lib/api.js';
+import { persistentStore } from './persistentStore.js';
+import { hyggesnakke, currentHyggesnak } from './hyggesnakStore.js';
 
 //============== Create persistent auth store ==================//
 
@@ -23,7 +21,6 @@ export const auth = {
     },
 
     getToken: () => {
-        const value = get(authStore);
         return value?.token || null;
     }
 };

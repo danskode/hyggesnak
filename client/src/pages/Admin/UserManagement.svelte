@@ -1,10 +1,10 @@
 <script>
     import { onMount } from 'svelte';
     import { toast } from 'svelte-sonner';
-    import { auth } from '../../stores/authStore.svelte.js';
-    import { apiGet, apiPost, apiDelete } from '../../lib/api.js';
-    import { API_ENDPOINTS } from '../../lib/constants.js';
-    import { validateUsername, validateEmail, validatePassword, validateDisplayName } from '../../lib/validators';
+    import { auth } from '../../lib/stores/authStore.js';
+    import { apiGet, apiPost, apiDelete } from '../../lib/api/api.js';
+    import { API_ENDPOINTS } from '../../lib/utils/constants.js';
+    import { validateUsername, validateEmail, validatePassword, validateDisplayName } from '../../lib/utils/validators.js';
 
     let users = $state([]);
     let loading = $state(true);

@@ -1,11 +1,11 @@
 <script>
     import { onMount } from 'svelte';
     import { toast } from 'svelte-sonner';
-    import { currentHyggesnak, hyggesnakke } from '../../stores/hyggesnakStore.svelte.js';
-    import { sanitizeDisplayName, sanitizeHyggesnakName } from '../../lib/sanitize.js';
-    import { useSocket } from '../../lib/useSocket.svelte.js';
-    import { apiGet, apiPost, apiPut, apiDelete } from '../../lib/api.js';
-    import { API_ENDPOINTS } from '../../lib/constants.js';
+    import { currentHyggesnak, hyggesnakke } from '../../lib/stores/hyggesnakStore.js';
+    import { sanitizeDisplayName, sanitizeHyggesnakName } from '../../lib/utils/sanitize.js';
+    import { useSocket } from '../../lib/composables/useSocket.js';
+    import { apiGet, apiPost, apiPut, apiDelete } from '../../lib/api/api.js';
+    import { API_ENDPOINTS } from '../../lib/utils/constants.js';
     import {
         fetchAllInvitations,
         networkInvitationsIncoming,
@@ -16,9 +16,9 @@
         removeNetworkInvitationOutgoing,
         addHyggesnakInvitation,
         removeHyggesnakInvitation
-    } from '../../stores/invitationsStore.svelte.js';
-    import { onlineUsers } from '../../stores/onlineUsersStore.svelte.js';
-    import Avatar from '../../components/Avatar.svelte';
+    } from '../../lib/stores/invitationsStore.js';
+    import { onlineUsers } from '../../lib/stores/onlineUsersStore.js';
+    import Avatar from '../../lib/components/Avatar.svelte';
 
     //==== State ====//
     let myCode = $state(null);

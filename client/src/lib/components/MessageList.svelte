@@ -1,6 +1,6 @@
 <script>
-    import { sanitizeMessage, sanitizeDisplayName } from '../lib/sanitize.js';
-    import { MESSAGE_MAX_LENGTH } from '../lib/constants.js';
+    import { sanitizeMessage, sanitizeDisplayName } from '../utils/sanitize.js';
+    import { MESSAGE_MAX_LENGTH } from '../utils/constants.js';
 
     let {
         messages = [],

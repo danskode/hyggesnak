@@ -1,9 +1,9 @@
 <script>
   import { onDestroy } from 'svelte';
   import { Link, navigate } from 'svelte-routing';
-  import { auth } from '../stores/authStore.svelte.js';
+  import { auth } from '../stores/authStore.js';
   import { toast } from 'svelte-sonner';
-  import { useSocket } from '../lib/useSocket.svelte.js';
+  import { useSocket } from '../composables/useSocket.js';
   import {
     fetchAllInvitations,
     totalPendingInvitations,
@@ -12,8 +12,8 @@
     addHyggesnakInvitation,
     removeHyggesnakInvitation,
     clearAllInvitations
-  } from '../stores/invitationsStore.svelte.js';
-  import { onlineUsers } from '../stores/onlineUsersStore.svelte.js';
+  } from '../stores/invitationsStore.js';
+  import { onlineUsers } from '../stores/onlineUsersStore.js';
 
   let isDarkMode = $state(false);
   let socket = null;

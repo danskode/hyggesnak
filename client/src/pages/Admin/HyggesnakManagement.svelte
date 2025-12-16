@@ -1,8 +1,8 @@
 <script>
     import { onMount } from 'svelte';
     import { toast } from 'svelte-sonner';
-    import { apiGet, apiDelete } from '../../lib/api.js';
-    import { API_ENDPOINTS } from '../../lib/constants.js';
+    import { apiGet, apiDelete } from '../../lib/api/api.js';
+    import { API_ENDPOINTS } from '../../lib/utils/constants.js';
 
     let hyggesnakke = $state([]);
     let loading = $state(true);

@@ -1,7 +1,6 @@
 import { writable, derived, get } from 'svelte/store';
-import { persistentStore } from '../lib/persistentStore.js';
-import { apiGet } from '../lib/api.js';
-import { API_ENDPOINTS } from '../lib/constants.js';
+import { apiGet } from '../api/api.js';
+import { API_ENDPOINTS } from '../utils/constants.js';
 
 //============= Store for managing all invitation-related state: Network invitations (incoming/outgoing, Hyggesnak invitations, Notification badge counts =============//
 

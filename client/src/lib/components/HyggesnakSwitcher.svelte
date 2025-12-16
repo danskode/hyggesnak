@@ -1,6 +1,6 @@
 <script>
   import { navigate } from 'svelte-routing';
-  import { hyggesnakke, currentHyggesnak } from '../stores/hyggesnakStore.svelte.js';
+  import { hyggesnakke, currentHyggesnak } from '../stores/hyggesnakStore.js';
   import { toast } from 'svelte-sonner';
 
   let showDropdown = $state(false);

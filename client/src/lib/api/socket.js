@@ -1,7 +1,7 @@
 import { io } from 'socket.io-client';
 import { get } from 'svelte/store';
-import { auth } from '../stores/authStore.svelte.js';
-import { BASE_URL, SOCKET_CONFIG } from './constants.js';
+import { auth } from '../stores/authStore.js';
+import { BASE_URL, SOCKET_CONFIG } from '../utils/constants.js';
 
 // Singleton socket instance
 let socketInstance = null;

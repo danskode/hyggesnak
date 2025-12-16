@@ -1,10 +1,10 @@
 <script>
   import { navigate } from 'svelte-routing';
-  import { hyggesnakke, currentHyggesnak } from '../../stores/hyggesnakStore.svelte.js';
+  import { hyggesnakke, currentHyggesnak } from '../../lib/stores/hyggesnakStore.js';
   import { toast } from 'svelte-sonner';
-  import { apiPost } from '../../lib/api.js';
-  import { API_ENDPOINTS } from '../../lib/constants.js';
-  import { validateHyggesnakName, validateHyggesnakDisplayName } from '../../lib/validators.js';
+  import { apiPost } from '../../lib/api/api.js';
+  import { API_ENDPOINTS } from '../../lib/utils/constants.js';
+  import { validateHyggesnakName, validateHyggesnakDisplayName } from '../../lib/utils/validators.js';
 
   let name = $state('');
   let display_name = $state('');

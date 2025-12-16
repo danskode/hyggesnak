@@ -1,5 +1,5 @@
 <script>
-    import { MESSAGE_MAX_LENGTH } from '../lib/constants.js';
+    import { MESSAGE_MAX_LENGTH } from '../utils/constants';
 
     let {
         value = '',

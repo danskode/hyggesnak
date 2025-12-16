@@ -1,5 +1,5 @@
 import { get } from 'svelte/store';
-import { persistentStore } from '../lib/persistentStore.js';
+import { persistentStore } from './persistentStore.js';
 
 //======= Create persistent stores for hyggesnakke =======//
 
@@ -19,16 +19,16 @@ export const hyggesnakke = {
         hyggesnakkeListStore.set([...current, hyggesnak]);
     },
 
-    remove: (hyggesnakId) => {
-        const current = get(hyggesnakkeListStore) || [];
-        hyggesnakkeListStore.set(current.filter(h => h.id !== hyggesnakId));
-    },
-
     update: (hyggesnakId, updatedData) => {
         const current = get(hyggesnakkeListStore) || [];
         hyggesnakkeListStore.set(
             current.map(h => h.id === hyggesnakId ? { ...h, ...updatedData } : h)
         );
+    },
+
+    remove: (hyggesnakId) => {
+        const current = get(hyggesnakkeListStore) || [];
+        hyggesnakkeListStore.set(current.filter(h => h.id !== hyggesnakId));
     },
 
     clear: () => {

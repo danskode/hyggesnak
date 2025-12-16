@@ -1,6 +1,6 @@
 <script>
-    import { apiPost } from '../../lib/api.js';
-    import { API_ENDPOINTS } from '../../lib/constants.js';
+    import { apiPost } from '../../lib/api/api.js';
+    import { API_ENDPOINTS } from '../../lib/utils/constants.js';
     import { toast } from 'svelte-sonner';
     import { Link } from 'svelte-routing';
 

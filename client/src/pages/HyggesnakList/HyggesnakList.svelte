@@ -1,13 +1,13 @@
 <script>
   import { onMount } from 'svelte';
   import { navigate, Link } from 'svelte-routing';
-  import { auth } from '../../stores/authStore.svelte.js';
-  import { hyggesnakke, currentHyggesnak } from '../../stores/hyggesnakStore.svelte.js';
+  import { auth } from '../../lib/stores/authStore.js';
+  import { hyggesnakke, currentHyggesnak } from '../../lib/stores/hyggesnakStore.js';
   import { toast } from 'svelte-sonner';
-  import { sanitizeHyggesnakName } from '../../lib/sanitize.js';
-  import { apiGet, apiDelete } from '../../lib/api.js';
-  import { API_ENDPOINTS } from '../../lib/constants.js';
-  import { useSocket } from '../../lib/useSocket.svelte.js';
+  import { sanitizeHyggesnakName } from '../../lib/utils/sanitize.js';
+  import { apiGet, apiDelete } from '../../lib/api/api.js';
+  import { API_ENDPOINTS } from '../../lib/utils/constants.js';
+  import { useSocket } from '../../lib/composables/useSocket.js';
 
   let loading = $state(true);
   let error = $state(null);

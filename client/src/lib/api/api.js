@@ -1,10 +1,10 @@
 //============ Centralized API utility for consistent error handling and request management ===============//
 
 import { get } from 'svelte/store';
-import { auth } from '../stores/authStore.svelte.js';
+import { auth } from '../stores/authStore.js';
 import { navigate } from 'svelte-routing';
 import { toast } from 'svelte-sonner';
-import { BASE_URL } from './constants.js';
+import { BASE_URL } from '../utils/constants.js';
 
 // Custom API Error class
 export class APIError extends Error {

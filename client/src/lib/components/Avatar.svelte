@@ -1,8 +1,8 @@
 <script>
     //==== Reusable Avatar Component ====//
 
-    import { getInitials, stringToColor } from '../lib/utils.js';
-    import { sanitizeDisplayName } from '../lib/sanitize.js';
+    import { getInitials } from '../utils/avatar.js';
+    import { sanitizeDisplayName } from '../utils/sanitize.js';
 
     let {
         name = '',

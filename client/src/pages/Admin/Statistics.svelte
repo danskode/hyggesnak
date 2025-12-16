@@ -1,7 +1,7 @@
 <script>
     import { onMount } from 'svelte';
-    import { apiGet } from '../../lib/api.js';
-    import { API_ENDPOINTS } from '../../lib/constants.js';
+    import { apiGet } from '../../lib/api/api.js';
+    import { API_ENDPOINTS } from '../../lib/utils/constants.js';
 
     let stats = $state(null);
     let loading = $state(true);

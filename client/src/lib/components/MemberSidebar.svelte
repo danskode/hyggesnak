@@ -1,9 +1,9 @@
 <script>
     import { toast } from 'svelte-sonner';
-    import { sanitizeDisplayName } from '../lib/sanitize.js';
-    import { ROLES, API_ENDPOINTS } from '../lib/constants.js';
-    import { apiGet, apiPost } from '../lib/api.js';
-    import { onlineUsers } from '../stores/onlineUsersStore.svelte.js';
+    import { sanitizeDisplayName } from '../utils/sanitize.js';
+    import { ROLES, API_ENDPOINTS } from '../utils/constants.js';
+    import { apiGet, apiPost } from '../api/api.js';
+    import { onlineUsers } from '../stores/onlineUsersStore.js';
     import Avatar from './Avatar.svelte';
 
     let {

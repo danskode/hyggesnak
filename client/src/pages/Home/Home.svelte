@@ -1,5 +1,5 @@
 <script>
-    import { auth } from '../../stores/authStore.svelte.js';
+    import { auth } from '../../lib/stores/authStore.js';
     import { Link } from 'svelte-routing';
 </script>
 

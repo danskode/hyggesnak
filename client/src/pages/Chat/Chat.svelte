@@ -2,14 +2,14 @@
     import { onMount } from 'svelte';
     import { navigate } from 'svelte-routing';
     import { toast } from 'svelte-sonner';
-    import { auth } from '../../stores/authStore.svelte.js';
-    import { currentHyggesnak } from '../../stores/hyggesnakStore.svelte.js';
-    import { useSocket } from '../../lib/useSocket.svelte.js';
-    import { apiGet, apiPost, apiPut, apiDelete } from '../../lib/api.js';
-    import { API_ENDPOINTS } from '../../lib/constants.js';
-    import MessageList from '../../components/MessageList.svelte';
-    import MessageInput from '../../components/MessageInput.svelte';
-    import MemberSidebar from '../../components/MemberSidebar.svelte';
+    import { auth } from '../../lib/stores/authStore.js';
+    import { currentHyggesnak } from '../../lib/stores/hyggesnakStore.js';
+    import { useSocket } from '../../lib/composables/useSocket.js';
+    import { apiGet, apiPost, apiPut, apiDelete } from '../../lib/api/api.js';
+    import { API_ENDPOINTS } from '../../lib/utils/constants.js';
+    import MessageList from '../../lib/components/MessageList.svelte';
+    import MessageInput from '../../lib/components/MessageInput.svelte';
+    import MemberSidebar from '../../lib/components/MemberSidebar.svelte';
 
     // Get hyggesnakId from store
     let hyggesnakId = $derived($currentHyggesnak?.id);

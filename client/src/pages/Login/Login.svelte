@@ -1,9 +1,9 @@
 <script>
-    import { auth } from "../../stores/authStore.svelte.js";
+    import { auth } from "../../lib/stores/authStore.js";
     import { toast } from 'svelte-sonner';
     import { navigate, Link } from 'svelte-routing';
-    import { apiPost } from '../../lib/api.js';
-    import { API_ENDPOINTS } from '../../lib/constants.js';
+    import { apiPost } from '../../lib/api/api.js';
+    import { API_ENDPOINTS } from '../../lib/utils/constants.js';
 
     let username = $state('');
     let password = $state('');
@@ -29,7 +29,9 @@
             }
 
             // Redirect to HyggesnakkeList for all others
-            navigate('/hyggesnakke');
+            setTimeout (() => {
+                navigate('/hyggesnakke');
+            }, 3000);
 
         } catch (err) {
             toast.error(err.message || 'Login fejlede - prøv igen senere');

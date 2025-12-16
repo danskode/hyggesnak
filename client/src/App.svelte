@@ -10,10 +10,10 @@
   import Login from './pages/Login/Login.svelte';
   import ForgotPassword from './pages/ForgotPassword/ForgotPassword.svelte';
   import ResetPassword from './pages/ResetPassword/ResetPassword.svelte';
-  import PrivateRoute from './components/PrivateRoute.svelte';
-  import AdminRoute from './components/AdminRoute.svelte';
-  import Header from './components/Header.svelte';
-  import Footer from './components/Footer.svelte';
+  import PrivateRoute from './lib/components/PrivateRoute.svelte';
+  import AdminRoute from './lib/components/AdminRoute.svelte';
+  import Header from './lib/components/Header.svelte';
+  import Footer from './lib/components/Footer.svelte';
 </script>
 
 <Toaster />
