@@ -18,6 +18,6 @@ Do you want to test it out? Well you can:
 8. Run `node server/database/seed.js` to add sqlite database and dummy data into users table
 9. You are ready to join a Hyggesnak: Run the command `npm run dev` (or `npm run dev:client` if you just want to run the client side or replace with `npm run dev:server` for backend only) from the root folder, then concurrently and the script will take care of starting both **client** and **server**.
 
-Happy chatting
+Happy hyggesnak
 
 💬💬💬💬💬💬💬💬💬💬💬💬💬💬💬💬💬💬💬💬💬💬💬💬💬💬💬💬

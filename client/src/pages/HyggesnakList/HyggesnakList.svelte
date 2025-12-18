@@ -38,18 +38,7 @@
   }
 
   function handleNavigationAfterLeave(hyggesnakId) {
-    if (!$currentHyggesnak || $currentHyggesnak.id !== hyggesnakId) {
-      return;
-    }
-
-    const remaining = $hyggesnakke.filter(h => h.id !== hyggesnakId);
-    if (remaining.length > 0) {
-      currentHyggesnak.select(remaining[0]);
-      navigate(`/h/${remaining[0].id}/chat`);
-    } else {
-      currentHyggesnak.clear();
       navigate('/hyggesnakke');
-    }
   }
 
   async function handleLeaveHyggesnak(hyggesnak) {
