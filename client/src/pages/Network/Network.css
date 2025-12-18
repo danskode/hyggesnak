@@ -1,0 +1,302 @@
+/* Global styles from app.css: .content-page, .page-header, section, .card-list */
+
+.page-header {
+    margin-bottom: var(--space-6);
+}
+
+.page-header h1 {
+    margin-bottom: var(--space-2);
+}
+
+.subtitle {
+    margin: 0;
+    color: var(--color-text-secondary);
+    font-size: 1rem;
+}
+
+.page-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+}
+
+section h2 {
+    margin: 0 0 var(--space-4) 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-4);
+    gap: var(--space-4);
+}
+
+.section-header h2 {
+    margin: 0;
+}
+
+.search-input {
+    width: 100%;
+    max-width: 400px;
+    padding: var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-size: 1rem;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(143, 176, 142, 0.1);
+}
+
+.connections-list,
+.invitation-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.connection-card,
+.invitation-card,
+.hyggesnak-invitation-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-4);
+    cursor: default;
+    border: 1px solid var(--color-border);
+}
+
+.connection-card:hover,
+.invitation-card:hover,
+.hyggesnak-invitation-card:hover {
+    background-color: transparent;
+    transform: none;
+}
+
+.connection-card .btn-danger {
+    opacity: 0;
+    transition: opacity var(--transition-base);
+}
+
+.connection-card:hover .btn-danger {
+    opacity: 1;
+}
+
+.connection-user,
+.invitation-user {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex: 1;
+}
+
+.user-info h3 {
+    margin: 0 0 var(--space-1) 0;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.username {
+    margin: 0;
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+}
+
+.status,
+.connected-since {
+    margin: var(--space-1) 0 0 0;
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+    font-style: italic;
+}
+
+.invitation-actions {
+    display: flex;
+    gap: var(--space-2);
+}
+
+.code-subsection {
+    margin-bottom: var(--space-4);
+}
+
+.code-subsection h3 {
+    margin: 0 0 var(--space-2) 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.description {
+    margin: 0 0 var(--space-4) 0;
+    color: var(--color-text-secondary);
+}
+
+.code-display {
+    text-align: center;
+    padding: var(--space-6);
+    background: var(--gradient-primary);
+    border-radius: var(--radius-lg);
+    color: white;
+}
+
+.code-value {
+    font-size: 3rem;
+    font-weight: 700;
+    letter-spacing: 0.5rem;
+    margin-bottom: var(--space-4);
+}
+
+.code-info {
+    margin-bottom: var(--space-4);
+    opacity: 0.9;
+}
+
+.no-code {
+    text-align: center;
+    padding: var(--space-8) var(--space-6);
+    background: var(--color-bg-secondary);
+    border-radius: var(--radius-lg);
+}
+
+.no-code p {
+    margin-bottom: var(--space-4);
+    color: var(--color-text-secondary);
+}
+
+.divider {
+    height: 1px;
+    background: var(--color-border);
+    margin: var(--space-6) 0;
+}
+
+.connect-form {
+    display: flex;
+    gap: var(--space-3);
+    max-width: 500px;
+}
+
+.code-input {
+    flex: 1;
+    padding: var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-size: 1.5rem;
+    text-align: center;
+    letter-spacing: 0.5rem;
+    font-weight: 600;
+}
+
+.code-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(143, 176, 142, 0.1);
+}
+
+.invitation-group {
+    margin-bottom: var(--space-6);
+}
+
+.invitation-group:last-child {
+    margin-bottom: 0;
+}
+
+.invitation-group h3 {
+    margin: 0 0 var(--space-4) 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-text);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.invitations-subgroup {
+    margin-bottom: var(--space-4);
+}
+
+.invitations-subgroup:last-child {
+    margin-bottom: 0;
+}
+
+.invitations-subgroup h4 {
+    margin: 0 0 var(--space-3) 0;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.5rem;
+    height: 1.5rem;
+    padding: 0 var(--space-2);
+    background: var(--color-danger);
+    color: white;
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.hyggesnak-info h3 {
+    margin: 0 0 var(--space-2) 0;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.hyggesnak-info p {
+    margin: 0;
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+}
+
+@media (max-width: 768px) {
+    .section-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-input {
+        max-width: 100%;
+    }
+
+    .code-value {
+        font-size: 2rem;
+        letter-spacing: 0.25rem;
+    }
+
+    .connection-card,
+    .invitation-card,
+    .hyggesnak-invitation-card {
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--space-3);
+    }
+
+    .connection-card .btn-danger {
+        opacity: 1;
+        align-self: flex-end;
+    }
+
+    .invitation-actions {
+        width: 100%;
+    }
+
+    .invitation-actions button {
+        flex: 1;
+    }
+
+    .connect-form {
+        flex-direction: column;
+        max-width: 100%;
+    }
+}

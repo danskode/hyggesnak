@@ -4,6 +4,7 @@
     import { navigate, Link } from 'svelte-routing';
     import { apiPost } from '../../lib/api/api.js';
     import { API_ENDPOINTS } from '../../lib/utils/constants.js';
+    import './Login.css';
 
     let username = $state('');
     let password = $state('');
@@ -29,9 +30,8 @@
             }
 
             // Redirect to HyggesnakkeList for all others
-            setTimeout (() => {
-                navigate('/hyggesnakke');
-            }, 3000);
+            navigate('/hyggesnakke');
+
 
         } catch (err) {
             toast.error(err.message || 'Login fejlede - prøv igen senere');
@@ -41,24 +41,28 @@
     }
 </script>
 
-<h1>Log ind for at hyggesnakke</h1>
+<div class="content-page auth-page">
+    <section>
+        <h1>Log ind for at hyggesnakke</h1>
 
-<form onsubmit={handleSubmit}>
-    <div>
-        <label for="username">Navn:</label>
-        <input type="text" id="username" bind:value={username} required />
-    </div>
+        <form onsubmit={handleSubmit}>
+            <div class="form-group">
+                <label for="username">Navn:</label>
+                <input type="text" id="username" bind:value={username} required />
+            </div>
 
-    <div>
-        <label for="password">Adgangskode:</label>
-        <input type="password" id="password" bind:value={password} required />
-    </div>
+            <div class="form-group">
+                <label for="password">Adgangskode:</label>
+                <input type="password" id="password" bind:value={password} required />
+            </div>
 
-    <button class="btn btn-primary btn-lg" type="submit" disabled={loading}>
-        {loading ? 'Logger ind...' : 'Log ind for at hyggesnakke'}
-    </button>
-</form>
+            <button class="btn btn-primary btn-lg" type="submit" disabled={loading}>
+                {loading ? 'Logger ind...' : 'Log ind for at hyggesnakke'}
+            </button>
+        </form>
 
-<p>
-    <Link to="/forgot-password">Har du glemt dit password?</Link>
-</p>
+        <p class="auth-link">
+            <Link to="/forgot-password">Har du glemt dit password?</Link>
+        </p>
+    </section>
+</div>

@@ -42,43 +42,15 @@ export const requireHyggesnakContext = (req, res, next) => {
             });
         }
 
-        const networkQuery = `
-            SELECT 1
-            FROM hyggesnak_memberships hm
-            WHERE hm.hyggesnak_id = ?
-            AND hm.user_id != ?
-            AND NOT EXISTS (
-                SELECT 1
-                FROM network_connections nc
-                WHERE (nc.user_id_1 = ? AND nc.user_id_2 = hm.user_id)
-                   OR (nc.user_id_2 = ? AND nc.user_id_1 = hm.user_id)
-            )
-            LIMIT 1
-        `;
+        // Attach hyggesnak context to request
+        req.hyggesnak = {
+            id: result.id,
+            name: result.name,
+            display_name: result.display_name,
+            userRole: result.user_role
+        };
 
-        db.get(networkQuery, [hyggesnakId, req.user.id, req.user.id, req.user.id], (err, notConnected) => {
-            if (err) {
-                return res.status(500).send({
-                    message: "Serverfejl ved verifikation af netværksforbindelser"
-                });
-            }
-
-            if (notConnected) {
-                return res.status(403).send({
-                    message: "Du har ikke adgang til denne hyggesnak, da du ikke er forbundet med alle medlemmer"
-                });
-            }
-
-            // 4. Attach hyggesnak context to request
-            req.hyggesnak = {
-                id: result.id,
-                name: result.name,
-                display_name: result.display_name,
-                userRole: result.user_role
-            };
-
-            next();
-        });
+        next();
     });
 };
 

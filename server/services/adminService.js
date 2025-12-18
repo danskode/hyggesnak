@@ -324,15 +324,9 @@ export async function getSystemStats() {
          WHERE created_at >= datetime('now', '-7 days')`
     );
 
-    // Get users by role
-    const usersByRole = await dbAll(
-        'SELECT role, COUNT(*) as count FROM users GROUP BY role'
-    );
-
     return {
         totalUsers,
         totalHyggesnakke,
-        newUsersThisWeek,
-        usersByRole
+        newUsersThisWeek
     };
 }

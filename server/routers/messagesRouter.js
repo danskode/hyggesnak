@@ -136,7 +136,34 @@ router.post('/hyggesnakke/:hyggesnakId/messages', authenticateToken, requireHygg
                 try {
                     const io = req.app.get('io');
                     if (io) {
+                        // Broadcast to hyggesnak room (users actively in chat)
                         io.to(`hyggesnak-${hyggesnakId}`).emit('new-message', message);
+
+                        // Send unread notification to all members NOT in the room
+                        // Get all members of this hyggesnak
+                        db.all(
+                            'SELECT user_id FROM hyggesnak_memberships WHERE hyggesnak_id = ? AND user_id != ?',
+                            [hyggesnakId, userId],
+                            (err, members) => {
+                                if (err) {
+                                    console.error('Error fetching hyggesnak members:', err);
+                                    return;
+                                }
+
+                                // Get all socket IDs in the room
+                                const roomSockets = io.sockets.adapter.rooms.get(`hyggesnak-${hyggesnakId}`) || new Set();
+
+                                // Emit to each member who is NOT in the room
+                                const sockets = io.sockets.sockets;
+                                members.forEach(member => {
+                                    for (const [socketId, socket] of sockets) {
+                                        if (socket.userId === member.user_id && !roomSockets.has(socketId)) {
+                                            socket.emit('unread-message', { hyggesnakId });
+                                        }
+                                    }
+                                });
+                            }
+                        );
                     }
                 } catch (broadcastErr) {
                     // Log but don't fail - message is saved and client was notified
@@ -299,6 +326,76 @@ router.delete('/messages/:messageId', authenticateToken, (req, res) => {
             );
         }
     );
+});
+
+//==== POST /api/hyggesnakke/:hyggesnakId/mark-read - Mark messages as read ====//
+
+router.post('/hyggesnakke/:hyggesnakId/mark-read', authenticateToken, requireHyggesnakContext, (req, res) => {
+    const hyggesnakId = req.params.hyggesnakId;
+    const userId = req.user.id;
+
+    // Update last_read_at to current timestamp
+    const query = `
+        UPDATE hyggesnak_memberships
+        SET last_read_at = CURRENT_TIMESTAMP
+        WHERE user_id = ? AND hyggesnak_id = ?
+    `;
+
+    db.run(query, [userId, hyggesnakId], function (err) {
+        if (err) {
+            console.error('Database error updating last_read_at:', err);
+            return res.status(500).send({ message: "Serverfejl" });
+        }
+
+        if (this.changes === 0) {
+            return res.status(404).send({ message: "Medlemskab ikke fundet" });
+        }
+
+        res.send({ message: "Markeret som læst" });
+    });
+});
+
+//==== GET /api/unread-counts - Get unread message counts for all hyggesnakke ====//
+
+router.get('/unread-counts', authenticateToken, (req, res) => {
+    const userId = req.user.id;
+
+    // Get unread counts for each hyggesnak the user is a member of
+    const query = `
+        SELECT
+            hm.hyggesnak_id,
+            COUNT(m.id) as unread_count
+        FROM hyggesnak_memberships hm
+        LEFT JOIN messages m ON m.hyggesnak_id = hm.hyggesnak_id
+            AND m.created_at > hm.last_read_at
+            AND m.user_id != hm.user_id
+            AND m.is_deleted = 0
+        WHERE hm.user_id = ?
+        GROUP BY hm.hyggesnak_id
+    `;
+
+    db.all(query, [userId], (err, results) => {
+        if (err) {
+            console.error('Database error fetching unread counts:', err);
+            return res.status(500).send({ message: "Serverfejl" });
+        }
+
+        // Transform to object format { hyggesnakId: count }
+        const unreadCounts = {};
+        results.forEach(row => {
+            unreadCounts[row.hyggesnak_id] = row.unread_count;
+        });
+
+        // Calculate total
+        const total = Object.values(unreadCounts).reduce((sum, count) => sum + count, 0);
+
+        res.send({
+            data: {
+                byHyggesnak: unreadCounts,
+                total: total
+            }
+        });
+    });
 });
 
 export default router;

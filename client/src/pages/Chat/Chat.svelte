@@ -3,13 +3,15 @@
     import { navigate } from 'svelte-routing';
     import { toast } from 'svelte-sonner';
     import { auth } from '../../lib/stores/authStore.js';
-    import { currentHyggesnak } from '../../lib/stores/hyggesnakStore.js';
+    import { currentHyggesnak, hyggesnakke } from '../../lib/stores/hyggesnakStore.js';
+    import { unreadCounts } from '../../lib/stores/unreadStore.js';
     import { useSocket } from '../../lib/composables/useSocket.js';
     import { apiGet, apiPost, apiPut, apiDelete } from '../../lib/api/api.js';
     import { API_ENDPOINTS } from '../../lib/utils/constants.js';
     import MessageList from '../../lib/components/MessageList.svelte';
     import MessageInput from '../../lib/components/MessageInput.svelte';
     import MemberSidebar from '../../lib/components/MemberSidebar.svelte';
+    import './Chat.css';
 
     // Get hyggesnakId from store
     let hyggesnakId = $derived($currentHyggesnak?.id);
@@ -31,6 +33,8 @@
             if (message.user_id !== $auth.id) {
                 messages = [...messages, message];
                 scrollToBottom();
+                // Mark as read immediately since user is actively viewing this chat
+                markAsRead();
             }
         },
         onMessageEdited: (editedMessage) => {
@@ -79,6 +83,17 @@
         }
     });
 
+    async function markAsRead() {
+        if (!hyggesnakId) return;
+
+        try {
+            await apiPost(API_ENDPOINTS.MARK_READ(hyggesnakId), {});
+            unreadCounts.reset(hyggesnakId);
+        } catch (err) {
+            console.error('Error marking as read:', err);
+        }
+    }
+
     onMount(async () => {
         if (!hyggesnakId) {
             toast.error('Ingen hyggesnak valgt');
@@ -90,6 +105,9 @@
         await loadMembers();
         await loadMessages();
         scrollToBottom();
+
+        // Mark messages as read when entering chat
+        await markAsRead();
 
         // Connect socket and join room
         socket.connect();
@@ -209,6 +227,27 @@
         }
     }
 
+    async function deleteHyggesnak() {
+        const confirmed = window.confirm(
+            `Er du sikker på at du vil slette "${hyggesnak.display_name}"?\n\nAlle beskeder vil blive slettet. Dette kan ikke fortrydes.`
+        );
+        if (!confirmed) return;
+
+        try {
+            await apiDelete(`${API_ENDPOINTS.HYGGESNAKKE}/${hyggesnakId}`);
+
+            // Remove from store
+            hyggesnakke.remove(hyggesnakId);
+            currentHyggesnak.clear();
+
+            // Navigate to hyggesnak list
+            toast.success('Hyggesnak slettet');
+            navigate('/hyggesnakke');
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
     // Cleanup typing timeouts on unmount
     $effect(() => {
         return () => {
@@ -258,6 +297,7 @@
                 {hyggesnakId}
                 onRemoveMember={removeMember}
                 onInviteSent={loadMembers}
+                onDeleteHyggesnak={deleteHyggesnak}
             />
         </div>
 
@@ -279,86 +319,3 @@
         {/if}
     {/if}
 </div>
-
-<style>
-    .chat-page {
-        display: flex;
-        flex-direction: column;
-        height: calc(90vh - 120px);
-        max-width: 1400px;
-        margin: 0 auto;
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
-    }
-
-    .loading,
-    .error {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        height: 100%;
-        font-size: 1.125rem;
-        color: var(--color-text-secondary);
-    }
-
-    .chat-header {
-        display: flex;
-        align-items: center;
-        gap: var(--space-4);
-        padding: var(--space-4) var(--space-6);
-        background: var(--color-primary);
-        color: white;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .back-button {
-        background: rgba(255, 255, 255, 0.2);
-        border: none;
-        color: white;
-        font-size: 1rem;
-        cursor: pointer;
-        padding: var(--space-2) var(--space-4);
-        border-radius: var(--radius-lg);
-        transition: all var(--transition-base);
-        font-weight: 500;
-    }
-
-    .back-button:hover {
-        background: rgba(255, 255, 255, 0.3);
-        transform: translateX(-2px);
-    }
-
-    h2 {
-        margin: 0;
-        font-size: 1.5rem;
-        font-weight: 600;
-    }
-
-    .chat-container {
-        display: flex;
-        flex: 1;
-        overflow: hidden;
-    }
-
-    /* Invite functionality integrated into MembersSidebar.svelte */
-
-    .connection-status {
-        padding: var(--space-2) var(--space-4);
-        background: #fff3cd;
-        color: #856404;
-        text-align: center;
-        font-size: 0.875rem;
-        font-weight: 500;
-        border-top: 1px solid #ffc107;
-    }
-
-    @media (max-width: 768px) {
-        .chat-page {
-            height: 70vh;
-            border-radius: 0;
-            max-width: 100%;
-        }
-    }
-</style>

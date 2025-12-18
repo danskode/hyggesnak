@@ -1,8 +1,10 @@
 <script>
     import { onMount } from 'svelte';
     import { toast } from 'svelte-sonner';
-    import { apiGet, apiDelete } from '../../lib/api/api.js';
-    import { API_ENDPOINTS } from '../../lib/utils/constants.js';
+    import { apiGet, apiDelete } from '../../../api/api.js';
+    import { API_ENDPOINTS } from '../../../utils/constants.js';
+    import { formatDateTime } from '../../../utils/dateUtils.js';
+    import './HyggesnakManagement.css';
 
     let hyggesnakke = $state([]);
     let loading = $state(true);
@@ -74,16 +76,6 @@
         loadHyggesnakke();
     }
 
-    function formatDate(dateString) {
-        return new Date(dateString).toLocaleDateString('da-DK', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-    }
-
     onMount(() => {
         loadHyggesnakke();
     });
@@ -101,7 +93,7 @@
             onkeydown={(e) => e.key === 'Enter' && handleSearch()}
             placeholder="Søg efter hyggesnak navn..."
         />
-        <button onclick={handleSearch}>Søg</button>
+        <button class="btn btn-secondary" onclick={handleSearch}>Søg</button>
     </div>
 
     <div class="layout">
@@ -130,7 +122,7 @@
                                 <h3>{hyggesnak.display_name}</h3>
                                 <p class="name">@{hyggesnak.name}</p>
                                 <p class="meta">
-                                    {hyggesnak.member_count} medlemmer • Oprettet {formatDate(hyggesnak.created_at)}
+                                    {hyggesnak.member_count} medlemmer • Oprettet {formatDateTime(hyggesnak.created_at)}
                                 </p>
                             </div>
                             <button
@@ -150,6 +142,7 @@
                 {#if totalPages > 1}
                     <div class="pagination">
                         <button
+                            class="btn btn-secondary"
                             disabled={page === 1}
                             onclick={() => { page--; loadHyggesnakke(); }}
                         >
@@ -157,6 +150,7 @@
                         </button>
                         <span>Side {page} af {totalPages}</span>
                         <button
+                            class="btn btn-secondary"
                             disabled={page === totalPages}
                             onclick={() => { page++; loadHyggesnakke(); }}
                         >
@@ -176,7 +170,7 @@
                 <div class="details">
                     <h3>{selectedHyggesnak.display_name}</h3>
                     <p class="name">@{selectedHyggesnak.name}</p>
-                    <p class="created">Oprettet: {formatDate(selectedHyggesnak.created_at)}</p>
+                    <p class="created">Oprettet: {formatDateTime(selectedHyggesnak.created_at)}</p>
 
                     <h4>Medlemmer ({selectedHyggesnak.members.length})</h4>
                     <div class="members-list">
@@ -197,177 +191,3 @@
         </div>
     </div>
 </div>
-
-<style>
-    .hyggesnak-management {
-        padding: 1rem;
-    }
-
-    .header {
-        margin-bottom: 2rem;
-    }
-
-    h2 {
-        margin: 0;
-    }
-
-    .search-bar {
-        display: flex;
-        gap: 0.5rem;
-        margin-bottom: 1.5rem;
-    }
-
-    .search-bar input {
-        flex: 1;
-        padding: 0.75rem;
-        border: 1px solid var(--border);
-        border-radius: 6px;
-    }
-
-    .layout {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1.5rem;
-    }
-
-    .list-panel, .details-panel {
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        padding: 1rem;
-        background: var(--card-bg);
-    }
-
-    .loading, .no-data, .no-selection {
-        text-align: center;
-        padding: 3rem;
-        color: var(--text-secondary);
-    }
-
-    .hyggesnakke-list {
-        display: flex;
-        flex-direction: column;
-        gap: 0.75rem;
-    }
-
-    .hyggesnak-card {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 1rem;
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-
-    .hyggesnak-card:hover {
-        background: var(--hover-bg);
-        border-color: var(--primary);
-    }
-
-    .hyggesnak-card.active {
-        background: var(--primary-bg);
-        border-color: var(--primary);
-    }
-
-    .hyggesnak-info {
-        flex: 1;
-    }
-
-    .hyggesnak-info h3 {
-        margin: 0 0 0.25rem 0;
-        font-size: 1.125rem;
-    }
-
-    .name {
-        margin: 0;
-        color: var(--text-secondary);
-        font-size: 0.875rem;
-    }
-
-    .meta {
-        margin: 0.5rem 0 0 0;
-        font-size: 0.75rem;
-        color: var(--text-secondary);
-    }
-
-    button.danger-icon {
-        padding: 0.5rem;
-        background: transparent;
-        border: none;
-        font-size: 1.25rem;
-        cursor: pointer;
-        transition: transform 0.2s;
-    }
-
-    button.danger-icon:hover:not(:disabled) {
-        transform: scale(1.2);
-    }
-
-    .details h3 {
-        margin: 0 0 0.5rem 0;
-    }
-
-    .created {
-        margin: 0.5rem 0 1.5rem 0;
-        color: var(--text-secondary);
-        font-size: 0.875rem;
-    }
-
-    h4 {
-        margin: 1.5rem 0 1rem 0;
-        padding-bottom: 0.5rem;
-        border-bottom: 2px solid var(--border);
-    }
-
-    .members-list {
-        display: flex;
-        flex-direction: column;
-        gap: 0.75rem;
-    }
-
-    .member-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0.75rem;
-        background: var(--bg);
-        border-radius: 6px;
-    }
-
-    .member-item .username {
-        margin-left: 0.5rem;
-        color: var(--text-secondary);
-        font-size: 0.875rem;
-    }
-
-    .role-badge {
-        padding: 0.25rem 0.75rem;
-        border-radius: 12px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        background: var(--bg);
-        color: var(--text-secondary);
-    }
-
-    .role-badge.owner {
-        background: var(--primary-bg);
-        color: var(--primary);
-    }
-
-    .pagination {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 1rem;
-        margin-top: 1rem;
-        padding-top: 1rem;
-        border-top: 1px solid var(--border);
-    }
-
-    @media (max-width: 1024px) {
-        .layout {
-            grid-template-columns: 1fr;
-        }
-    }
-</style>

@@ -1,0 +1,40 @@
+/* Global styles from app.css: .content-page, .btn-*, section, form, input, select, textarea */
+
+.auth-page {
+    max-width: 500px;
+}
+
+.auth-page h1 {
+    margin: 0 0 var(--space-6) 0;
+    text-align: center;
+}
+
+.auth-page .form-group {
+    margin-bottom: var(--space-4);
+}
+
+.auth-page .form-group label {
+    display: block;
+    margin-bottom: var(--space-2);
+    font-weight: 500;
+}
+
+.auth-page button[type="submit"] {
+    width: 100%;
+    margin-top: var(--space-4);
+}
+
+.auth-link {
+    text-align: center;
+    margin-top: var(--space-5);
+    color: var(--color-text-secondary);
+}
+
+.auth-link a {
+    color: var(--color-primary);
+    text-decoration: none;
+}
+
+.auth-link a:hover {
+    text-decoration: underline;
+}

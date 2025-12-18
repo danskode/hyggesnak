@@ -1,3 +1,4 @@
+import { get } from 'svelte/store';
 import { persistentStore } from './persistentStore.js';
 import { hyggesnakke, currentHyggesnak } from './hyggesnakStore.js';
 
@@ -21,6 +22,7 @@ export const auth = {
     },
 
     getToken: () => {
+        const value = get(authStore);
         return value?.token || null;
     }
 };

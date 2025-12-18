@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS hyggesnak_memberships (
     hyggesnak_id INTEGER NOT NULL,
     role TEXT NOT NULL DEFAULT 'MEMBER' CHECK(role IN ('OWNER', 'MEMBER')),
     joined_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    last_read_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (hyggesnak_id) REFERENCES hyggesnakke(id) ON DELETE CASCADE,
     UNIQUE(user_id, hyggesnak_id)

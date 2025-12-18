@@ -3,6 +3,7 @@
     import { API_ENDPOINTS } from '../../lib/utils/constants.js';
     import { toast } from 'svelte-sonner';
     import { Link } from 'svelte-routing';
+    import '../Login/Login.css';
 
     let email = $state('');
     let loading = $state(false);
@@ -25,34 +26,42 @@
     }
 </script>
 
-<h1>Glemt password</h1>
+<div class="content-page auth-page">
+    <section>
+        <h1>Glemt password</h1>
 
-{#if emailSent}
-    <div class="success-message">
-        <p>Et reset link er blevet sendt til din email!</p>
-        <Link to="/login">Tilbage til login</Link>
-    </div>
-{:else}
-    <p>Indtast din email for at modtage et password reset link.</p>
+        {#if emailSent}
+            <div class="success-message">
+                <p>Et reset link er blevet sendt til din email!</p>
+                <p class="auth-link">
+                    <Link to="/login">Tilbage til login</Link>
+                </p>
+            </div>
+        {:else}
+            <p style="text-align: center; margin-bottom: var(--space-6); color: var(--color-text-secondary);">
+                Indtast din email for at modtage et password reset link.
+            </p>
 
-    <form onsubmit={handleSubmit}>
-        <div>
-            <label for="email">Email:</label>
-            <input
-                type="email"
-                id="email"
-                bind:value={email}
-                required
-                placeholder="din@email.dk"
-            />
-        </div>
+            <form onsubmit={handleSubmit}>
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input
+                        type="email"
+                        id="email"
+                        bind:value={email}
+                        required
+                        placeholder="din@email.dk"
+                    />
+                </div>
 
-        <button type="submit" disabled={loading}>
-            {loading ? 'Sender...' : 'Send reset link'}
-        </button>
-    </form>
+                <button class="btn btn-primary btn-lg" type="submit" disabled={loading}>
+                    {loading ? 'Sender...' : 'Send reset link'}
+                </button>
+            </form>
 
-    <p>
-        <Link to="/login">Tilbage til login</Link>
-    </p>
-{/if}
+            <p class="auth-link">
+                <Link to="/login">Tilbage til login</Link>
+            </p>
+        {/if}
+    </section>
+</div>

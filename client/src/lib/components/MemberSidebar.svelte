@@ -12,7 +12,8 @@
         currentUserRole = null,
         hyggesnakId = null,
         onRemoveMember = () => {},
-        onInviteSent = () => {}
+        onInviteSent = () => {},
+        onDeleteHyggesnak = () => {}
     } = $props();
 
     // Invite section state
@@ -135,6 +136,20 @@
             </div>
         {/each}
     </div>
+
+    <!-- Delete Hyggesnak Section (only when owner is alone) -->
+    {#if currentUserRole === ROLES.OWNER && members.length === 1}
+        <div class="delete-section">
+            <p class="delete-info">Du er det eneste medlem tilbage</p>
+            <button
+                class="btn btn-danger"
+                onclick={onDeleteHyggesnak}
+                title="Slet hyggesnak permanent"
+            >
+                🗑️ Slet Hyggesnak
+            </button>
+        </div>
+    {/if}
 
     <!-- Invite Section -->
     {#if showInviteSection && currentUserRole === ROLES.OWNER}
@@ -269,6 +284,26 @@
     }
 
     /* Global .btn-icon and .btn-danger-hover styles apply */
+
+    .delete-section {
+        padding: var(--space-4);
+        border-top: 2px solid var(--color-border);
+        background: var(--color-bg-secondary);
+        text-align: center;
+    }
+
+    .delete-info {
+        margin: 0 0 var(--space-3) 0;
+        font-size: 0.875rem;
+        color: var(--color-text-secondary);
+        font-style: italic;
+    }
+
+    .delete-section .btn {
+        width: 100%;
+    }
+
+    /* Global .btn-danger styles apply */
 
     .invite-section {
         border-top: 2px solid var(--color-border);

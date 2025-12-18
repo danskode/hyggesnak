@@ -5,6 +5,7 @@
     import { navigate, Link } from 'svelte-routing';
     import { onMount } from 'svelte';
     import { validatePassword } from '../../lib/utils/validators.js';
+    import '../Login/Login.css';
 
     let newPassword = $state('');
     let confirmPassword = $state('');
@@ -52,40 +53,46 @@
     }
 </script>
 
-<h1>Nulstil password</h1>
+<div class="content-page auth-page">
+    <section>
+        <h1>Nulstil password</h1>
 
-<p>Indtast dit nye password nedenfor.</p>
+        <p style="text-align: center; margin-bottom: var(--space-6); color: var(--color-text-secondary);">
+            Indtast dit nye password nedenfor.
+        </p>
 
-<form onsubmit={handleSubmit}>
-    <div>
-        <label for="newPassword">Nyt password:</label>
-        <input
-            type="password"
-            id="newPassword"
-            bind:value={newPassword}
-            required
-            minlength="8"
-            placeholder="Min 8 tegn, inkl. stort bogstav, lille bogstav og tal"
-        />
-    </div>
+        <form onsubmit={handleSubmit}>
+            <div class="form-group">
+                <label for="newPassword">Nyt password:</label>
+                <input
+                    type="password"
+                    id="newPassword"
+                    bind:value={newPassword}
+                    required
+                    minlength="8"
+                    placeholder="Min 8 tegn, inkl. stort bogstav, lille bogstav og tal"
+                />
+            </div>
 
-    <div>
-        <label for="confirmPassword">Bekræft password:</label>
-        <input
-            type="password"
-            id="confirmPassword"
-            bind:value={confirmPassword}
-            required
-            minlength="8"
-            placeholder="Gentag password"
-        />
-    </div>
+            <div class="form-group">
+                <label for="confirmPassword">Bekræft password:</label>
+                <input
+                    type="password"
+                    id="confirmPassword"
+                    bind:value={confirmPassword}
+                    required
+                    minlength="8"
+                    placeholder="Gentag password"
+                />
+            </div>
 
-    <button type="submit" disabled={loading}>
-        {loading ? 'Nulstiller...' : 'Nulstil password'}
-    </button>
-</form>
+            <button class="btn btn-primary btn-lg" type="submit" disabled={loading}>
+                {loading ? 'Nulstiller...' : 'Nulstil password'}
+            </button>
+        </form>
 
-<p>
-    <Link to="/login">Tilbage til login</Link>
-</p>
+        <p class="auth-link">
+            <Link to="/login">Tilbage til login</Link>
+        </p>
+    </section>
+</div>

@@ -1,0 +1,89 @@
+/* Global styles from app.css: .content-page, .btn-*, section */
+
+.home-page {
+    max-width: 900px;
+}
+
+.hero-section {
+    text-align: center;
+    padding: var(--space-8) var(--space-6);
+}
+
+.hero-section h1 {
+    margin: 0 0 var(--space-6) 0;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--color-text);
+}
+
+.welcome-message {
+    margin-top: var(--space-6);
+}
+
+.welcome-message p {
+    font-size: 1.25rem;
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-6);
+}
+
+.action-buttons {
+    display: flex;
+    gap: var(--space-4);
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.action-buttons a {
+    text-decoration: none;
+}
+
+.login-prompt {
+    margin-top: var(--space-6);
+}
+
+.login-prompt p {
+    font-size: 1.125rem;
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-6);
+}
+
+.login-prompt a {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.login-prompt a:hover {
+    text-decoration: underline;
+}
+
+.hero-image {
+    margin-top: var(--space-6);
+    display: flex;
+    justify-content: center;
+}
+
+.hero-image img {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+}
+
+@media (max-width: 768px) {
+    .hero-section h1 {
+        font-size: 2rem;
+    }
+
+    .welcome-message p {
+        font-size: 1.125rem;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+
+    .action-buttons button {
+        width: 100%;
+    }
+}

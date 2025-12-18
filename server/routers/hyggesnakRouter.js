@@ -22,22 +22,10 @@ router.get('/hyggesnakke', authenticateToken, membersReadLimiter, (req, res) => 
         FROM hyggesnakke h
         INNER JOIN hyggesnak_memberships hm ON h.id = hm.hyggesnak_id
         WHERE hm.user_id = ?
-        AND NOT EXISTS (
-            SELECT 1
-            FROM hyggesnak_memberships hm2
-            WHERE hm2.hyggesnak_id = h.id
-            AND hm2.user_id != ?
-            AND NOT EXISTS (
-                SELECT 1
-                FROM network_connections nc
-                WHERE (nc.user_id_1 = ? AND nc.user_id_2 = hm2.user_id)
-                   OR (nc.user_id_2 = ? AND nc.user_id_1 = hm2.user_id)
-            )
-        )
         ORDER BY h.created_at DESC
     `;
 
-    db.all(query, [req.user.id, req.user.id, req.user.id, req.user.id], (err, hyggesnakke) => {
+    db.all(query, [req.user.id], (err, hyggesnakke) => {
         if (err) {
             console.error('Database error:', err);
             return res.status(500).send({ message: "Serverfejl" });
@@ -239,45 +227,63 @@ router.put('/hyggesnakke/:hyggesnakId', authenticateToken, requireHyggesnakConte
     );
 });
 
-//==== DELETE /api/hyggesnakke/:id - Delete hyggesnak (Owner only) ====//
+//==== DELETE /api/hyggesnakke/:id - Delete hyggesnak (Owner only, only when alone) ====//
 
 router.delete('/hyggesnakke/:hyggesnakId', authenticateToken, requireHyggesnakContext, requireHyggesnakOwner, membersDeleteLimiter, (req, res) => {
     const hyggesnakId = parseInt(req.params.hyggesnakId, 10);
 
-    // Get hyggesnak details before deletion
+    // Check member count - only allow deletion if owner is alone
     db.get(
-        'SELECT name, display_name FROM hyggesnakke WHERE id = ?',
+        'SELECT COUNT(*) as member_count FROM hyggesnak_memberships WHERE hyggesnak_id = ?',
         [hyggesnakId],
-        (err, hyggesnak) => {
+        (err, result) => {
             if (err) {
                 console.error('Database error:', err);
                 return res.status(500).send({ message: "Serverfejl" });
             }
 
-            if (!hyggesnak) {
-                return res.status(404).send({
-                    message: "Hyggesnak ikke fundet"
+            if (result.member_count > 1) {
+                return res.status(400).send({
+                    message: "Du kan kun slette hyggesnak når du er det eneste medlem. Fjern først alle andre medlemmer."
                 });
             }
 
-            // Delete hyggesnak (CASCADE will delete memberships)
-            db.run('DELETE FROM hyggesnakke WHERE id = ?', [hyggesnakId], function (err) {
-                if (err) {
-                    console.error('Database error:', err);
-                    return res.status(500).send({ message: "Serverfejl" });
-                }
+            // Get hyggesnak details before deletion
+            db.get(
+                'SELECT name, display_name FROM hyggesnakke WHERE id = ?',
+                [hyggesnakId],
+                (err, hyggesnak) => {
+                    if (err) {
+                        console.error('Database error:', err);
+                        return res.status(500).send({ message: "Serverfejl" });
+                    }
 
-                if (this.changes === 0) {
-                    return res.status(404).send({
-                        message: "Hyggesnak ikke fundet"
+                    if (!hyggesnak) {
+                        return res.status(404).send({
+                            message: "Hyggesnak ikke fundet"
+                        });
+                    }
+
+                    // Delete hyggesnak (CASCADE will delete memberships)
+                    db.run('DELETE FROM hyggesnakke WHERE id = ?', [hyggesnakId], function (err) {
+                        if (err) {
+                            console.error('Database error:', err);
+                            return res.status(500).send({ message: "Serverfejl" });
+                        }
+
+                        if (this.changes === 0) {
+                            return res.status(404).send({
+                                message: "Hyggesnak ikke fundet"
+                            });
+                        }
+
+                        res.status(200).send({
+                            message: `Hyggesnak "${hyggesnak.display_name}" blev slettet`,
+                            data: { id: hyggesnakId, name: hyggesnak.name }
+                        });
                     });
                 }
-
-                res.status(200).send({
-                    message: `Hyggesnak "${hyggesnak.display_name}" blev slettet`,
-                    data: { id: hyggesnakId, name: hyggesnak.name }
-                });
-            });
+            );
         }
     );
 });

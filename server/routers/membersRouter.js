@@ -226,9 +226,28 @@ router.delete('/hyggesnakke/:hyggesnakId/members/:userId', authenticateToken, re
                         }
 
                         if (result.owner_count <= 1) {
-                            return res.status(403).send({
-                                message: "Kan ikke fjerne sidste ejer"
-                            });
+                            // Check total member count - if owner is also the last member, delete hyggesnak
+                            db.get(
+                                'SELECT COUNT(*) as member_count FROM hyggesnak_memberships WHERE hyggesnak_id = ?',
+                                [hyggesnakId],
+                                (err, memberResult) => {
+                                    if (err) {
+                                        console.error('Database error:', err);
+                                        return res.status(500).send({ message: "Serverfejl" });
+                                    }
+
+                                    if (memberResult.member_count === 1 && isSelfRemoval) {
+                                        // Owner is alone - delete the entire hyggesnak
+                                        deleteHyggesnak(hyggesnakId, res);
+                                    } else {
+                                        // There are other members - cannot remove last owner
+                                        return res.status(403).send({
+                                            message: "Kan ikke fjerne sidste ejer når der er andre medlemmer"
+                                        });
+                                    }
+                                }
+                            );
+                            return;
                         }
 
                         // Safe to remove - proceed
@@ -296,6 +315,46 @@ function performMembershipRemoval(userId, hyggesnakId, res) {
             }
         );
     });
+}
+
+// Helper function to delete hyggesnak when owner leaves as last member
+function deleteHyggesnak(hyggesnakId, res) {
+    // Get hyggesnak details before deletion
+    db.get(
+        'SELECT name, display_name FROM hyggesnakke WHERE id = ?',
+        [hyggesnakId],
+        (err, hyggesnak) => {
+            if (err) {
+                console.error('Database error:', err);
+                return res.status(500).send({ message: "Serverfejl" });
+            }
+
+            if (!hyggesnak) {
+                return res.status(404).send({
+                    message: "Hyggesnak ikke fundet"
+                });
+            }
+
+            // Delete hyggesnak (CASCADE will delete memberships and messages)
+            db.run('DELETE FROM hyggesnakke WHERE id = ?', [hyggesnakId], function (err) {
+                if (err) {
+                    console.error('Database error:', err);
+                    return res.status(500).send({ message: "Serverfejl" });
+                }
+
+                if (this.changes === 0) {
+                    return res.status(404).send({
+                        message: "Hyggesnak ikke fundet"
+                    });
+                }
+
+                res.status(200).send({
+                    message: `Du har forladt og slettet "${hyggesnak.display_name}"`,
+                    data: { id: hyggesnakId, name: hyggesnak.name, deleted: true }
+                });
+            });
+        }
+    );
 }
 
 export default router;

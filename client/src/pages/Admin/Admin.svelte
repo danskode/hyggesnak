@@ -1,5 +1,5 @@
 <script>
-    import { auth } from '../stores/authStore.js';
+    import { auth } from '../../lib/stores/authStore.js';
     import { navigate } from 'svelte-routing';
     import { onMount } from 'svelte';
     import { toast } from 'svelte-sonner';

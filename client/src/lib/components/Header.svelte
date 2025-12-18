@@ -14,6 +14,7 @@
     clearAllInvitations
   } from '../stores/invitationsStore.js';
   import { onlineUsers } from '../stores/onlineUsersStore.js';
+  import { unreadCounts, totalUnread } from '../stores/unreadStore.js';
 
   let isDarkMode = $state(false);
   let socket = null;
@@ -36,6 +37,7 @@
       socketInitialized = true;
 
       fetchAllInvitations();
+      unreadCounts.load();
 
       socket = useSocket({});
       socket.connect();
@@ -81,6 +83,10 @@
       socket.on('user:offline', ({ userId }) => {
         onlineUsers.remove(userId);
       });
+
+      socket.on('unread-message', ({ hyggesnakId }) => {
+        unreadCounts.increment(hyggesnakId);
+      });
     }
   });
 
@@ -94,8 +100,14 @@
 
   function handleLogout() {
     clearAllInvitations();
+    unreadCounts.clear();
     onlineUsers.clear();
     auth.logout();
+    if(socket){
+      socket.destroy();
+      socket = null;
+      socketInitialized = false;
+    }
     toast.success('Du er nu logget ud');
     navigate('/');
   }
@@ -118,7 +130,12 @@
       {#if $auth.role === 'SUPER_ADMIN'}
         <Link to="/admin">🔧 Admin</Link>
       {:else}
-        <Link to="/hyggesnakke">Hyggesnakke</Link>
+        <Link to="/hyggesnakke" class="nav-link-with-badge">
+          Hyggesnakke
+          {#if $totalUnread > 0}
+            <span class="nav-badge">{$totalUnread}</span>
+          {/if}
+        </Link>
         <Link to="/network" class="nav-link-with-badge">
           Netværk
           {#if $totalPendingInvitations > 0}
@@ -178,11 +195,6 @@
 
   :global(nav a:hover) {
     background: rgba(255, 255, 255, 0.1);
-  }
-
-  :global(nav a[aria-current='page']) {
-    background: rgba(255, 255, 255, 0.2);
-    font-weight: 600;
   }
 
   :global(.nav-link-with-badge) {

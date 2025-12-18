@@ -16,9 +16,9 @@
   --color-text: #213547;
   --color-text-secondary: #666;
   --color-text-muted: #999;
-  --color-border: #ddd;
+  --color-border: #d0d0d0;
   --color-border-light: #eee;
-  --color-input-bg: #fff;
+  --color-input-bg: #fafafa;
   --color-card-bg: #fff;
 
   /* Gradients */
@@ -544,6 +544,15 @@ input::placeholder {
     gap: 1rem;
   }
 
+  .content-page {
+    padding: var(--space-4);
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
   .members-list {
     grid-template-columns: 1fr;
   }
@@ -610,69 +619,6 @@ footer p {
   }
 }
 
-/* ===== Modal/Overlay ===== */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: var(--z-modal);
-  animation: fadeIn var(--transition-base);
-}
-
-.modal {
-  background: var(--color-card-bg);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-xl);
-  max-width: 90vw;
-  max-height: 90vh;
-  overflow: auto;
-  animation: slideIn var(--transition-base);
-}
-
-.modal-sm {
-  width: 400px;
-}
-
-.modal-md {
-  width: 600px;
-}
-
-.modal-lg {
-  width: 800px;
-}
-
-.modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--space-6);
-  border-bottom: 1px solid var(--color-border);
-}
-
-.modal-header h3 {
-  margin: 0;
-  color: var(--color-text);
-}
-
-.modal-body {
-  padding: var(--space-6);
-}
-
-.modal-footer {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: var(--space-3);
-  padding: var(--space-6);
-  border-top: 1px solid var(--color-border);
-}
-
 .close-button {
   background: none;
   border: none;
@@ -706,6 +652,47 @@ footer p {
 
 .text-secondary {
   color: var(--color-text-secondary);
+}
+
+/* ===== Toaster / Notifications ===== */
+/* Remove svelte-sonner's wrapper section from layout flow */
+section[aria-label="Notifications alt+T"] {
+  display: contents !important;
+}
+
+/* ===== Page Layout Patterns ===== */
+.content-page {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: var(--space-6);
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-6);
+  gap: var(--space-4);
+}
+
+.page-header h1 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+section {
+  background: var(--color-card-bg);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  box-shadow: var(--shadow-sm);
+}
+
+.card-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
 }
 
 .empty-state {
@@ -835,7 +822,7 @@ footer p {
   display: inline-block;
   font-size: 0.75rem;
   padding: var(--space-1) var(--space-2);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-sm) !important;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -1029,11 +1016,8 @@ footer p {
     color: #7edb87;
   }
 
-  .modal {
-    background: var(--color-card-bg);
-  }
-
   .close-button:hover {
     background-color: var(--color-bg-secondary);
   }
 }
+

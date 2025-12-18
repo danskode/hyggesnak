@@ -6,17 +6,22 @@
   import CreateHyggesnak from './pages/CreateHyggesnak/CreateHyggesnak.svelte';
   import Chat from './pages/Chat/Chat.svelte';
   import Network from './pages/Network/Network.svelte';
-  import AdminPanel from './pages/Admin/AdminPanel.svelte';
+  import AdminPanel from './lib/components/AdminPanel/AdminPanel.svelte';
   import Login from './pages/Login/Login.svelte';
   import ForgotPassword from './pages/ForgotPassword/ForgotPassword.svelte';
   import ResetPassword from './pages/ResetPassword/ResetPassword.svelte';
   import PrivateRoute from './lib/components/PrivateRoute.svelte';
-  import AdminRoute from './lib/components/AdminRoute.svelte';
+  import AdminRoute from './pages/Admin/Admin.svelte';
   import Header from './lib/components/Header.svelte';
   import Footer from './lib/components/Footer.svelte';
 </script>
 
-<Toaster />
+<Toaster
+  position="top-center"
+  closeButton
+  richColors
+  visibleToasts={5}
+/>
 
 <Router>
   <Header />
@@ -50,13 +55,6 @@
     <Route path='/h/:hyggesnakId/chat'>
       <PrivateRoute>
         <Chat />
-      </PrivateRoute>
-    </Route>
-
-    <!-- Hyggesnak-scoped members route -->
-    <Route path='/h/:hyggesnakId/members'>
-      <PrivateRoute>
-        <Members />
       </PrivateRoute>
     </Route>
 

@@ -56,6 +56,8 @@ export const API_ENDPOINTS = {
 
     // Messages
     MESSAGE_BY_ID: (id) => `/api/messages/${id}`,
+    MARK_READ: (id) => `/api/hyggesnakke/${id}/mark-read`,
+    UNREAD_COUNTS: '/api/unread-counts',
 
     // Network
     NETWORK_GENERATE_CODE: '/api/network/generate-code',
@@ -95,6 +97,7 @@ export const SOCKET_EVENTS = {
     STOP_TYPING: 'stop-typing',
     USER_TYPING: 'user-typing',
     USER_STOPPED_TYPING: 'user-stopped-typing',
+    UNREAD_MESSAGE: 'unread-message',
 
     // Network invitation events
     NETWORK_INVITATION_RECEIVED: 'network:invitation:received',

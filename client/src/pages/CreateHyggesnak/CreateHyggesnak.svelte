@@ -5,6 +5,7 @@
   import { apiPost } from '../../lib/api/api.js';
   import { API_ENDPOINTS } from '../../lib/utils/constants.js';
   import { validateHyggesnakName, validateHyggesnakDisplayName } from '../../lib/utils/validators.js';
+  import './CreateHyggesnak.css';
 
   let name = $state('');
   let display_name = $state('');
@@ -57,10 +58,11 @@
   }
 </script>
 
-<div class="create-hyggesnak-container">
+<div class="content-page create-page">
   <h1>Opret ny hyggesnak</h1>
 
-  <form onsubmit={handleSubmit} class="create-form">
+  <section>
+    <form onsubmit={handleSubmit}>
     <div class="form-group">
       <label for="name">
         Unikt navn (URL-venligt)
@@ -94,125 +96,24 @@
       />
     </div>
 
-    <div class="form-actions">
-      <button type="submit" class="btn btn-primary" disabled={creating}>
-        {creating ? 'Opretter...' : 'Opret hyggesnak'}
-      </button>
-      <button type="button" class="btn btn-secondary" onclick={handleCancel} disabled={creating}>
-        Annuller
-      </button>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary" disabled={creating}>
+          {creating ? 'Opretter...' : 'Opret hyggesnak'}
+        </button>
+        <button type="button" class="btn btn-secondary" onclick={handleCancel} disabled={creating}>
+          Annuller
+        </button>
+      </div>
+    </form>
+
+    <div class="info-box">
+      <h3>Om hyggesnakke</h3>
+      <ul>
+        <li>Du bliver automatisk ejer af den nye hyggesnak</li>
+        <li>Som ejer kan du tilføje andre medlemmer</li>
+        <li>Det unikke navn kan ikke ændres senere</li>
+        <li>Visningsnavnet kan ændres når som helst</li>
+      </ul>
     </div>
-  </form>
-
-  <div class="info-box">
-    <h3>Om hyggesnakke</h3>
-    <ul>
-      <li>Du bliver automatisk ejer af den nye hyggesnak</li>
-      <li>Som ejer kan du tilføje andre medlemmer</li>
-      <li>Det unikke navn kan ikke ændres senere</li>
-      <li>Visningsnavnet kan ændres når som helst</li>
-    </ul>
-  </div>
+  </section>
 </div>
-
-<style>
-  .create-hyggesnak-container {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 2rem 1rem;
-  }
-
-  h1 {
-    margin-bottom: 2rem;
-  }
-
-  .create-form {
-    background: var(--color-bg, white);
-    border: 1px solid var(--color-border, #ddd);
-    border-radius: 12px;
-    padding: 2rem;
-    margin-bottom: 2rem;
-  }
-
-  .form-group {
-    margin-bottom: 1.5rem;
-  }
-
-  label {
-    display: block;
-    font-weight: 500;
-    margin-bottom: 0.5rem;
-  }
-
-  .hint {
-    display: block;
-    font-size: 0.875rem;
-    font-weight: 400;
-    color: var(--color-text-secondary, #666);
-    margin-top: 0.25rem;
-  }
-
-  input {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid var(--color-border, #ddd);
-    border-radius: 8px;
-    font-size: 1rem;
-    transition: border-color 0.2s;
-  }
-
-  input:focus {
-    outline: none;
-    border-color: var(--color-primary, #0066cc);
-  }
-
-  .form-actions {
-    display: flex;
-    gap: 1rem;
-    margin-top: 2rem;
-  }
-
-  .form-actions button {
-    flex: 1;
-  }
-
-  .info-box {
-    background: var(--color-bg-secondary, #f9f9f9);
-    border: 1px solid var(--color-border, #ddd);
-    border-radius: 12px;
-    padding: 1.5rem;
-  }
-
-  .info-box h3 {
-    margin: 0 0 1rem 0;
-    font-size: 1rem;
-  }
-
-  .info-box ul {
-    margin: 0;
-    padding-left: 1.5rem;
-  }
-
-  .info-box li {
-    margin: 0.5rem 0;
-    color: var(--color-text-secondary, #666);
-  }
-
-  @media (prefers-color-scheme: dark) {
-    .create-form {
-      background: var(--color-bg, #1e1e1e);
-      border-color: var(--color-border, #444);
-    }
-
-    input {
-      background: var(--color-bg, #2a2a2a);
-      border-color: var(--color-border, #444);
-      color: var(--color-text, #fff);
-    }
-
-    .info-box {
-      background: var(--color-bg-secondary, #2a2a2a);
-      border-color: var(--color-border, #444);
-    }
-  }
-</style>
