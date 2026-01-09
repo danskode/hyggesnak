@@ -46,7 +46,7 @@
             const numericMessageId = parseInt(messageId, 10);
             messages = messages.map(msg => {
                 if (msg.id === numericMessageId) {
-                    return { ...msg, is_deleted: true, content: '[Slettet]' };
+                    return { ...msg, is_deleted: true, content: '(Beskeden er slettet)' };
                 }
                 return msg;
             });
@@ -142,7 +142,7 @@
             // Process messages to show [Slettet] for deleted messages
             messages = result.data.map(msg => {
                 if (msg.is_deleted) {
-                    return { ...msg, content: '[Slettet]' };
+                    return { ...msg, content: '(Beskeden er slettet)' };
                 }
                 return msg;
             }).reverse(); // Reverse to show oldest first
@@ -164,7 +164,7 @@
                 { content }
             );
 
-            // Add message optimistically
+            // Add message
             messages = [...messages, result.data];
             scrollToBottom();
         } catch (err) {
@@ -186,7 +186,6 @@
                 msg.id === messageId ? result.data : msg
             );
 
-            toast.success('Besked redigeret');
         } catch (err) {
             console.error(err);
         }
@@ -198,7 +197,7 @@
 
             // Update message locally (soft delete)
             messages = messages.map(msg =>
-                msg.id === messageId ? { ...msg, is_deleted: true, content: '[Slettet]' } : msg
+                msg.id === messageId ? { ...msg, is_deleted: true, content: '(slettet besked)' } : msg
             );
 
             toast.success('Beskeden er slettet');

@@ -10,13 +10,12 @@
       const updateFavicon = () => {
         const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         const favicon = document.getElementById('favicon');
-        favicon.href = isDark
-          ? '/images/favicons/favicon-darkmode.png'
-          : '/images/favicons/favicon-lightmode.png';
+        if (favicon) {
+          favicon.href = isDark
+            ? '/images/favicons/favicon-darkmode.png'
+            : '/images/favicons/favicon-lightmode.png';
+        }
       };
-
-      // Opdater favicon ved load
-      updateFavicon();
 
       // Lyt efter ændringer i color scheme
       window.matchMedia('(prefers-color-scheme: dark)')

@@ -141,9 +141,7 @@ router.delete('/hyggesnakke/:hyggesnakId/invitations/:invitationId',
     }
 );
 
-// ============================================
-// User's Hyggesnak Invitations
-// ============================================
+// ============= User's Hyggesnak Invitations ======================//
 
 // GET /api/hyggesnak-invitations
 router.get('/hyggesnak-invitations', async (req, res, next) => {

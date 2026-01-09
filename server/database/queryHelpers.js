@@ -1,6 +1,6 @@
 import db from './db.js';
 
-//==== Database Query Helpers to avoid manual promise wrapping throughoug ====//
+//==== Database Query Helpers to avoid manual promise wrapping throughout ====//
 
 // Execute a SELECT query that returns a single row
 export function dbGet(query, params = []) {

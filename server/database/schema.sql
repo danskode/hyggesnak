@@ -140,3 +140,23 @@ CREATE INDEX IF NOT EXISTS idx_network_connections_user2 ON network_connections(
 CREATE INDEX IF NOT EXISTS idx_hyggesnak_invitations_hyggesnak ON hyggesnak_invitations(hyggesnak_id, status);
 CREATE INDEX IF NOT EXISTS idx_hyggesnak_invitations_user ON hyggesnak_invitations(invited_user_id, status);
 CREATE INDEX IF NOT EXISTS idx_hyggesnak_invitations_inviter ON hyggesnak_invitations(invited_by_user_id);
+
+-- ============================================
+-- 7. Additional Performance Indexes
+-- ============================================
+
+-- Composite index for message queries (hyggesnak + user + not deleted)
+CREATE INDEX IF NOT EXISTS idx_messages_hyggesnak_user_active
+ON messages(hyggesnak_id, user_id) WHERE is_deleted = 0;
+
+-- Partial index for active network codes
+CREATE INDEX IF NOT EXISTS idx_network_codes_active
+ON network_invite_codes(code, is_active, expires_at) WHERE is_active = 1;
+
+-- Partial index for pending network invitations
+CREATE INDEX IF NOT EXISTS idx_network_invitations_pending
+ON network_invitations(to_user_id, from_user_id) WHERE status = 'PENDING';
+
+-- Partial index for pending hyggesnak invitations
+CREATE INDEX IF NOT EXISTS idx_hyggesnak_invitations_pending
+ON hyggesnak_invitations(invited_user_id, hyggesnak_id) WHERE status = 'PENDING';

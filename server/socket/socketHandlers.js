@@ -1,6 +1,8 @@
 import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from '../config/auth.js';
-import db from '../database/db.js';
+import { dbGet } from '../database/queryHelpers.js';
+import { validateHyggesnakId, validateTypingEvent } from './socketValidators.js';
+import { socketRateLimiter } from './socketRateLimiter.js';
 
 // Helper function to emit invitation events to specific user
 export function emitToUser(io, userId, eventName, data) {
@@ -36,16 +38,10 @@ export function setupSocketHandlers(io) {
             const decoded = jwt.verify(token, JWT_SECRET);
 
             // Verify user still exists and get fresh role data
-            const user = await new Promise((resolve, reject) => {
-                db.get(
-                    'SELECT id, username, role FROM users WHERE id = ?',
-                    [decoded.id],
-                    (err, row) => {
-                        if (err) reject(err);
-                        else resolve(row);
-                    }
-                );
-            });
+            const user = await dbGet(
+                'SELECT id, username, role FROM users WHERE id = ?',
+                [decoded.id]
+            );
 
             if (!user) {
                 return next(new Error('Authentication error: User not found'));
@@ -70,26 +66,28 @@ export function setupSocketHandlers(io) {
         }
 
         socket.on('join-hyggesnak', async (hyggesnakId) => {
+            // Check rate limit first
+            const rateLimitCheck = socketRateLimiter.check(socket.id, 'join-hyggesnak');
+            if (!rateLimitCheck.allowed) {
+                socket.emit('error', { message: rateLimitCheck.message });
+                return;
+            }
+
             try {
                 // Validate input
-                const parsedId = parseInt(hyggesnakId, 10);
-                if (isNaN(parsedId) || parsedId <= 0) {
-                    socket.emit('error', { message: 'Ugyldigt hyggesnak ID' });
+                const validation = validateHyggesnakId(hyggesnakId);
+                if (!validation.valid) {
+                    socket.emit('error', { message: validation.error });
                     return;
                 }
+                const parsedId = validation.value;
 
                 // Verify user is member of this hyggesnak
-                const membership = await new Promise((resolve, reject) => {
-                    db.get(
-                        `SELECT * FROM hyggesnak_memberships
-                         WHERE user_id = ? AND hyggesnak_id = ?`,
-                        [socket.userId, parsedId],
-                        (err, row) => {
-                            if (err) reject(err);
-                            else resolve(row);
-                        }
-                    );
-                });
+                const membership = await dbGet(
+                    `SELECT * FROM hyggesnak_memberships
+                     WHERE user_id = ? AND hyggesnak_id = ?`,
+                    [socket.userId, parsedId]
+                );
 
                 if (!membership) {
                     socket.emit('error', { message: 'Du har ikke adgang til denne hyggesnak' });
@@ -99,8 +97,6 @@ export function setupSocketHandlers(io) {
                 // Join the room
                 socket.join(`hyggesnak-${parsedId}`);
                 socket.currentHyggesnakId = parsedId;
-                // console.log(`User ${socket.userId} joined hyggesnak-${parsedId}`);
-
             } catch (err) {
                 console.error('Error joining hyggesnak:', err);
                 socket.emit('error', { message: 'Kunne ikke tilslutte til hyggesnak' });
@@ -116,25 +112,27 @@ export function setupSocketHandlers(io) {
         });
 
         // Handle typing indicator
-        socket.on('typing', async ({ hyggesnakId }) => {
+        socket.on('typing', async (payload) => {
+            // Check rate limit
+            const rateLimitCheck = socketRateLimiter.check(socket.id, 'typing');
+            if (!rateLimitCheck.allowed) {
+                return; // Silently ignore rate-limited typing events
+            }
+
             try {
-                const parsedId = parseInt(hyggesnakId, 10);
-                if (isNaN(parsedId) || parsedId <= 0) {
-                    return;
+                // Validate payload
+                const validation = validateTypingEvent(payload);
+                if (!validation.valid) {
+                    return; // Silently ignore invalid typing events
                 }
+                const parsedId = validation.value;
 
                 // Verify membership before broadcasting
-                const membership = await new Promise((resolve, reject) => {
-                    db.get(
-                        `SELECT * FROM hyggesnak_memberships
-                         WHERE user_id = ? AND hyggesnak_id = ?`,
-                        [socket.userId, parsedId],
-                        (err, row) => {
-                            if (err) reject(err);
-                            else resolve(row);
-                        }
-                    );
-                });
+                const membership = await dbGet(
+                    `SELECT * FROM hyggesnak_memberships
+                     WHERE user_id = ? AND hyggesnak_id = ?`,
+                    [socket.userId, parsedId]
+                );
 
                 if (membership) {
                     // Broadcast to others in the room
@@ -149,25 +147,27 @@ export function setupSocketHandlers(io) {
         });
 
         // Handle stop typing
-        socket.on('stop-typing', async ({ hyggesnakId }) => {
+        socket.on('stop-typing', async (payload) => {
+            // Check rate limit
+            const rateLimitCheck = socketRateLimiter.check(socket.id, 'stop-typing');
+            if (!rateLimitCheck.allowed) {
+                return; // Silently ignore rate-limited events
+            }
+
             try {
-                const parsedId = parseInt(hyggesnakId, 10);
-                if (isNaN(parsedId) || parsedId <= 0) {
-                    return;
+                // Validate payload
+                const validation = validateTypingEvent(payload);
+                if (!validation.valid) {
+                    return; // Silently ignore invalid events
                 }
+                const parsedId = validation.value;
 
                 // Verify membership before broadcasting
-                const membership = await new Promise((resolve, reject) => {
-                    db.get(
-                        `SELECT * FROM hyggesnak_memberships
-                         WHERE user_id = ? AND hyggesnak_id = ?`,
-                        [socket.userId, parsedId],
-                        (err, row) => {
-                            if (err) reject(err);
-                            else resolve(row);
-                        }
-                    );
-                });
+                const membership = await dbGet(
+                    `SELECT * FROM hyggesnak_memberships
+                     WHERE user_id = ? AND hyggesnak_id = ?`,
+                    [socket.userId, parsedId]
+                );
 
                 if (membership) {
                     // Broadcast to others in the room
@@ -182,6 +182,9 @@ export function setupSocketHandlers(io) {
         });
 
         socket.on('disconnect', (reason) => {
+            // Cleanup rate limiter data
+            socketRateLimiter.remove(socket.id);
+
             if (socket.currentHyggesnakId) {
                 socket.leave(`hyggesnak-${socket.currentHyggesnakId}`);
             }

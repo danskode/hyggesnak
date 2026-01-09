@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
-import db from '../database/db.js';
+import { dbGet, dbRun } from '../database/queryHelpers.js';
 import emailService from './emailService.js';
 import { JWT_SECRET, JWT_EXPIRY } from '../config/auth.js';
 import { config } from '../config/config.js';
@@ -9,134 +9,106 @@ import { config } from '../config/config.js';
 class AuthService {
     // Login user and generate JWT token
     async login(username, password) {
-        return new Promise((resolve, reject) => {
-            db.get(
-                'SELECT * FROM users WHERE username = ?',
-                [username],
-                async (err, user) => {
-                    if (err) {
-                        return reject({ status: 500, message: "Server fejl" });
-                    }
+        try {
+            const user = await dbGet('SELECT * FROM users WHERE username = ?', [username]);
 
-                    if (!user) {
-                        return reject({ status: 401, message: "Forkert brugernavn eller password" });
-                    }
+            if (!user) {
+                throw { status: 401, message: "Forkert brugernavn eller password" };
+            }
 
-                    try {
-                        const isValidPassword = await bcrypt.compare(password, user.password);
+            const isValidPassword = await bcrypt.compare(password, user.password);
+            if (!isValidPassword) {
+                throw { status: 401, message: "Forkert brugernavn eller password" };
+            }
 
-                        if (!isValidPassword) {
-                            return reject({ status: 401, message: "Forkert brugernavn eller password" });
-                        }
-
-                        // Generate JWT token
-                        const token = jwt.sign(
-                            { id: user.id, username: user.username, role: user.role },
-                            JWT_SECRET,
-                            { expiresIn: JWT_EXPIRY }
-                        );
-
-                        resolve({
-                            id: user.id,
-                            username: user.username,
-                            role: user.role,
-                            token: token
-                        });
-                    } catch (error) {
-                        reject({ status: 500, message: "Server fejl" });
-                    }
-                }
+            // Generate JWT token
+            const token = jwt.sign(
+                { id: user.id, username: user.username, role: user.role },
+                JWT_SECRET,
+                { expiresIn: JWT_EXPIRY }
             );
-        });
+
+            return {
+                id: user.id,
+                username: user.username,
+                role: user.role,
+                token: token
+            };
+        } catch (error) {
+            if (error.status) throw error;
+            throw { status: 500, message: "Server fejl" };
+        }
     }
 
     // Request password reset - generate and save token
     async requestPasswordReset(email) {
-        return new Promise((resolve, reject) => {
-            db.get('SELECT * FROM users WHERE email = ?', [email], (err, user) => {
-                if (err) {
-                    return reject({ status: 500, message: "Server fejl" });
-                }
+        try {
+            const user = await dbGet('SELECT * FROM users WHERE email = ?', [email]);
 
-                // Always return success for security (don't reveal if email exists)
-                if (!user) {
-                    return resolve({ message: "Hvis emailen findes, er et reset link sendt" });
-                }
+            // Always return success for security (don't reveal if email exists)
+            if (!user) {
+                return { message: "Hvis emailen findes, er et reset link sendt" };
+            }
 
-                // Generate reset token - this will be sent to user
-                const resetToken = crypto.randomBytes(32).toString('hex');
+            // Generate reset token - this will be sent to user
+            const resetToken = crypto.randomBytes(32).toString('hex');
 
-                // Hash token before storing in database for security
-                const hashedToken = crypto
-                    .createHash('sha256')
-                    .update(resetToken)
-                    .digest('hex');
+            // Hash token before storing in database for security
+            const hashedToken = crypto
+                .createHash('sha256')
+                .update(resetToken)
+                .digest('hex');
 
-                const resetTokenExpires = new Date(Date.now() + config.resetTokenExpiryHours * 60 * 60 * 1000);
+            const resetTokenExpires = new Date(Date.now() + config.resetTokenExpiryHours * 60 * 60 * 1000);
 
-                // Save HASHED token to database
-                db.run(
-                    'UPDATE users SET reset_token = ?, reset_token_expires = ? WHERE id = ?',
-                    [hashedToken, resetTokenExpires.toISOString(), user.id],
-                    (err) => {
-                        if (err) {
-                            return reject({ status: 500, message: "Server fejl" });
-                        }
+            // Save HASHED token to database
+            await dbRun(
+                'UPDATE users SET reset_token = ?, reset_token_expires = ? WHERE id = ?',
+                [hashedToken, resetTokenExpires.toISOString(), user.id]
+            );
 
-                        // Send UNHASHED token via email (user needs this to reset password)
-                        emailService.sendPasswordResetEmail(user.username, user.email, resetToken)
-                            .catch(err => console.error('Email send error:', err));
+            // Send UNHASHED token via email (user needs this to reset password)
+            emailService.sendPasswordResetEmail(user.username, user.email, resetToken)
+                .catch(err => console.error('Email send error:', err));
 
-                        resolve({ message: "Hvis emailen findes, er et reset link sendt" });
-                    }
-                );
-            });
-        });
+            return { message: "Hvis emailen findes, er et reset link sendt" };
+        } catch (error) {
+            throw { status: 500, message: "Server fejl" };
+        }
     }
 
     // Reset password with token
     async resetPassword(token, newPassword) {
-        return new Promise((resolve, reject) => {
+        try {
             // Hash the incoming token to compare with database
             const hashedToken = crypto
                 .createHash('sha256')
                 .update(token)
                 .digest('hex');
 
-            db.get(
+            const user = await dbGet(
                 'SELECT * FROM users WHERE reset_token = ? AND reset_token_expires > ?',
-                [hashedToken, new Date().toISOString()],
-                async (err, user) => {
-                    if (err) {
-                        return reject({ status: 500, message: "Server fejl" });
-                    }
-
-                    if (!user) {
-                        return reject({ status: 400, message: "Ugyldig eller udløbet reset token" });
-                    }
-
-                    try {
-                        // Hash new password
-                        const hashedPassword = await bcrypt.hash(newPassword, config.saltRounds);
-
-                        // Update password and clear reset token
-                        db.run(
-                            'UPDATE users SET password = ?, reset_token = NULL, reset_token_expires = NULL WHERE id = ?',
-                            [hashedPassword, user.id],
-                            (err) => {
-                                if (err) {
-                                    return reject({ status: 500, message: "Server fejl" });
-                                }
-
-                                resolve({ message: "Password er blevet nulstillet succesfuldt" });
-                            }
-                        );
-                    } catch (error) {
-                        reject({ status: 500, message: "Server fejl" });
-                    }
-                }
+                [hashedToken, new Date().toISOString()]
             );
-        });
+
+            if (!user) {
+                throw { status: 400, message: "Ugyldig eller udløbet reset token" };
+            }
+
+            // Hash new password
+            const hashedPassword = await bcrypt.hash(newPassword, config.saltRounds);
+
+            // Update password and clear reset token
+            await dbRun(
+                'UPDATE users SET password = ?, reset_token = NULL, reset_token_expires = NULL WHERE id = ?',
+                [hashedPassword, user.id]
+            );
+
+            return { message: "Password er blevet nulstillet succesfuldt" };
+        } catch (error) {
+            if (error.status) throw error;
+            throw { status: 500, message: "Server fejl" };
+        }
     }
 }
 

@@ -1,4 +1,5 @@
 import db, { dbReady } from './db.js';
+import { dbRun } from './queryHelpers.js';
 import bcrypt from 'bcrypt';
 import { config } from '../config/config.js';
 
@@ -83,24 +84,19 @@ async function seedDatabase() {
         // 1. Create hyggesnakke
         console.log('Creating hyggesnakke...');
         for (const hyggesnak of hyggesnakke) {
-            await new Promise((resolve, reject) => {
-                db.run(
+            try {
+                await dbRun(
                     'INSERT INTO hyggesnakke (name, display_name) VALUES (?, ?)',
-                    [hyggesnak.name, hyggesnak.display_name],
-                    (err) => {
-                        if (err) {
-                            if (err.message.includes('UNIQUE constraint failed')) {
-                                console.log(`⚠️  Hyggesnak ${hyggesnak.name} already exists, skipping...`);
-                            } else {
-                                console.error(`❌ Error inserting hyggesnak ${hyggesnak.name}:`, err);
-                            }
-                        } else {
-                            console.log(`✓ Hyggesnak ${hyggesnak.name} created`);
-                        }
-                        resolve();
-                    }
+                    [hyggesnak.name, hyggesnak.display_name]
                 );
-            });
+                console.log(`✓ Hyggesnak ${hyggesnak.name} created`);
+            } catch (err) {
+                if (err.message.includes('UNIQUE constraint failed')) {
+                    console.log(`⚠️  Hyggesnak ${hyggesnak.name} already exists, skipping...`);
+                } else {
+                    console.error(`❌ Error inserting hyggesnak ${hyggesnak.name}:`, err);
+                }
+            }
         }
 
         // 2. Create users
@@ -108,70 +104,55 @@ async function seedDatabase() {
         for (const user of users) {
             const hashedPassword = await bcrypt.hash(user.password, config.saltRounds);
 
-            await new Promise((resolve, reject) => {
-                db.run(
+            try {
+                await dbRun(
                     'INSERT INTO users (username, display_name, password, email, role) VALUES (?, ?, ?, ?, ?)',
-                    [user.username, user.display_name, hashedPassword, user.email, user.role],
-                    (err) => {
-                        if (err) {
-                            if (err.message.includes('UNIQUE constraint failed')) {
-                                console.log(`⚠️  User ${user.username} already exists, skipping...`);
-                            } else {
-                                console.error(`❌ Error inserting user ${user.username}:`, err);
-                            }
-                        } else {
-                            console.log(`✓ User ${user.username} created`);
-                        }
-                        resolve();
-                    }
+                    [user.username, user.display_name, hashedPassword, user.email, user.role]
                 );
-            });
+                console.log(`✓ User ${user.username} created`);
+            } catch (err) {
+                if (err.message.includes('UNIQUE constraint failed')) {
+                    console.log(`⚠️  User ${user.username} already exists, skipping...`);
+                } else {
+                    console.error(`❌ Error inserting user ${user.username}:`, err);
+                }
+            }
         }
 
         // 3. Create memberships
         console.log('\nCreating memberships...');
         for (const [userId, hyggesnakId, role] of memberships) {
-            await new Promise((resolve, reject) => {
-                db.run(
+            try {
+                await dbRun(
                     'INSERT INTO hyggesnak_memberships (user_id, hyggesnak_id, role) VALUES (?, ?, ?)',
-                    [userId, hyggesnakId, role],
-                    (err) => {
-                        if (err) {
-                            if (err.message.includes('UNIQUE constraint failed')) {
-                                console.log(`⚠️  Membership (user ${userId}, hyggesnak ${hyggesnakId}) already exists, skipping...`);
-                            } else {
-                                console.error(`❌ Error creating membership:`, err);
-                            }
-                        } else {
-                            console.log(`✓ Membership created: user ${userId} -> hyggesnak ${hyggesnakId} (${role})`);
-                        }
-                        resolve();
-                    }
+                    [userId, hyggesnakId, role]
                 );
-            });
+                console.log(`✓ Membership created: user ${userId} -> hyggesnak ${hyggesnakId} (${role})`);
+            } catch (err) {
+                if (err.message.includes('UNIQUE constraint failed')) {
+                    console.log(`⚠️  Membership (user ${userId}, hyggesnak ${hyggesnakId}) already exists, skipping...`);
+                } else {
+                    console.error(`❌ Error creating membership:`, err);
+                }
+            }
         }
 
         // 4. Create network connections
         console.log('\nCreating network connections...');
         for (const [userId1, userId2] of networkConnections) {
-            await new Promise((resolve, reject) => {
-                db.run(
+            try {
+                await dbRun(
                     'INSERT INTO network_connections (user_id_1, user_id_2) VALUES (?, ?)',
-                    [userId1, userId2],
-                    (err) => {
-                        if (err) {
-                            if (err.message.includes('UNIQUE constraint failed')) {
-                                console.log(`⚠️  Network connection (${userId1} <-> ${userId2}) already exists, skipping...`);
-                            } else {
-                                console.error(`❌ Error creating network connection:`, err);
-                            }
-                        } else {
-                            console.log(`✓ Network connection created: ${userId1} <-> ${userId2}`);
-                        }
-                        resolve();
-                    }
+                    [userId1, userId2]
                 );
-            });
+                console.log(`✓ Network connection created: ${userId1} <-> ${userId2}`);
+            } catch (err) {
+                if (err.message.includes('UNIQUE constraint failed')) {
+                    console.log(`⚠️  Network connection (${userId1} <-> ${userId2}) already exists, skipping...`);
+                } else {
+                    console.error(`❌ Error creating network connection:`, err);
+                }
+            }
         }
 
         console.log('\n✓ Seeding complete!');

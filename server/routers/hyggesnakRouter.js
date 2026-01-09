@@ -3,6 +3,7 @@ import { authenticateToken } from '../middleware/authMiddleware.js';
 import { requireHyggesnakContext, requireHyggesnakOwner } from '../middleware/hyggesnakContextMiddleware.js';
 import { membersReadLimiter, membersCreateLimiter, membersDeleteLimiter } from '../middleware/rateLimitersMiddleware.js';
 import db from '../database/db.js';
+import { transaction } from '../database/queryHelpers.js';
 import { validateHyggesnakName, validateDisplayName, sanitizeString, sanitizeDisplayName } from '../utils/validators.js';
 
 const router = Router();
@@ -37,107 +38,80 @@ router.get('/hyggesnakke', authenticateToken, membersReadLimiter, (req, res) => 
 //==== POST /api/hyggesnakke - Create new hyggesnak ====//
 
 router.post('/hyggesnakke', authenticateToken, membersCreateLimiter, async (req, res) => {
-    let { name, display_name } = req.body;
+    try {
+        let { name, display_name } = req.body;
 
-    // Sanitize inputs
-    name = sanitizeString(name);
-    display_name = sanitizeDisplayName(display_name);
+        // Sanitize inputs
+        name = sanitizeString(name);
+        display_name = sanitizeDisplayName(display_name);
 
-    // Validate hyggesnak name (URL-safe identifier)
-    const nameValidation = validateHyggesnakName(name);
-    if (!nameValidation.valid) {
-        return res.status(400).send({
-            message: nameValidation.message
-        });
-    }
+        // Validate hyggesnak name (URL-safe identifier)
+        const nameValidation = validateHyggesnakName(name);
+        if (!nameValidation.valid) {
+            return res.status(400).send({
+                message: nameValidation.message
+            });
+        }
 
-    // Validate display name (public name with Danish chars, emojis)
-    const displayNameValidation = validateDisplayName(display_name);
-    if (!displayNameValidation.valid) {
-        return res.status(400).send({
-            message: displayNameValidation.message
-        });
-    }
+        // Validate display name (public name with Danish chars, emojis)
+        const displayNameValidation = validateDisplayName(display_name);
+        if (!displayNameValidation.valid) {
+            return res.status(400).send({
+                message: displayNameValidation.message
+            });
+        }
 
-    // Normalize name to lowercase for case-insensitive uniqueness
-    const normalizedName = name.toLowerCase();
+        // Normalize name to lowercase for case-insensitive uniqueness
+        const normalizedName = name.toLowerCase();
 
-    // Use transaction to ensure atomic operation
-    db.serialize(() => {
-        db.run('BEGIN TRANSACTION', (err) => {
-            if (err) {
-                console.error('Transaction error:', err);
-                return res.status(500).send({ message: "Serverfejl" });
+        // Use transaction helper for atomic operation
+        const hyggesnak = await transaction(async ({ dbRun, dbGet }) => {
+            let hyggesnakId;
+            try {
+                const result = await dbRun(
+                    'INSERT INTO hyggesnakke (name, display_name) VALUES (?, ?)',
+                    [normalizedName, display_name]
+                );
+                hyggesnakId = result.lastID;
+            } catch (err) {
+                if (err.message.includes('UNIQUE constraint failed')) {
+                    throw { status: 400, message: "Dette hyggesnak navn er allerede i brug" };
+                }
+                throw err;
             }
 
-            // Insert new hyggesnak
-            db.run(
-                'INSERT INTO hyggesnakke (name, display_name) VALUES (?, ?)',
-                [normalizedName, display_name],
-                function (err) {
-                    if (err) {
-                        db.run('ROLLBACK');
-                        if (err.message.includes('UNIQUE constraint failed')) {
-                            return res.status(400).send({
-                                message: "Dette hyggesnak navn er allerede i brug"
-                            });
-                        }
-                        console.error('Database error:', err);
-                        return res.status(500).send({ message: "Serverfejl" });
-                    }
+            // Add creator as OWNER member
+            await dbRun(
+                'INSERT INTO hyggesnak_memberships (user_id, hyggesnak_id, role) VALUES (?, ?, ?)',
+                [req.user.id, hyggesnakId, 'OWNER']
+            );
 
-                    const hyggesnakId = this.lastID;
-
-                    // Add creator as OWNER member
-                    db.run(
-                        'INSERT INTO hyggesnak_memberships (user_id, hyggesnak_id, role) VALUES (?, ?, ?)',
-                        [req.user.id, hyggesnakId, 'OWNER'],
-                        (err) => {
-                            if (err) {
-                                console.error('Database error adding admin membership:', err);
-                                db.run('ROLLBACK');
-                                return res.status(500).send({ message: "Serverfejl" });
-                            }
-
-                            // Commit transaction
-                            db.run('COMMIT', (err) => {
-                                if (err) {
-                                    console.error('Transaction commit error:', err);
-                                    db.run('ROLLBACK');
-                                    return res.status(500).send({ message: "Serverfejl" });
-                                }
-
-                                // Get the created hyggesnak with full details
-                                db.get(
-                                    `SELECT
-                                        h.id,
-                                        h.name,
-                                        h.display_name,
-                                        h.created_at,
-                                        'OWNER' as user_role,
-                                        1 as member_count
-                                    FROM hyggesnakke h
-                                    WHERE h.id = ?`,
-                                    [hyggesnakId],
-                                    (err, hyggesnak) => {
-                                        if (err) {
-                                            console.error('Database error:', err);
-                                            return res.status(500).send({ message: "Serverfejl" });
-                                        }
-
-                                        res.status(201).send({
-                                            message: "Hyggesnak oprettet",
-                                            data: hyggesnak
-                                        });
-                                    }
-                                );
-                            });
-                        }
-                    );
-                }
+            // Get the created hyggesnak with full details
+            return await dbGet(
+                `SELECT
+                    h.id,
+                    h.name,
+                    h.display_name,
+                    h.created_at,
+                    'OWNER' as user_role,
+                    1 as member_count
+                FROM hyggesnakke h
+                WHERE h.id = ?`,
+                [hyggesnakId]
             );
         });
-    });
+
+        res.status(201).send({
+            message: "Hyggesnak oprettet",
+            data: hyggesnak
+        });
+    } catch (error) {
+        if (error.status) {
+            return res.status(error.status).send({ message: error.message });
+        }
+        console.error('Database error:', error);
+        res.status(500).send({ message: "Serverfejl" });
+    }
 });
 
 //==== GET /api/hyggesnakke/:id - Get hyggesnak details ====//

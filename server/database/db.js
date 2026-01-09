@@ -16,11 +16,65 @@ const db = new sqlite3.Database(dbPath, (err) => {
     }
 });
 
-// Enable foreign keys
-db.run('PRAGMA foreign_keys = ON', (err) => {
-    if (err) {
-        console.error('Error enabling foreign keys:', err);
-    }
+// Configure database for optimal performance
+db.serialize(() => {
+    // Enable foreign keys (security)
+    db.run('PRAGMA foreign_keys = ON', (err) => {
+        if (err) {
+            console.error('❌ Error enabling foreign keys:', err);
+        }
+    });
+
+    // Enable WAL mode for better concurrency (multiple readers, one writer)
+    db.run('PRAGMA journal_mode = WAL', (err) => {
+        if (err) {
+            console.error('❌ Error enabling WAL mode:', err);
+        } else {
+            console.log('✓ WAL mode enabled');
+        }
+    });
+
+    // Optimize WAL checkpoint behavior
+    db.run('PRAGMA wal_autocheckpoint = 1000', (err) => {
+        if (err) {
+            console.error('❌ Error setting WAL autocheckpoint:', err);
+        }
+    });
+
+    // Enable busy timeout to handle concurrent access
+    db.run('PRAGMA busy_timeout = 5000', (err) => {
+        if (err) {
+            console.error('❌ Error setting busy timeout:', err);
+        }
+    });
+
+    // Optimize cache size (in pages, -2000 = ~2MB)
+    db.run('PRAGMA cache_size = -2000', (err) => {
+        if (err) {
+            console.error('❌ Error setting cache size:', err);
+        }
+    });
+
+    // Use memory-mapped I/O for better performance (30MB)
+    db.run('PRAGMA mmap_size = 30000000', (err) => {
+        if (err) {
+            console.error('❌ Error setting mmap size:', err);
+        }
+    });
+
+    // Optimize synchronous mode (NORMAL is safe with WAL)
+    db.run('PRAGMA synchronous = NORMAL', (err) => {
+        if (err) {
+            console.error('❌ Error setting synchronous mode:', err);
+        }
+    });
+
+    // Optimize temp store to use memory
+    db.run('PRAGMA temp_store = MEMORY', (err) => {
+        if (err) {
+            console.error('❌ Error setting temp store:', err);
+        }
+    });
 });
 
 // Promise wrapper for database ready state
