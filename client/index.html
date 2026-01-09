@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/images/favicons/favicon-lightmode.png" id="favicon" />
+    <link rel="icon" type="image/png" href="/images/favicons/favicon-lightmode.png?v=2" id="favicon" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Hyggesnakke - start en hyggesnak med din familie og venner (ikke en masse reklamesælgere)</title>
     <script>
@@ -12,10 +12,13 @@
         const favicon = document.getElementById('favicon');
         if (favicon) {
           favicon.href = isDark
-            ? '/images/favicons/favicon-darkmode.png'
-            : '/images/favicons/favicon-lightmode.png';
+            ? '/images/favicons/favicon-darkmode.png?v=2'
+            : '/images/favicons/favicon-lightmode.png?v=2';
         }
       };
+
+      // Run on page load
+      updateFavicon();
 
       // Lyt efter ændringer i color scheme
       window.matchMedia('(prefers-color-scheme: dark)')

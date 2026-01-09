@@ -58,7 +58,15 @@ h2 {
 .chat-container {
     display: flex;
     flex: 1;
-    overflow: hidden;
+    min-height: 0;
+    position: relative;
+}
+
+.chat-main {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
 }
 
 /* Invite functionality integrated into MembersSidebar.svelte */
@@ -75,8 +83,24 @@ h2 {
 
 @media (max-width: 768px) {
     .chat-page {
-        height: 70vh;
+        height: auto;
+        min-height: 100vh;
         border-radius: 0;
         max-width: 100%;
+        background: var(--color-bg-secondary);
+    }
+
+    .chat-container {
+        flex-direction: column;
+        padding: var(--space-4);
+        gap: 0;
+    }
+
+    .chat-main {
+        flex: 1;
+        min-height: 60vh;
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        box-shadow: var(--shadow-md);
     }
 }

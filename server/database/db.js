@@ -7,7 +7,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Database file path
-const dbPath = path.join(__dirname, 'users.db');
+const dbPath = path.join(__dirname, 'hyggesnak.db');
 
 // Create SQLite database connection
 const db = new sqlite3.Database(dbPath, (err) => {

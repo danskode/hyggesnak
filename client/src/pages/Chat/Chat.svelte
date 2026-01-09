@@ -279,14 +279,27 @@
         </div>
 
         <div class="chat-container">
-            <!-- Messages Area -->
-            <MessageList
-                {messages}
-                currentUserId={$auth.id}
-                onEditMessage={editMessage}
-                onDeleteMessage={deleteMessage}
-                bind:messagesContainerRef={messagesContainer}
-            />
+            <!-- Main Chat Area (Messages + Input) -->
+            <div class="chat-main">
+                <!-- Messages Area -->
+                <MessageList
+                    {messages}
+                    currentUserId={$auth.id}
+                    onEditMessage={editMessage}
+                    onDeleteMessage={deleteMessage}
+                    bind:messagesContainerRef={messagesContainer}
+                />
+
+                <!-- Message Input -->
+                <MessageInput
+                    onSend={sendMessage}
+                    onTyping={handleTyping}
+                    onStopTyping={handleStopTyping}
+                    {sending}
+                    disabled={!socket.isConnected}
+                    {typingUsers}
+                />
+            </div>
 
             <!-- Members Sidebar -->
             <MemberSidebar
@@ -299,16 +312,6 @@
                 onDeleteHyggesnak={deleteHyggesnak}
             />
         </div>
-
-        <!-- Message Input -->
-        <MessageInput
-            onSend={sendMessage}
-            onTyping={handleTyping}
-            onStopTyping={handleStopTyping}
-            {sending}
-            disabled={!socket.isConnected}
-            {typingUsers}
-        />
 
         <!-- Connection status indicator -->
         {#if !socket.isConnected}

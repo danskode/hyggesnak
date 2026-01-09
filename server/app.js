@@ -95,19 +95,25 @@ app.set('io', io);
 const gracefulShutdown = (signal) => {
     console.log(`\n${signal} received. Starting graceful shutdown...`);
 
-    server.close(() => {
-        console.log('HTTP server closed');
+    // Close Socket.IO connections first
+    io.close(() => {
+        console.log('Socket.IO server closed');
 
-        // Close database connection
-        import('./database/db.js').then((dbModule) => {
-            const db = dbModule.default;
-            db.close((err) => {
-                if (err) {
-                    console.error('Error closing database:', err);
-                    process.exit(1);
-                }
-                console.log('Database connection closed');
-                process.exit(0);
+        // Then close HTTP server
+        server.close(() => {
+            console.log('HTTP server closed');
+
+            // Finally close database connection
+            import('./database/db.js').then((dbModule) => {
+                const db = dbModule.default;
+                db.close((err) => {
+                    if (err) {
+                        console.error('Error closing database:', err);
+                        process.exit(1);
+                    }
+                    console.log('Database connection closed');
+                    process.exit(0);
+                });
             });
         });
     });

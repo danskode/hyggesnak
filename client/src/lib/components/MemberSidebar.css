@@ -1,0 +1,229 @@
+.members-sidebar {
+    width: 280px;
+    border-left: 1px solid var(--color-border);
+    background: var(--color-card-bg);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow-y: auto;
+    flex-shrink: 0;
+}
+
+.members-sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.members-sidebar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.members-sidebar::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: var(--radius-full);
+}
+
+.members-sidebar::-webkit-scrollbar-thumb:hover {
+    background: var(--color-text-secondary);
+}
+
+.members-header {
+    padding: var(--space-6) var(--space-4);
+    border-bottom: 1px solid var(--color-border);
+    background: var(--gradient-secondary);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.members-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+/* Global .btn-success and .btn-active styles apply */
+
+.members-list {
+    padding: var(--space-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.member-card {
+    /* Similar to .list-item but with custom structure */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-3);
+    background: var(--color-bg-secondary);
+    border-radius: var(--radius-lg);
+    transition: all var(--transition-base);
+}
+
+.member-card:hover {
+    background: #e9ecef;
+    transform: translateX(-2px);
+}
+
+.member-info {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex: 1;
+    min-width: 0;
+}
+
+/* Avatar styling now handled by Avatar component */
+
+.member-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.member-name {
+    font-weight: 500;
+    font-size: 0.875rem;
+    color: var(--color-text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.member-role {
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+    margin-top: var(--space-1);
+}
+
+/* Global .btn-icon and .btn-danger-hover styles apply */
+
+.delete-section {
+    padding: var(--space-4);
+    border-top: 2px solid var(--color-border);
+    background: var(--color-bg-secondary);
+    text-align: center;
+}
+
+.delete-info {
+    margin: 0 0 var(--space-3) 0;
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+    font-style: italic;
+}
+
+.delete-section .btn {
+    width: 100%;
+}
+
+/* Global .btn-danger styles apply */
+
+.invite-section {
+    margin: var(--space-4);
+    border-radius: var(--radius-lg);
+    background: var(--color-bg-secondary);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    animation: slideDown 0.3s ease-out;
+}
+
+.invite-header {
+    padding: var(--space-4);
+    border-bottom: 1px solid var(--color-border);
+    flex-shrink: 0;
+    background: var(--gradient-secondary);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+.invite-header h4 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.invite-body {
+    padding: var(--space-4);
+    flex: 1;
+}
+
+.invite-loading {
+    /* Global .empty-state styles apply */
+    text-align: center;
+    padding: var(--space-6);
+    color: var(--color-text-secondary);
+}
+
+.invite-empty {
+    /* Global .empty-state styles apply */
+    font-size: 0.875rem;
+}
+
+.invite-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.invite-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-2);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-card-bg);
+    transition: background-color var(--transition-base);
+}
+
+.invite-item:hover {
+    background-color: var(--color-bg-secondary);
+}
+
+.invite-user {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex: 1;
+    min-width: 0;
+}
+
+.invite-name {
+    font-weight: 500;
+    font-size: 0.875rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+    .members-sidebar {
+        width: 100%;
+        height: auto;
+        max-height: none;
+        overflow-y: visible;
+        border-left: none;
+        border-top: none;
+        margin: var(--space-8) 0 0 0;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+    }
+
+    .members-header {
+        padding: var(--space-4);
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    }
+
+    .members-list {
+        padding: var(--space-3);
+    }
+
+    .invite-section {
+        margin: var(--space-3);
+    }
+}

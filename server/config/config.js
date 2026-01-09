@@ -5,7 +5,7 @@ export const config = {
     clientUrl: process.env.CLIENT_URL || 'http://localhost:5173',
 
     // Database
-    dbPath: './database/users.db',
+    dbPath: './database/hyggesnak.db',
 
     // Email
     resendApiKey: process.env.RESEND_API_KEY,
