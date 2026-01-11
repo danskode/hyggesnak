@@ -5,7 +5,7 @@
   import { hyggesnakke, currentHyggesnak } from '../../lib/stores/hyggesnakStore.js';
   import { unreadCounts } from '../../lib/stores/unreadStore.js';
   import { toast } from 'svelte-sonner';
-  import { sanitizeHyggesnakName } from '../../lib/utils/sanitize.js';
+  import { sanitizeHyggesnakName, sanitizeDisplayName } from '../../lib/utils/sanitize.js';
   import { apiGet, apiDelete } from '../../lib/api/api.js';
   import { API_ENDPOINTS } from '../../lib/utils/constants.js';
   import { useSocket } from '../../lib/composables/useSocket.js';
@@ -83,7 +83,7 @@
 
 <div class="content-page">
   <div class="page-header">
-    <h1>Dine hyggesnakke</h1>
+    <h1>{sanitizeDisplayName($auth.display_name || $auth.username)}, her er dine hyggesnakke</h1>
     <Link to="/hyggesnakke/create">
       <button class="btn btn-primary">+ Opret ny hyggesnak</button>
     </Link>
