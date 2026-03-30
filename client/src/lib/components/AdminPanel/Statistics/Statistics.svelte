@@ -72,7 +72,7 @@
                 </div>
                 <div class="info-item">
                     <span class="label">Environment:</span>
-                    <span class="value">Development</span>
+                    <span class="value">{import.meta.env.MODE}</span>
                 </div>
                 <div class="info-item">
                     <span class="label">Server Status:</span>
