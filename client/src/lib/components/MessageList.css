@@ -122,14 +122,6 @@
     opacity: 1;
 }
 
-.swipe-msg-wrapper {
-    display: contents;
-}
-
-.swipe-msg-content {
-    display: contents;
-}
-
 .swipe-action-reveal {
     display: none;
 }
@@ -139,33 +131,21 @@
         display: none;
     }
 
-    .swipe-msg-wrapper {
-        display: flex;
-        align-items: stretch;
+    .message.own {
         position: relative;
         overflow: hidden;
-        align-self: flex-end;
-        max-width: 85%;
-        border-radius: 1rem;
     }
 
-    .swipe-msg-content {
-        flex: 1;
+    .message.own .message-content {
         transition: transform 0.25s ease;
     }
 
-    .swipe-msg-wrapper.swiped-left .swipe-msg-content {
+    .message.own.swiped-left .message-content {
         transform: translateX(-88px);
-    }
-
-    .swipe-msg-wrapper .message.own {
-        max-width: 100%;
-        align-self: stretch;
     }
 
     .swipe-action-reveal {
         display: flex;
-        flex-direction: row;
         position: absolute;
         right: 0;
         top: 0;
@@ -175,7 +155,7 @@
         transition: transform 0.25s ease;
     }
 
-    .swipe-msg-wrapper.swiped-left .swipe-action-reveal {
+    .message.own.swiped-left .swipe-action-reveal {
         transform: translateX(0);
     }
 
