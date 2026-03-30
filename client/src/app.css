@@ -532,7 +532,7 @@ input::placeholder {
 /* ===== Responsive Design ===== */
 @media (max-width: 768px) {
   #app {
-    padding: 0.5rem 0.75rem;
+    padding: 0 0.75rem;
   }
 
   h1 {

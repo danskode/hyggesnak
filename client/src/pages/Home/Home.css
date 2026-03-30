@@ -71,6 +71,10 @@
 }
 
 @media (max-width: 768px) {
+    .hero-section {
+        padding: var(--space-4) var(--space-4);
+    }
+
     .hero-section h1 {
         font-size: 2rem;
     }
