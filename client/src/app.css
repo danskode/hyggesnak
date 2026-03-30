@@ -550,6 +550,10 @@ input::placeholder {
     display: flex;
     flex-direction: column;
   }
+
+  body.chat-active footer {
+    display: none;
+  }
 }
 
 /* ===== Responsive Design ===== */
