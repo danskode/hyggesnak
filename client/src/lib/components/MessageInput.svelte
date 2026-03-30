@@ -8,10 +8,18 @@
         onStopTyping = () => {},
         sending = false,
         disabled = false,
-        typingUsers = []
+        typingUsers = [],
+        autofocus = false
     } = $props();
 
     let isTyping = $state(false);
+    let inputEl = $state(null);
+
+    $effect(() => {
+        if (autofocus && inputEl) {
+            inputEl.focus();
+        }
+    });
     let lastTypingEmit = $state(0);
     let typingTimeout = $state(null);
 
@@ -109,6 +117,7 @@
     <form class="message-input" onsubmit={handleSubmit}>
         <input
             type="text"
+            bind:this={inputEl}
             bind:value
             oninput={handleInput}
             onfocus={handleFocus}

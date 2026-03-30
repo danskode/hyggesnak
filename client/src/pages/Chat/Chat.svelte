@@ -23,6 +23,8 @@
     let loading = $state(true);
     let sending = $state(false);
     let messagesContainer = $state(null);
+    let chatPage = $state(null);
+    let isMobile = $derived(typeof window !== 'undefined' && window.innerWidth <= 768);
     let typingUsers = $state([]);
     let typingTimeouts = $state(new Map());
 
@@ -105,6 +107,10 @@
         await loadMembers();
         await loadMessages();
         scrollToBottom();
+
+        if (isMobile && chatPage) {
+            chatPage.scrollIntoView({ behavior: 'smooth' });
+        }
 
         // Mark messages as read when entering chat
         await markAsRead();
@@ -265,7 +271,7 @@
     }
 </script>
 
-<div class="chat-page">
+<div class="chat-page" bind:this={chatPage}>
     {#if loading}
         <div class="loading">Indlæser chat...</div>
     {:else if !hyggesnak}
@@ -298,6 +304,7 @@
                     {sending}
                     disabled={!socket.isConnected}
                     {typingUsers}
+                    autofocus={isMobile}
                 />
             </div>
 
