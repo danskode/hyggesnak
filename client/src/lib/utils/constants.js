@@ -4,7 +4,7 @@
  */
 
 // API Base URL
-export const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8081';
+export const BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8081';
 
 // Message constraints
 export const MESSAGE_MAX_LENGTH = 2000;
