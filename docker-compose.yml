@@ -10,6 +10,10 @@ services:
       CLIENT_URL: ${CLIENT_URL}
       RESEND_API_KEY: ${RESEND_API_KEY:-}
       RESEND_ALLOWED_EMAIL: ${RESEND_ALLOWED_EMAIL:-}
+      INIT_ADMIN_USERNAME: ${INIT_ADMIN_USERNAME:-}
+      INIT_ADMIN_PASSWORD: ${INIT_ADMIN_PASSWORD:-}
+      INIT_ADMIN_EMAIL: ${INIT_ADMIN_EMAIL:-}
+      INIT_ADMIN_DISPLAY_NAME: ${INIT_ADMIN_DISPLAY_NAME:-}
     volumes:
       - db_data:/app/database
     restart: unless-stopped
