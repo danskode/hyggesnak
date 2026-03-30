@@ -23,6 +23,29 @@
   let socket = null;
   let socketInitialized = $state(false);
   let navOpen = $state(false);
+  let touchStartX = 0;
+
+  function handleEdgeTouchStart(e) {
+    touchStartX = e.touches[0].clientX;
+  }
+
+  function handleEdgeTouchEnd(e) {
+    const deltaX = e.changedTouches[0].clientX - touchStartX;
+    if (deltaX < -40) {
+      navOpen = true;
+    }
+  }
+
+  function handleNavTouchStart(e) {
+    touchStartX = e.touches[0].clientX;
+  }
+
+  function handleNavTouchEnd(e) {
+    const deltaX = e.changedTouches[0].clientX - touchStartX;
+    if (deltaX > 50) {
+      navOpen = false;
+    }
+  }
 
   $effect(() => {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
@@ -138,7 +161,17 @@
     <div class="nav-overlay" onclick={() => navOpen = false}></div>
   {/if}
 
-  <nav class:open={navOpen}>
+  <div
+    class="swipe-edge-zone"
+    ontouchstart={handleEdgeTouchStart}
+    ontouchend={handleEdgeTouchEnd}
+  ></div>
+
+  <nav
+    class:open={navOpen}
+    ontouchstart={handleNavTouchStart}
+    ontouchend={handleNavTouchEnd}
+  >
     <button class="nav-close" onclick={() => navOpen = false}>✕</button>
     {#if $auth}
       {#if $auth.role === 'SUPER_ADMIN'}

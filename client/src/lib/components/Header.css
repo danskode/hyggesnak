@@ -71,6 +71,10 @@ nav {
   display: none;
 }
 
+.swipe-edge-zone {
+  display: none;
+}
+
 .nav-drawer-context {
   display: none;
 }
@@ -163,6 +167,16 @@ nav {
     padding: 0.25rem;
     margin-bottom: 0.5rem;
     line-height: 1;
+  }
+
+  .swipe-edge-zone {
+    display: block;
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 20px;
+    height: 100%;
+    z-index: 50;
   }
 
   .nav-drawer-context {
