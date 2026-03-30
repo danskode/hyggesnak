@@ -21,3 +21,83 @@ Do you want to test it out? Well you can:
 Happy hyggesnak
 
 💬💬💬💬💬💬💬💬💬💬💬💬💬💬💬💬💬💬💬💬💬💬💬💬💬💬💬💬
+
+---
+
+## Deploy to homelab (Docker + Tailscale)
+
+Want to run Hyggesnak privately for your family on a local server? Here's how to get it running on Ubuntu with Docker and accessible via Tailscale.
+
+### Prerequisites
+
+On your Ubuntu server:
+
+```bash
+# Docker + Docker Compose
+curl -fsSL https://get.docker.com | sh
+
+# Allow your user to run Docker without sudo.
+# This adds your current user to the "docker" group — it does NOT create a new user.
+# You still log in to the server with the same username as always.
+# The change only takes effect after you log out and back in.
+sudo usermod -aG docker $USER
+# Log out: exit
+# Log back in via SSH, then continue below
+
+# Tailscale
+curl -fsSL https://tailscale.com/install.sh | sh
+sudo tailscale up
+```
+
+### First deployment
+
+```bash
+# 1. Clone the repo
+git clone https://github.com/danskode/hyggesnak.git && cd hyggesnak
+
+# 2. Create your production .env
+cp .env.production.example .env
+nano .env
+```
+
+Fill in `.env`:
+
+| Variable | Description |
+|----------|-------------|
+| `JWT_SECRET` | Random 32-byte hex string — generate with the command below |
+| `ENCRYPTION_KEY` | Random 32-byte hex string — generate with the command below (encrypts messages at rest) |
+| `CLIENT_URL` | Your Tailscale IP, e.g. `http://100.x.x.x` |
+| `INIT_ADMIN_USERNAME` | Your admin username |
+| `INIT_ADMIN_PASSWORD` | Your admin password |
+| `INIT_ADMIN_EMAIL` | Your admin email |
+
+Generate a secure key (run this twice — once for each). No extra tools needed, `openssl` is built into Ubuntu:
+```bash
+openssl rand -hex 32
+```
+Copy the output and paste it as the value in `.env`. Run it again to get a second unique key for the other variable.
+
+```bash
+# 3. Build and start
+docker compose up -d --build
+
+# 4. Create admin user (first time only)
+docker compose exec server node database/init.js
+```
+
+Your family can now reach the app at `http://<tailscale-ip>` — on any device connected to your Tailscale network. 🎉
+
+### Updating the app
+
+```bash
+git pull
+docker compose up -d --build
+```
+
+### Useful commands
+
+```bash
+docker compose logs -f          # Follow logs
+docker compose ps               # Check container status
+docker compose down             # Stop everything
+```

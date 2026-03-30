@@ -1,0 +1,27 @@
+services:
+  server:
+    build:
+      context: ./server
+    environment:
+      NODE_ENV: production
+      PORT: 8081
+      JWT_SECRET: ${JWT_SECRET}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY}
+      CLIENT_URL: ${CLIENT_URL}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      RESEND_ALLOWED_EMAIL: ${RESEND_ALLOWED_EMAIL:-}
+    volumes:
+      - db_data:/app/database
+    restart: unless-stopped
+
+  client:
+    build:
+      context: ./client
+    ports:
+      - "80:80"
+    depends_on:
+      - server
+    restart: unless-stopped
+
+volumes:
+  db_data:

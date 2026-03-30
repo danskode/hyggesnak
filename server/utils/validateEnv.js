@@ -1,6 +1,6 @@
 // If you do net set variables in an .env file, you will get errors from this fuctions, called in app.js line 11 before anything else starts up :)
 export function validateEnv() {
-    const required = ['JWT_SECRET'];
+    const required = ['JWT_SECRET', 'ENCRYPTION_KEY'];
     const missing = [];
 
     for (const key of required) {

@@ -3,6 +3,7 @@ import { authenticateToken } from '../middleware/authMiddleware.js';
 import { requireHyggesnakContext } from '../middleware/hyggesnakContextMiddleware.js';
 import db from '../database/db.js';
 import { sanitizeString } from '../utils/validators.js';
+import { encryptMessage, decryptMessage } from '../utils/crypto.js';
 
 const router = Router();
 
@@ -62,8 +63,14 @@ router.get('/hyggesnakke/:hyggesnakId/messages', authenticateToken, requireHygge
             messages.reverse();
         }
 
+        // Decrypt message content
+        const decrypted = messages.map(msg => ({
+            ...msg,
+            content: decryptMessage(msg.content, hyggesnakId)
+        }));
+
         res.send({
-            data: messages,
+            data: decrypted,
             hasMore: hasMore
         });
     });
@@ -93,12 +100,14 @@ router.post('/hyggesnakke/:hyggesnakId/messages', authenticateToken, requireHygg
     const hyggesnakId = req.params.hyggesnakId;
     const userId = req.user.id;
 
+    const encryptedContent = encryptMessage(content, hyggesnakId);
+
     const query = `
         INSERT INTO messages (hyggesnak_id, user_id, content)
         VALUES (?, ?, ?)
     `;
 
-    db.run(query, [hyggesnakId, userId, content.trim()], function (err) {
+    db.run(query, [hyggesnakId, userId, encryptedContent], function (err) {
         if (err) {
             console.error('Database error creating message:', err);
             return res.status(500).send({ message: "Serverfejl ved oprettelse af besked" });
@@ -128,8 +137,10 @@ router.post('/hyggesnakke/:hyggesnakId/messages', authenticateToken, requireHygg
                 return res.status(500).send({ message: "Serverfejl" });
             }
 
+            const decryptedMessage = { ...message, content: decryptMessage(message.content, hyggesnakId) };
+
             // Respond to HTTP request FIRST (ensures client gets confirmation)
-            res.status(201).send({ data: message });
+            res.status(201).send({ data: decryptedMessage });
 
             // Then broadcast asynchronously (don't wait for completion)
             setImmediate(() => {
@@ -137,7 +148,7 @@ router.post('/hyggesnakke/:hyggesnakId/messages', authenticateToken, requireHygg
                     const io = req.app.get('io');
                     if (io) {
                         // Broadcast to hyggesnak room (users actively in chat)
-                        io.to(`hyggesnak-${hyggesnakId}`).emit('new-message', message);
+                        io.to(`hyggesnak-${hyggesnakId}`).emit('new-message', decryptedMessage);
 
                         // Send unread notification to all members NOT in the room
                         // Get all members of this hyggesnak
@@ -215,6 +226,8 @@ router.put('/messages/:messageId', authenticateToken, (req, res) => {
                 return res.status(403).send({ message: "Du kan kun redigere dine egne beskeder" });
             }
 
+            const encryptedContent = encryptMessage(content, message.hyggesnak_id);
+
             // Update the message
             const updateQuery = `
                 UPDATE messages
@@ -222,7 +235,7 @@ router.put('/messages/:messageId', authenticateToken, (req, res) => {
                 WHERE id = ?
             `;
 
-            db.run(updateQuery, [content.trim(), messageId], function (err) {
+            db.run(updateQuery, [encryptedContent, messageId], function (err) {
                 if (err) {
                     console.error('Database error updating message:', err);
                     return res.status(500).send({ message: "Serverfejl ved opdatering af besked" });
@@ -250,15 +263,17 @@ router.put('/messages/:messageId', authenticateToken, (req, res) => {
                         return res.status(500).send({ message: "Serverfejl" });
                     }
 
+                    const decryptedMessage = { ...updatedMessage, content: decryptMessage(updatedMessage.content, message.hyggesnak_id) };
+
                     // Respond to HTTP request FIRST
-                    res.send({ data: updatedMessage });
+                    res.send({ data: decryptedMessage });
 
                     // Then broadcast asynchronously
                     setImmediate(() => {
                         try {
                             const io = req.app.get('io');
                             if (io) {
-                                io.to(`hyggesnak-${message.hyggesnak_id}`).emit('message-edited', updatedMessage);
+                                io.to(`hyggesnak-${message.hyggesnak_id}`).emit('message-edited', decryptedMessage);
                             }
                         } catch (broadcastErr) {
                             console.error('Socket.IO broadcast error:', broadcastErr);
