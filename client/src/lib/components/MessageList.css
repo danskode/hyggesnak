@@ -122,6 +122,14 @@
     opacity: 1;
 }
 
+.swipe-msg-wrapper {
+    display: contents;
+}
+
+.swipe-action-reveal {
+    display: none;
+}
+
 @media (max-width: 768px) {
     .message-actions {
         display: none;
@@ -191,14 +199,6 @@
         font-size: 1rem;
         min-height: 100px;
     }
-}
-
-.swipe-msg-wrapper {
-    display: contents;
-}
-
-.swipe-action-reveal {
-    display: none;
 }
 
 /* Global .btn-icon and .btn-scale styles apply */
