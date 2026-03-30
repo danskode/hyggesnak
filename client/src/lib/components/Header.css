@@ -67,25 +67,31 @@ nav {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
+.nav-toggle {
+  display: none;
+}
+
+.nav-drawer-context {
+  display: none;
+}
+
+.nav-close {
+  display: none;
+}
+
+.nav-members-divider {
+  display: none;
+}
+
 /* Global .btn-ghost styles apply */
 
 @media (max-width: 768px) {
   header {
-    flex-direction: column;
-    gap: 0.35rem;
-    padding: 0.4rem 1rem;
-  }
-
-  nav {
-    flex-wrap: nowrap;
-    justify-content: center;
-    gap: 0.25rem;
-  }
-
-  :global(nav a),
-  :global(nav .btn) {
-    padding: 0.2rem 0.5rem;
-    font-size: 0.875rem;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0;
+    padding: 0.5rem 1rem;
   }
 
   .site-title {
@@ -99,5 +105,85 @@ nav {
 
   .site-header {
     gap: 0.5rem;
+  }
+
+  .nav-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--color-text);
+    padding: 0.25rem 0.5rem;
+    line-height: 1;
+  }
+
+  .nav-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 99;
+  }
+
+  nav {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100dvh;
+    width: 75%;
+    max-width: 280px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    z-index: 100;
+    overflow-y: auto;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 0;
+    padding: var(--space-4, 1rem);
+    background: var(--color-card-bg);
+    border-radius: 0.5rem 0 0 0.5rem;
+    box-shadow: -4px 0 16px rgba(0, 0, 0, 0.15);
+  }
+
+  nav.open {
+    transform: translateX(0);
+  }
+
+  .nav-close {
+    display: flex;
+    align-self: flex-end;
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+    cursor: pointer;
+    color: var(--color-text-secondary);
+    padding: 0.25rem;
+    margin-bottom: 0.5rem;
+    line-height: 1;
+  }
+
+  .nav-drawer-context {
+    display: contents;
+  }
+
+  .nav-members-divider {
+    display: block;
+    width: 100%;
+    height: 1px;
+    background: var(--color-border);
+    margin: var(--space-2, 0.5rem) 0;
+    flex-shrink: 0;
+  }
+
+  :global(nav a),
+  :global(nav .btn) {
+    width: 100%;
+    padding: 0.75rem 1rem !important;
+    font-size: 1rem !important;
+    border-radius: 0.375rem;
+    text-align: left;
   }
 }

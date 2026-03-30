@@ -120,6 +120,19 @@
 
 /* Global .btn-danger styles apply */
 
+.management-actions {
+    display: flex;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    border-top: 1px solid var(--color-border);
+    background: var(--color-bg-secondary);
+    flex-wrap: wrap;
+}
+
+.management-actions .btn {
+    flex: 1;
+}
+
 .invite-section {
     margin: var(--space-4);
     border-radius: var(--radius-lg);
@@ -202,21 +215,26 @@
 }
 
 @media (max-width: 768px) {
-    .members-sidebar {
-        width: 100%;
-        height: auto;
-        max-height: none;
-        overflow-y: visible;
-        border-left: none;
-        border-top: none;
-        margin: var(--space-8) 0 0 0;
-        border-radius: var(--radius-lg);
-        box-shadow: var(--shadow-md);
+    /* In chat layout: hidden on mobile (accessible via header drawer instead) */
+    .members-sidebar:not(.in-header) {
+        display: none;
     }
 
-    .members-header {
-        padding: var(--space-4);
-        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    /* When rendered inside the header drawer */
+    .members-sidebar.in-header {
+        width: 100%;
+        height: auto;
+        border-left: none;
+        border-top: 1px solid var(--color-border);
+        border-radius: 0;
+        box-shadow: none;
+        overflow-y: visible;
+        flex-shrink: 0;
+    }
+
+    .members-sidebar.in-header .members-header {
+        border-radius: 0;
+        padding: var(--space-3) var(--space-4);
     }
 
     .members-list {

@@ -13,21 +13,31 @@
         hyggesnakId = null,
         onRemoveMember = () => {},
         onInviteSent = () => {},
-        onDeleteHyggesnak = () => {}
+        onDeleteHyggesnak = () => {},
+        inHeader = false
     } = $props();
 
     // Invite section state
     let showInviteSection = $state(false);
+    let showRemoveButtons = $state(false);
     let networkConnections = $state([]);
     let loadingConnections = $state(false);
     let sendingInvites = $state(new Set());
 
-    // Toggle invite section and load connections if needed
     function toggleInviteSection() {
         showInviteSection = !showInviteSection;
+        if (showInviteSection) {
+            showRemoveButtons = false;
+            if (networkConnections.length === 0) {
+                loadEligibleConnections();
+            }
+        }
+    }
 
-        if (showInviteSection && networkConnections.length === 0) {
-            loadEligibleConnections();
+    function toggleRemoveButtons() {
+        showRemoveButtons = !showRemoveButtons;
+        if (showRemoveButtons) {
+            showInviteSection = false;
         }
     }
 
@@ -87,11 +97,11 @@
     }
 </script>
 
-<div class="members-sidebar">
+<div class="members-sidebar" class:in-header={inHeader}>
     <div class="members-header">
         <h3>Medlemmer ({members.length})</h3>
 
-        {#if currentUserRole === ROLES.OWNER}
+        {#if currentUserRole === ROLES.OWNER && !inHeader}
             <button
                 class="btn btn-success"
                 class:btn-active={showInviteSection}
@@ -124,7 +134,7 @@
                 </div>
 
                 <!-- Action buttons -->
-                {#if currentUserRole === ROLES.OWNER && member.id !== currentUserId}
+                {#if currentUserRole === ROLES.OWNER && member.id !== currentUserId && (!inHeader || showRemoveButtons)}
                     <button
                         class="btn btn-icon btn-danger-hover"
                         onclick={() => handleRemoveMember(member.id, sanitizeDisplayName(member.display_name || member.username))}
@@ -147,6 +157,28 @@
                 title="Slet hyggesnak permanent"
             >
                 🗑️ Slet Hyggesnak
+            </button>
+        </div>
+    {/if}
+
+    <!-- Management actions (only in header drawer context) -->
+    {#if inHeader && currentUserRole === ROLES.OWNER}
+        <div class="management-actions">
+            {#if members.some(m => m.id !== currentUserId)}
+                <button
+                    class="btn btn-sm btn-danger"
+                    class:btn-active={showRemoveButtons}
+                    onclick={toggleRemoveButtons}
+                >
+                    {showRemoveButtons ? '✕ Luk' : '✕ Fjern medlem'}
+                </button>
+            {/if}
+            <button
+                class="btn btn-sm btn-success"
+                class:btn-active={showInviteSection}
+                onclick={toggleInviteSection}
+            >
+                {showInviteSection ? '✕ Luk' : '➕ Tilføj medlem'}
             </button>
         </div>
     {/if}

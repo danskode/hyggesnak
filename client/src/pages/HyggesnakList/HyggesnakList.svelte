@@ -1,5 +1,5 @@
 <script>
-  import { onMount } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
   import { navigate, Link } from 'svelte-routing';
   import { auth } from '../../lib/stores/authStore.js';
   import { hyggesnakke, currentHyggesnak } from '../../lib/stores/hyggesnakStore.js';
@@ -9,12 +9,32 @@
   import { apiGet, apiDelete } from '../../lib/api/api.js';
   import { API_ENDPOINTS } from '../../lib/utils/constants.js';
   import { useSocket } from '../../lib/composables/useSocket.js';
+  import { pageActions } from '../../lib/stores/pageContextStore.js';
   import Avatar from '../../lib/components/Avatar.svelte';
   import './HyggesnakList.css';
 
   let loading = $state(true);
   let error = $state(null);
   let leaving = $state(null);
+  let swipedId = $state(null);
+  let touchStartX = 0;
+
+  function handleTouchStart(e, hyggesnakId) {
+    touchStartX = e.touches[0].clientX;
+    // Close other open cards when starting a new swipe
+    if (swipedId !== null && swipedId !== hyggesnakId) {
+      swipedId = null;
+    }
+  }
+
+  function handleTouchEnd(e, hyggesnakId) {
+    const delta = e.changedTouches[0].clientX - touchStartX;
+    if (delta < -50) {
+      swipedId = hyggesnakId;
+    } else if (delta > 20) {
+      swipedId = null;
+    }
+  }
 
   const socket = useSocket({});
 
@@ -69,7 +89,13 @@
     navigate(`/h/${hyggesnak.id}/chat`);
   }
 
+  onDestroy(() => {
+    pageActions.set([]);
+  });
+
   onMount(async () => {
+    pageActions.set([{ label: '+ Opret ny hyggesnak', path: '/hyggesnakke/create' }]);
+
     await loadHyggesnakke();
 
     socket.connect();
@@ -84,9 +110,11 @@
 <div class="content-page">
   <div class="page-header">
     <h1>{sanitizeDisplayName($auth.display_name || $auth.username)}, her er dine hyggesnakke</h1>
-    <Link to="/hyggesnakke/create">
-      <button class="btn btn-primary">+ Opret ny hyggesnak</button>
-    </Link>
+    <span class="create-link">
+      <Link to="/hyggesnakke/create">
+        <button class="btn btn-primary">+ Opret ny hyggesnak</button>
+      </Link>
+    </span>
   </div>
 
   <section>
@@ -98,41 +126,60 @@
       <div class="card-list">
         {#each $hyggesnakke as hyggesnak}
           <div
-            class="hyggesnak-card list-item"
-            role="button"
-            tabindex="0"
-            onclick={() => selectAndNavigate(hyggesnak)}
-            onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectAndNavigate(hyggesnak); } }}
+            class="swipe-wrapper"
+            class:swiped={swipedId === hyggesnak.id}
+            ontouchstart={(e) => handleTouchStart(e, hyggesnak.id)}
+            ontouchend={(e) => handleTouchEnd(e, hyggesnak.id)}
           >
-            <div class="hyggesnak-info">
-              <Avatar
-                name={hyggesnak.display_name}
-                size="medium"
-              />
-              <div class="info-details">
-                <div class="name-row">
-                  <h3>{sanitizeHyggesnakName(hyggesnak.display_name)}</h3>
-                  {#if $unreadCounts.byHyggesnak[hyggesnak.id] > 0}
-                    <span class="unread-badge">{$unreadCounts.byHyggesnak[hyggesnak.id]}</span>
-                  {/if}
-                  <span class="role-badge {hyggesnak.user_role.toLowerCase()}">
-                    {hyggesnak.user_role === 'OWNER' ? 'Du er ejer' : 'Du er medlem'}
-                  </span>
-                </div>
-                <div class="meta-info">
-                  <span>{hyggesnak.member_count} {hyggesnak.member_count === 1 ? 'medlem' : 'medlemmer'}</span>
-                  <span>•</span>
-                  <span>Oprettet {new Date(hyggesnak.created_at).toLocaleDateString('da-DK')}</span>
+            <div
+              class="hyggesnak-card list-item swipe-content"
+              role="button"
+              tabindex="0"
+              onclick={() => {
+                if (swipedId === hyggesnak.id) { swipedId = null; return; }
+                selectAndNavigate(hyggesnak);
+              }}
+              onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectAndNavigate(hyggesnak); } }}
+            >
+              <div class="hyggesnak-info">
+                <Avatar
+                  name={hyggesnak.display_name}
+                  size="medium"
+                />
+                <div class="info-details">
+                  <div class="name-row">
+                    <h3>{sanitizeHyggesnakName(hyggesnak.display_name)}</h3>
+                    {#if $unreadCounts.byHyggesnak[hyggesnak.id] > 0}
+                      <span class="unread-badge">{$unreadCounts.byHyggesnak[hyggesnak.id]}</span>
+                    {/if}
+                    <span class="role-badge {hyggesnak.user_role.toLowerCase()}">
+                      {hyggesnak.user_role === 'OWNER' ? 'Du er ejer' : 'Du er medlem'}
+                    </span>
+                  </div>
+                  <div class="meta-info">
+                    <span>{hyggesnak.member_count} {hyggesnak.member_count === 1 ? 'medlem' : 'medlemmer'}</span>
+                    <span>•</span>
+                    <span>Oprettet {new Date(hyggesnak.created_at).toLocaleDateString('da-DK')}</span>
+                  </div>
                 </div>
               </div>
+              <div class="hyggesnak-actions">
+                <button
+                  class="btn btn-danger btn-sm"
+                  onclick={(e) => { e.stopPropagation(); handleLeaveHyggesnak(hyggesnak); }}
+                  disabled={leaving === hyggesnak.id}
+                >
+                  {leaving === hyggesnak.id ? 'Forlader...' : 'Forlad'}
+                </button>
+              </div>
             </div>
-            <div class="hyggesnak-actions">
+
+            <div class="swipe-action">
               <button
-                class="btn btn-danger btn-sm"
-                onclick={(e) => { e.stopPropagation(); handleLeaveHyggesnak(hyggesnak); }}
+                onclick={(e) => { e.stopPropagation(); swipedId = null; handleLeaveHyggesnak(hyggesnak); }}
                 disabled={leaving === hyggesnak.id}
               >
-                {leaving === hyggesnak.id ? 'Forlader...' : 'Forlad'}
+                {leaving === hyggesnak.id ? '...' : 'Forlad'}
               </button>
             </div>
           </div>

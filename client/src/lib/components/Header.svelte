@@ -15,10 +15,14 @@
   } from '../stores/invitationsStore.js';
   import { onlineUsers } from '../stores/onlineUsersStore.js';
   import { unreadCounts, totalUnread } from '../stores/unreadStore.js';
+  import { chatContext } from '../stores/chatContextStore.js';
+  import { pageActions } from '../stores/pageContextStore.js';
+  import MemberSidebar from './MemberSidebar.svelte';
 
   let isDarkMode = $state(false);
   let socket = null;
   let socketInitialized = $state(false);
+  let navOpen = $state(false);
 
   $effect(() => {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
@@ -99,6 +103,7 @@
   });
 
   function handleLogout() {
+    navOpen = false;
     clearAllInvitations();
     unreadCounts.clear();
     onlineUsers.clear();
@@ -125,18 +130,27 @@
     <h1 class="site-title">Hyggesnakke</h1>
   </div>
 
-  <nav>
+  <button class="nav-toggle" onclick={() => navOpen = !navOpen} aria-label="Menu">
+    ☰
+  </button>
+
+  {#if navOpen}
+    <div class="nav-overlay" onclick={() => navOpen = false}></div>
+  {/if}
+
+  <nav class:open={navOpen}>
+    <button class="nav-close" onclick={() => navOpen = false}>✕</button>
     {#if $auth}
       {#if $auth.role === 'SUPER_ADMIN'}
-        <Link to="/admin">🔧 Admin</Link>
+        <Link to="/admin" onclick={() => navOpen = false}>🔧 Admin</Link>
       {:else}
-        <Link to="/hyggesnakke" class="nav-link-with-badge">
+        <Link to="/hyggesnakke" class="nav-link-with-badge" onclick={() => navOpen = false}>
           Hyggesnakke
           {#if $totalUnread > 0}
             <span class="nav-badge">{$totalUnread}</span>
           {/if}
         </Link>
-        <Link to="/network" class="nav-link-with-badge">
+        <Link to="/network" class="nav-link-with-badge" onclick={() => navOpen = false}>
           Netværk
           {#if $totalPendingInvitations > 0}
             <span class="nav-badge">{$totalPendingInvitations}</span>
@@ -145,9 +159,37 @@
       {/if}
       <button class="btn btn-ghost" onclick={handleLogout}>Log ud</button>
     {:else}
-      <Link to="/">Home</Link>
-      <Link to="/login">Login</Link>
+      <Link to="/" onclick={() => navOpen = false}>Home</Link>
+      <Link to="/login" onclick={() => navOpen = false}>Login</Link>
     {/if}
+
+    <div class="nav-drawer-context">
+      {#if $pageActions.length > 0}
+        <div class="nav-members-divider"></div>
+        {#each $pageActions as action}
+          <button
+            class="btn btn-primary"
+            onclick={() => { navOpen = false; navigate(action.path); }}
+          >
+            {action.label}
+          </button>
+        {/each}
+      {/if}
+
+      {#if $chatContext}
+        <div class="nav-members-divider"></div>
+        <MemberSidebar
+          members={$chatContext.members}
+          currentUserId={$auth?.id}
+          currentUserRole={$chatContext.userRole}
+          hyggesnakId={$chatContext.hyggesnakId}
+          onRemoveMember={$chatContext.onRemoveMember}
+          onInviteSent={$chatContext.onInviteSent}
+          onDeleteHyggesnak={$chatContext.onDeleteHyggesnak}
+          inHeader={true}
+        />
+      {/if}
+    </div>
   </nav>
 </header>
 

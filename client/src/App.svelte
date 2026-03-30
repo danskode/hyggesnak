@@ -16,8 +16,7 @@
   import Footer from './lib/components/Footer.svelte';
 </script>
 
-<Toaster
-  position="top-center"
+<Toaster position="bottom-right"
   closeButton
   richColors
   visibleToasts={5}

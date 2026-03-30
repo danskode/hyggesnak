@@ -1,10 +1,11 @@
 <script>
-    import { onMount } from 'svelte';
+    import { onMount, onDestroy } from 'svelte';
     import { navigate } from 'svelte-routing';
     import { toast } from 'svelte-sonner';
     import { auth } from '../../lib/stores/authStore.js';
     import { currentHyggesnak, hyggesnakke } from '../../lib/stores/hyggesnakStore.js';
     import { unreadCounts } from '../../lib/stores/unreadStore.js';
+    import { chatContext } from '../../lib/stores/chatContextStore.js';
     import { useSocket } from '../../lib/composables/useSocket.js';
     import { apiGet, apiPost, apiPut, apiDelete } from '../../lib/api/api.js';
     import { API_ENDPOINTS } from '../../lib/utils/constants.js';
@@ -103,6 +104,8 @@
             return;
         }
 
+        document.body.classList.add('chat-active');
+
         await loadHyggesnak();
         await loadMembers();
         await loadMessages();
@@ -118,6 +121,25 @@
         // Connect socket and join room
         socket.connect();
         socket.joinRoom(hyggesnakId);
+    });
+
+    onDestroy(() => {
+        document.body.classList.remove('chat-active');
+        chatContext.set(null);
+    });
+
+    // Keep chatContext store in sync so header drawer can render members
+    $effect(() => {
+        if (hyggesnak) {
+            chatContext.set({
+                members,
+                hyggesnakId,
+                userRole: hyggesnak.user_role,
+                onRemoveMember: removeMember,
+                onInviteSent: loadMembers,
+                onDeleteHyggesnak: deleteHyggesnak
+            });
+        }
     });
 
     async function loadHyggesnak() {
@@ -308,7 +330,7 @@
                 />
             </div>
 
-            <!-- Members Sidebar -->
+            <!-- Members Sidebar (desktop only; mobile handled via header drawer) -->
             <MemberSidebar
                 {members}
                 currentUserId={$auth.id}
