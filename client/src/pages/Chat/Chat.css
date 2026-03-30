@@ -3,7 +3,7 @@
 .chat-page {
     display: flex;
     flex-direction: column;
-    height: calc(90vh - 120px);
+    height: calc(100dvh - 160px);
     max-width: 1400px;
     margin: 0 auto;
     background: var(--color-card-bg);

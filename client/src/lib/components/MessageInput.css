@@ -81,3 +81,17 @@
 }
 
 /* Global .btn-primary, .btn-wide, and .btn-loading styles apply */
+
+@media (max-width: 768px) {
+    .message-input {
+        padding: var(--space-3);
+    }
+
+    .char-count {
+        display: none;
+    }
+
+    .input-footer {
+        justify-content: flex-end;
+    }
+}

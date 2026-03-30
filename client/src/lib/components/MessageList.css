@@ -122,6 +122,29 @@
     opacity: 1;
 }
 
+@media (max-width: 768px) {
+    .message-actions {
+        opacity: 1;
+        flex-direction: row;
+        align-self: flex-end;
+        margin-bottom: var(--space-1);
+    }
+
+    .message-actions .btn-icon {
+        min-width: 44px;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+    }
+
+    .edit-mode textarea {
+        font-size: 1rem;
+        min-height: 100px;
+    }
+}
+
 /* Global .btn-icon and .btn-scale styles apply */
 
 .edit-mode {

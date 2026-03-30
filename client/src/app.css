@@ -24,7 +24,7 @@
   /* Gradients */
   --gradient-primary: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
   --gradient-success: linear-gradient(135deg, var(--color-success) 0%, var(--color-success-hover) 100%);
-  --gradient-secondary: linear-gradient(to bottom, var(--color-bg-secondary), #ffffff);
+  --gradient-secondary: linear-gradient(to bottom, var(--color-bg-secondary), var(--color-card-bg));
 
   /* Spacing scale */
   --space-1: 0.25rem;
@@ -1040,6 +1040,45 @@ section {
 
   .close-button:hover {
     background-color: var(--color-bg-secondary);
+  }
+
+  /* Chat */
+  .message-content {
+    background: var(--color-card-bg);
+  }
+
+  .connection-status {
+    background: #3a2e00;
+    color: #ffd54f;
+    border-top-color: #665200;
+  }
+
+  /* Input */
+  .message-input-container {
+    background: var(--color-card-bg);
+    border-top-color: var(--color-border);
+  }
+
+  .typing-indicator {
+    background: var(--color-bg-secondary);
+    border-bottom-color: var(--color-border);
+  }
+
+  /* Sidebar */
+  .invite-item {
+    background: var(--color-bg-secondary);
+    border-color: var(--color-border);
+  }
+
+  .management-actions {
+    background: var(--color-bg-secondary);
+    border-top-color: var(--color-border);
+  }
+
+  /* Nav drawer */
+  nav {
+    background: var(--color-card-bg);
+    box-shadow: -4px 0 16px rgba(0, 0, 0, 0.4);
   }
 }
 

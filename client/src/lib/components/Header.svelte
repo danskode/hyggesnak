@@ -24,6 +24,8 @@
   let socketInitialized = $state(false);
   let navOpen = $state(false);
   let touchStartX = 0;
+  let navDragOffset = $state(0);
+  let isDraggingNav = $state(false);
 
   function handleEdgeTouchStart(e) {
     touchStartX = e.touches[0].clientX;
@@ -38,10 +40,22 @@
 
   function handleNavTouchStart(e) {
     touchStartX = e.touches[0].clientX;
+    isDraggingNav = true;
+    navDragOffset = 0;
+  }
+
+  function handleNavTouchMove(e) {
+    if (!isDraggingNav || !navOpen) return;
+    const delta = e.touches[0].clientX - touchStartX;
+    if (delta > 0) {
+      navDragOffset = delta;
+    }
   }
 
   function handleNavTouchEnd(e) {
+    isDraggingNav = false;
     const deltaX = e.changedTouches[0].clientX - touchStartX;
+    navDragOffset = 0;
     if (deltaX > 50) {
       navOpen = false;
     }
@@ -169,7 +183,9 @@
 
   <nav
     class:open={navOpen}
+    style={isDraggingNav && navDragOffset > 0 ? `transform: translateX(${navDragOffset}px); transition: none;` : ''}
     ontouchstart={handleNavTouchStart}
+    ontouchmove={handleNavTouchMove}
     ontouchend={handleNavTouchEnd}
   >
     <button class="nav-close" onclick={() => navOpen = false}>✕</button>
