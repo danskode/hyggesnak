@@ -126,6 +126,10 @@
     display: contents;
 }
 
+.swipe-msg-content {
+    display: contents;
+}
+
 .swipe-action-reveal {
     display: none;
 }
