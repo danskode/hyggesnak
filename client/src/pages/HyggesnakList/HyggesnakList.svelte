@@ -20,10 +20,14 @@
   let touchStartX = 0;
 
   //==== Reorder state ====//
-  let reorderMode = $state(false);
   let orderedList = $state([]);
   let dragIndex = $state(null);
   let dragOverIndex = $state(null);
+
+  //==== Touch drag state (mobile) ====//
+  let isDraggingTouch = false;
+  let touchGhostEl = null;
+  let touchDragStartY = 0;
 
   function storageKey() {
     return `hyggesnak-order-${$auth.id}`;
@@ -88,26 +92,76 @@
     dragOverIndex = null;
   }
 
-  //==== Mobile reorder ====//
-  function moveUp(index) {
-    if (index === 0) return;
-    const list = [...orderedList];
-    [list[index - 1], list[index]] = [list[index], list[index - 1]];
-    orderedList = list;
-    saveOrder();
+  //==== Mobile touch drag (on handle only) ====//
+  function handleDragHandleTouchStart(e, index) {
+    e.stopPropagation(); // prevent swipe-to-leave from activating
+    e.preventDefault();  // prevent scroll
+    dragIndex = index;
+    isDraggingTouch = true;
+    touchDragStartY = e.touches[0].clientY;
+
+    const wrapper = e.currentTarget.closest('.swipe-wrapper');
+    const rect = wrapper.getBoundingClientRect();
+    const ghost = wrapper.cloneNode(true);
+    Object.assign(ghost.style, {
+      position: 'fixed',
+      top: `${rect.top}px`,
+      left: `${rect.left}px`,
+      width: `${rect.width}px`,
+      height: `${rect.height}px`,
+      opacity: '0.85',
+      pointerEvents: 'none',
+      zIndex: '999',
+      boxShadow: 'var(--shadow-lg)',
+      borderRadius: 'var(--radius-lg)',
+    });
+    document.body.appendChild(ghost);
+    touchGhostEl = ghost;
   }
 
-  function moveDown(index) {
-    if (index === orderedList.length - 1) return;
-    const list = [...orderedList];
-    [list[index], list[index + 1]] = [list[index + 1], list[index]];
-    orderedList = list;
-    saveOrder();
+  function handleDragHandleTouchMove(e) {
+    if (!isDraggingTouch || !touchGhostEl) return;
+    e.preventDefault();
+
+    const touch = e.touches[0];
+    const dy = touch.clientY - touchDragStartY;
+    touchGhostEl.style.transform = `translateY(${dy}px)`;
+
+    // Find element under touch point (temporarily hide ghost)
+    touchGhostEl.style.visibility = 'hidden';
+    const el = document.elementFromPoint(touch.clientX, touch.clientY);
+    touchGhostEl.style.visibility = '';
+
+    const wrapper = el?.closest('[data-drag-index]');
+    if (wrapper) {
+      const idx = parseInt(wrapper.dataset.dragIndex);
+      if (!isNaN(idx) && idx !== dragIndex) dragOverIndex = idx;
+    }
   }
 
-  //==== Swipe to leave (disabled in reorder mode) ====//
+  function handleDragHandleTouchEnd() {
+    if (!isDraggingTouch) return;
+
+    if (touchGhostEl) {
+      document.body.removeChild(touchGhostEl);
+      touchGhostEl = null;
+    }
+
+    if (dragIndex !== null && dragOverIndex !== null && dragIndex !== dragOverIndex) {
+      const list = [...orderedList];
+      const [moved] = list.splice(dragIndex, 1);
+      list.splice(dragOverIndex, 0, moved);
+      orderedList = list;
+      saveOrder();
+    }
+
+    isDraggingTouch = false;
+    dragIndex = null;
+    dragOverIndex = null;
+  }
+
+  //==== Swipe to leave (on card body, not handle) ====//
   function handleTouchStart(e, hyggesnakId) {
-    if (reorderMode) return;
     touchStartX = e.touches[0].clientX;
     if (swipedId !== null && swipedId !== hyggesnakId) {
       swipedId = null;
@@ -115,7 +169,7 @@
   }
 
   function handleTouchEnd(e, hyggesnakId) {
-    if (reorderMode) return;
+    if (isDraggingTouch) return;
     const delta = e.changedTouches[0].clientX - touchStartX;
     if (delta < -50) {
       swipedId = hyggesnakId;
@@ -145,10 +199,6 @@
     }
   }
 
-  function handleNavigationAfterLeave(hyggesnakId) {
-    navigate('/hyggesnakke');
-  }
-
   async function handleLeaveHyggesnak(hyggesnak) {
     const isOwnerAndLast = hyggesnak.user_role === 'OWNER' && hyggesnak.member_count === 1;
     const confirmMessage = isOwnerAndLast
@@ -164,7 +214,7 @@
       toast.success(result.message || `Du har forladt ${hyggesnak.display_name}`);
 
       hyggesnakke.remove(hyggesnak.id);
-      handleNavigationAfterLeave(hyggesnak.id);
+      navigate('/hyggesnakke');
     } catch (err) {
       toast.error(err.message || 'Kunne ikke forlade hyggesnak');
     } finally {
@@ -179,6 +229,10 @@
 
   onDestroy(() => {
     pageActions.set([]);
+    if (touchGhostEl) {
+      document.body.removeChild(touchGhostEl);
+      touchGhostEl = null;
+    }
   });
 
   onMount(async () => {
@@ -198,15 +252,6 @@
   <div class="page-header">
     <h1>{sanitizeDisplayName($auth.display_name || $auth.username)}, her er dine hyggesnakke</h1>
     <div class="header-actions">
-      {#if orderedList.length > 1}
-        <button
-          class="btn btn-secondary"
-          class:btn-active={reorderMode}
-          onclick={() => { reorderMode = !reorderMode; swipedId = null; }}
-        >
-          {reorderMode ? 'Færdig' : '⇅ Tilpas rækkefølge'}
-        </button>
-      {/if}
       <span class="create-link">
         <Link to="/hyggesnakke/create">
           <button class="btn btn-primary">+ Opret ny hyggesnak</button>
@@ -221,52 +266,40 @@
     {:else if error}
       <p class="error">Fejl: {error}</p>
     {:else if orderedList.length > 0}
-      <div class="card-list" class:reorder-list={reorderMode}>
+      <div class="card-list">
         {#each orderedList as hyggesnak, index (hyggesnak.id)}
           <div
             class="swipe-wrapper"
             class:swiped={swipedId === hyggesnak.id}
             class:drag-over={dragOverIndex === index && dragIndex !== index}
             class:dragging={dragIndex === index}
-            class:reorder-mode={reorderMode}
-            draggable={reorderMode}
-            ondragstart={reorderMode ? (e) => handleDragStart(e, index) : null}
-            ondragover={reorderMode ? (e) => handleDragOver(e, index) : null}
-            ondrop={reorderMode ? (e) => handleDrop(e, index) : null}
-            ondragend={reorderMode ? handleDragEnd : null}
+            data-drag-index={index}
+            draggable={true}
+            ondragstart={(e) => handleDragStart(e, index)}
+            ondragover={(e) => handleDragOver(e, index)}
+            ondrop={(e) => handleDrop(e, index)}
+            ondragend={handleDragEnd}
             ontouchstart={(e) => handleTouchStart(e, hyggesnak.id)}
             ontouchend={(e) => handleTouchEnd(e, hyggesnak.id)}
           >
-            {#if reorderMode}
-              <div class="mobile-reorder-buttons">
-                <button
-                  class="btn btn-icon btn-sm"
-                  onclick={() => moveUp(index)}
-                  disabled={index === 0}
-                  aria-label="Flyt op"
-                >↑</button>
-                <button
-                  class="btn btn-icon btn-sm"
-                  onclick={() => moveDown(index)}
-                  disabled={index === orderedList.length - 1}
-                  aria-label="Flyt ned"
-                >↓</button>
-              </div>
-            {/if}
-
             <div
               class="hyggesnak-card list-item swipe-content"
               role="button"
               tabindex="0"
               onclick={() => {
-                if (reorderMode) return;
                 if (swipedId === hyggesnak.id) { swipedId = null; return; }
                 selectAndNavigate(hyggesnak);
               }}
-              onkeydown={(e) => { if (!reorderMode && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); selectAndNavigate(hyggesnak); } }}
+              onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectAndNavigate(hyggesnak); } }}
             >
-              {#if reorderMode}
-                <div class="drag-handle" aria-hidden="true">⠿</div>
+              {#if orderedList.length > 1}
+                <div
+                  class="drag-handle"
+                  aria-hidden="true"
+                  ontouchstart={(e) => handleDragHandleTouchStart(e, index)}
+                  ontouchmove={handleDragHandleTouchMove}
+                  ontouchend={handleDragHandleTouchEnd}
+                >⠿</div>
               {/if}
 
               <div class="hyggesnak-info">
@@ -292,29 +325,25 @@
                 </div>
               </div>
 
-              {#if !reorderMode}
-                <div class="hyggesnak-actions">
-                  <button
-                    class="btn btn-danger btn-sm"
-                    onclick={(e) => { e.stopPropagation(); handleLeaveHyggesnak(hyggesnak); }}
-                    disabled={leaving === hyggesnak.id}
-                  >
-                    {leaving === hyggesnak.id ? 'Forlader...' : 'Forlad'}
-                  </button>
-                </div>
-              {/if}
-            </div>
-
-            {#if !reorderMode}
-              <div class="swipe-action">
+              <div class="hyggesnak-actions">
                 <button
-                  onclick={(e) => { e.stopPropagation(); swipedId = null; handleLeaveHyggesnak(hyggesnak); }}
+                  class="btn btn-danger btn-sm"
+                  onclick={(e) => { e.stopPropagation(); handleLeaveHyggesnak(hyggesnak); }}
                   disabled={leaving === hyggesnak.id}
                 >
-                  {leaving === hyggesnak.id ? '...' : 'Forlad'}
+                  {leaving === hyggesnak.id ? 'Forlader...' : 'Forlad'}
                 </button>
               </div>
-            {/if}
+            </div>
+
+            <div class="swipe-action">
+              <button
+                onclick={(e) => { e.stopPropagation(); swipedId = null; handleLeaveHyggesnak(hyggesnak); }}
+                disabled={leaving === hyggesnak.id}
+              >
+                {leaving === hyggesnak.id ? '...' : 'Forlad'}
+              </button>
+            </div>
           </div>
         {/each}
       </div>
