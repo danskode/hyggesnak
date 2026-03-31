@@ -1,140 +1,174 @@
 # Hyggesnakke
 
-💬 A chat app for friends and families focusing on privacy, security and to keep you close to the ones who matters and not meta or other big tech companies 💬
+💬 A chat app for friends and families — private, self-hosted, and free from Big Tech. 💬
 
-![Mangler du en app til at holde kontakten med familien uden at skulle ?](client/public/images/content/hyggesnak.png "Hyggesnakke - a chat app for friends and families")
-
-Do you want to test it out? Well you can:
-
-## How to run locally  
-
-1. Clone the repo: `git clone https://github.com/danskode/hyggesnak.git`
-2. `cd client`
-3. `npm i`
-4. `cd ..`
-5. `cd server`
-6. `npm i`
-7. Setup an .env file guided by the .env.local key value pairs in the server folder
-8. Run `node server/database/seed.js` to add sqlite database and dummy data into users table
-9. You are ready to join a Hyggesnak: Run the command `npm run dev` (or `npm run dev:client` if you just want to run the client side or replace with `npm run dev:server` for backend only) from the root folder, then concurrently and the script will take care of starting both **client** and **server**.
-
-Happy hyggesnak
-
-💬💬💬💬💬💬💬💬💬💬💬💬💬💬💬💬💬💬💬💬💬💬💬💬💬💬💬💬
+![Hyggesnakke](client/public/images/content/hyggesnak.png "Hyggesnakke - a chat app for friends and families")
 
 ---
 
-## Deploy to homelab (Docker + Tailscale)
+## Run locally (development)
 
-Want to run Hyggesnak privately for your family on a local server? Here's how to get it running on Ubuntu with Docker and accessible via Tailscale.
+1. Clone the repo:
+   ```bash
+   git clone https://github.com/danskode/hyggesnak.git && cd hyggesnak
+   ```
+2. Install dependencies:
+   ```bash
+   cd client && npm i && cd ../server && npm i && cd ..
+   ```
+3. Create your `.env` file:
+   ```bash
+   cp server/.env.example server/.env
+   ```
+4. Seed the database with demo users:
+   ```bash
+   node server/database/seed.js
+   ```
+5. Start both client and server:
+   ```bash
+   npm run dev
+   ```
 
-### Prerequisites
+App runs at `http://localhost:5173`. Demo users: `mor`, `far`, `lillebror` — password: `Familien1!`
+
+---
+
+## Self-host on a private server (Docker + Tailscale)
+
+Run Hyggesnak privately for your family on a home server or VPS. Access it securely from any device via Tailscale — no port forwarding, no public exposure.
+
+### 1. Install prerequisites
 
 On your Ubuntu server:
 
 ```bash
-# Docker + Docker Compose
+# Docker
 curl -fsSL https://get.docker.com | sh
-
-# Allow your user to run Docker without sudo.
-# This adds your current user to the "docker" group — it does NOT create a new user.
-# You still log in to the server with the same username as always.
-# The change only takes effect after you log out and back in.
 sudo usermod -aG docker $USER
-# Log out: exit
-# Log back in via SSH, then continue below
+# Log out and back in for the group change to take effect
 
 # Tailscale
 curl -fsSL https://tailscale.com/install.sh | sh
 sudo tailscale up
 ```
 
-### First deployment
+### 2. Clone and configure
 
 ```bash
-# 1. Clone the repo
 git clone https://github.com/danskode/hyggesnak.git && cd hyggesnak
-
-# 2. Create your production .env
 cp .env.production.example .env
 nano .env
 ```
 
-Fill in `.env`:
-
 | Variable | Description |
 |----------|-------------|
-| `JWT_SECRET` | Random 32-byte hex string — generate with the command below |
-| `ENCRYPTION_KEY` | Random 32-byte hex string — generate with the command below (encrypts messages at rest) |
+| `JWT_SECRET` | Random secret — generate with `openssl rand -hex 32` |
 | `CLIENT_URL` | Your Tailscale IP, e.g. `http://100.x.x.x` |
-| `INIT_ADMIN_USERNAME` | Your admin username |
-| `INIT_ADMIN_PASSWORD` | Your admin password |
-| `INIT_ADMIN_EMAIL` | Your admin email |
 
-Generate a secure key (run this twice — once for each). No extra tools needed, `openssl` is built into Ubuntu:
+Generate a secure secret (run once per variable):
 ```bash
 openssl rand -hex 32
 ```
-Copy the output and paste it as the value in `.env`. Run it again to get a second unique key for the other variable.
+
+### 3. Build and start
 
 ```bash
-# 3. Build and start
 docker compose up -d --build
-
-# 4. Create admin user (first time only)
-docker compose exec server node database/init.js
 ```
 
-Your family can now reach the app at `http://<tailscale-ip>` — on any device connected to your Tailscale network. 🎉
+Your family can now reach the app at `http://<tailscale-ip>` from any device on your Tailscale network. 🎉
 
-### Updating the app
+### 4. Create your first users
+
+Use the built-in CLI to add users — no database tools needed:
+
+```bash
+docker compose exec server node cli.js user create lars
+```
+
+You will be prompted for:
+- **Display name** (shown in the app)
+- **Role** — `user` (regular member) or `admin` (can manage the app)
+- **Password** — type one, or press Enter to auto-generate a secure password
+
+---
+
+## Managing users
+
+All user management is done via the CLI inside the server container.
+
+### Commands
+
+```bash
+# Create a new user (interactive prompts)
+docker compose exec server node cli.js user create <username>
+
+# List all users
+docker compose exec server node cli.js user list
+
+# Reset a user's password
+docker compose exec server node cli.js user password <username>
+
+# Delete a user and all their data
+docker compose exec server node cli.js user delete <username>
+```
+
+### Non-interactive options
+
+Useful for scripts or when you want to skip prompts:
+
+```bash
+# Create admin with auto-generated password (prints it to terminal)
+docker compose exec server node cli.js user create lars --name "Lars Hansen" --role admin --generate
+
+# Create regular user with a specific password
+docker compose exec server node cli.js user create anna --name "Anna" --password "SomeSafePassword1!"
+
+# Reset password and auto-generate a new one
+docker compose exec server node cli.js user password lars --generate
+```
+
+| Option | Description |
+|--------|-------------|
+| `--name "Display Name"` | Display name shown in the app (default: username) |
+| `--role user\|admin` | Set role directly — skips the prompt |
+| `--password <pwd>` | Set password directly — skips the prompt |
+| `--generate` | Auto-generate a secure password and print it |
+
+### Optional: add a shortcut alias
+
+To avoid typing `docker compose exec server node cli.js` every time, add an alias to `~/.bashrc` on your server:
+
+```bash
+echo "alias hygge='docker compose -f ~/hyggesnak/docker-compose.yml exec server node cli.js'" >> ~/.bashrc
+source ~/.bashrc
+```
+
+Then you can use:
+```bash
+hygge user create lars
+hygge user list
+hygge user password lars --generate
+hygge user delete lars
+```
+
+---
+
+## Updating the app
 
 ```bash
 git pull
 docker compose up -d --build
 ```
 
-### Managing users
+---
 
-After deploying, use the built-in CLI to manage users directly on the server — no need to touch the database manually.
-
-Run commands inside the server container:
+## Useful commands
 
 ```bash
-docker compose exec server node cli.js user create lars
-docker compose exec server node cli.js user list
-docker compose exec server node cli.js user password lars
-docker compose exec server node cli.js user delete lars
-```
-
-**Available commands:**
-
-| Command | Description |
-|---------|-------------|
-| `user create <username>` | Create a new user. Prompts for password. |
-| `user list` | List all users and their roles. |
-| `user password <username>` | Reset a user's password. |
-| `user delete <username>` | Delete a user and all their data. |
-
-**Useful options:**
-
-```bash
-# Create an admin user with auto-generated password
-docker compose exec server node cli.js user create lars --name "Lars Hansen" --admin --generate
-
-# Create a regular user with a specific password
-docker compose exec server node cli.js user create anna --password "FamilienRocks1!"
-
-# Reset a password and auto-generate a new one
-docker compose exec server node cli.js user password lars --generate
-```
-
-> Passwords are auto-generated if you leave the prompt blank or pass `--generate`.
-
-### Useful commands
-
-```bash
-docker compose logs -f          # Follow logs
-docker compose ps               # Check container status
-docker compose down             # Stop everything
+docker compose logs -f server    # Follow server logs
+docker compose logs -f client    # Follow client logs
+docker compose ps                # Check container status
+docker compose down              # Stop everything
+docker compose down -v           # Stop and remove volumes (wipes database!)
 ```
