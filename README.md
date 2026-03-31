@@ -94,6 +94,43 @@ git pull
 docker compose up -d --build
 ```
 
+### Managing users
+
+After deploying, use the built-in CLI to manage users directly on the server — no need to touch the database manually.
+
+Run commands inside the server container:
+
+```bash
+docker compose exec server node cli.js user create lars
+docker compose exec server node cli.js user list
+docker compose exec server node cli.js user password lars
+docker compose exec server node cli.js user delete lars
+```
+
+**Available commands:**
+
+| Command | Description |
+|---------|-------------|
+| `user create <username>` | Create a new user. Prompts for password. |
+| `user list` | List all users and their roles. |
+| `user password <username>` | Reset a user's password. |
+| `user delete <username>` | Delete a user and all their data. |
+
+**Useful options:**
+
+```bash
+# Create an admin user with auto-generated password
+docker compose exec server node cli.js user create lars --name "Lars Hansen" --admin --generate
+
+# Create a regular user with a specific password
+docker compose exec server node cli.js user create anna --password "FamilienRocks1!"
+
+# Reset a password and auto-generate a new one
+docker compose exec server node cli.js user password lars --generate
+```
+
+> Passwords are auto-generated if you leave the prompt blank or pass `--generate`.
+
 ### Useful commands
 
 ```bash
