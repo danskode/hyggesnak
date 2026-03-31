@@ -141,8 +141,7 @@
         width: fit-content;
         max-width: min(85%, 85vw);
         position: relative;
-        overflow: hidden;
-        border-radius: 1rem;
+        clip-path: inset(0 round 1rem);
     }
 
     .message-swipe-wrapper .message.own {
