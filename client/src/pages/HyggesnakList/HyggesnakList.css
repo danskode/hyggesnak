@@ -1,5 +1,15 @@
 /* Global styles from app.css: .btn-*, .role-badge, .list-item, .empty-state, .content-page, .page-header, section, .card-list */
 
+/* Override global .card-list for 2-column grid */
+.card-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.card-list.reorder-list {
+    grid-template-columns: 1fr;
+}
+
 .header-actions {
     display: flex;
     align-items: center;
@@ -24,7 +34,7 @@
 }
 
 .swipe-wrapper.drag-over {
-    border-top: 2px solid var(--color-primary);
+    box-shadow: inset 0 2px 0 var(--color-primary);
 }
 
 .swipe-wrapper.reorder-mode {
@@ -218,5 +228,9 @@
 
     .hyggesnak-actions {
         display: none;
+    }
+
+    .card-list {
+        grid-template-columns: 1fr;
     }
 }

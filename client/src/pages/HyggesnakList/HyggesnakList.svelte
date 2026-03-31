@@ -221,7 +221,7 @@
     {:else if error}
       <p class="error">Fejl: {error}</p>
     {:else if orderedList.length > 0}
-      <div class="card-list">
+      <div class="card-list" class:reorder-list={reorderMode}>
         {#each orderedList as hyggesnak, index (hyggesnak.id)}
           <div
             class="swipe-wrapper"
