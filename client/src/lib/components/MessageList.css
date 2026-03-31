@@ -138,6 +138,7 @@
     .message-swipe-wrapper {
         display: block;
         align-self: flex-end;
+        width: fit-content;
         max-width: 85%;
         position: relative;
         overflow: hidden;
