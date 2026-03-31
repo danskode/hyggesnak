@@ -144,6 +144,10 @@
         border-radius: 1rem;
     }
 
+    .message-swipe-wrapper .message.own {
+        max-width: 100%;
+    }
+
     .message-swipe-wrapper .message-content {
         transition: transform 0.25s ease;
     }
