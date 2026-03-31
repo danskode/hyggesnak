@@ -57,9 +57,9 @@
     min-width: 1.5rem;
     height: 1.5rem;
     padding: 0 0.5rem;
-    background: #ef4444;
+    background: var(--color-danger);
     color: white;
-    border-radius: 12px;
+    border-radius: var(--radius-full);
     font-size: 0.75rem;
     font-weight: 700;
     line-height: 1;

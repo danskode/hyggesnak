@@ -51,7 +51,7 @@ section h2 {
 .search-input:focus {
     outline: none;
     border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(143, 176, 142, 0.1);
+    box-shadow: 0 0 0 3px rgba(122, 158, 121, 0.15);
 }
 
 .connections-list,
@@ -141,7 +141,7 @@ section h2 {
 .code-display {
     text-align: center;
     padding: var(--space-6);
-    background: var(--gradient-primary);
+    background: var(--color-primary);
     border-radius: var(--radius-lg);
     color: white;
 }
@@ -196,7 +196,7 @@ section h2 {
 .code-input:focus {
     outline: none;
     border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(143, 176, 142, 0.1);
+    box-shadow: 0 0 0 3px rgba(122, 158, 121, 0.15);
 }
 
 .invitation-group {

@@ -1,30 +1,27 @@
 /* ===== Global Styles ===== */
 :root {
-  /* Colors - Standardized naming */
-  --color-primary: #8FB08E;
-  --color-primary-hover: #536952;
-  --color-primary-dark: #536952;
-  --color-success: #8FB08E;
-  --color-success-hover: #218838;
-  --color-success-bg: #d4edda;
-  --color-danger: #D57859;
-  --color-danger-hover: #b85f43;
-  --color-error: #dc3545;
-  --color-error-bg: #f8d7da;
-  --color-bg: #fff5e0;
-  --color-bg-secondary: #f8f9fa;
-  --color-text: #213547;
-  --color-text-secondary: #666;
-  --color-text-muted: #999;
-  --color-border: #d0d0d0;
-  --color-border-light: #eee;
-  --color-input-bg: #fafafa;
-  --color-card-bg: #fff;
-
-  /* Gradients */
-  --gradient-primary: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
-  --gradient-success: linear-gradient(135deg, var(--color-success) 0%, var(--color-success-hover) 100%);
-  --gradient-secondary: linear-gradient(to bottom, var(--color-bg-secondary), var(--color-card-bg));
+  /* Colors */
+  --color-primary: #7A9E79;
+  --color-primary-hover: #4D6B4C;
+  --color-primary-dark: #4D6B4C;
+  --color-success: #5C8C5B;
+  --color-success-hover: #4A7249;
+  --color-success-bg: #E8F0E8;
+  --color-avatar-online: #5C8C5B;
+  --color-danger: #C0392B;
+  --color-danger-hover: #962D22;
+  --color-warning: #B45309;
+  --color-warning-bg: #FEF3C7;
+  --color-warning-border: #D97706;
+  --color-bg: #F9FAFB;
+  --color-bg-secondary: #F3F4F6;
+  --color-text: #111827;
+  --color-text-secondary: #6B7280;
+  --color-text-muted: #9CA3AF;
+  --color-border: #E5E7EB;
+  --color-border-light: #F3F4F6;
+  --color-input-bg: #F9FAFB;
+  --color-card-bg: #FFFFFF;
 
   /* Spacing scale */
   --space-1: 0.25rem;
@@ -36,10 +33,10 @@
   --space-8: 2rem;
 
   /* Border radius */
-  --radius-sm: 0.25rem;
-  --radius-md: 0.375rem;
-  --radius-lg: 0.5rem;
-  --radius-xl: 0.75rem;
+  --radius-sm: 0.125rem;
+  --radius-md: 0.25rem;
+  --radius-lg: 0.375rem;
+  --radius-xl: 0.5rem;
   --radius-full: 50%;
 
   /* Shadows */
@@ -231,7 +228,7 @@ nav a:hover {
 }
 
 .btn-success {
-  background: var(--gradient-success);
+  background: var(--color-success);
 }
 
 .btn-success:hover:not(:disabled) {
@@ -402,9 +399,9 @@ input::placeholder {
 .admin-section {
   margin-bottom: 2rem;
   padding: 1.5rem;
-  background-color: #f8f9fa;
-  border-radius: 8px;
-  border: 1px solid var(--border-color);
+  background-color: var(--color-bg-secondary);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
 }
 
 .admin-section > button {
@@ -998,19 +995,37 @@ section {
 /* ===== Dark Mode Support ===== */
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-bg: #1a1a1a;
-    --color-bg-secondary: #2a2a2a;
-    --color-text: rgba(255, 255, 255, 0.87);
-    --color-text-secondary: #aaa;
-    --color-text-muted: #888;
-    --color-border: #444;
-    --color-border-light: #333;
-    --color-input-bg: #2a2a2a;
-    --color-card-bg: #333333;
-    --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.3);
-    --shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.4);
-    --color-success-bg: #1e4620;
-    --color-error-bg: #4a1e1e;
+    --color-bg: #0F1117;
+    --color-bg-secondary: #1C1E26;
+    --color-card-bg: #252830;
+    --color-input-bg: #1C1E26;
+
+    /* Cobalt/indigo erstatter grøn i darkmode */
+    --color-primary: #6B7FD4;
+    --color-primary-hover: #8B9FE8;
+    --color-primary-dark: #5468B8;
+
+    --color-success: #0E9688;
+    --color-success-hover: #0B7A6E;
+    --color-success-bg: #0A2622;
+    --color-avatar-online: #6B7FD4;
+
+    --color-danger: #E05252;
+    --color-danger-hover: #C23F3F;
+
+    --color-warning: #D4A84B;
+    --color-warning-bg: #2A2010;
+    --color-warning-border: #8B6914;
+
+    --color-text: #E8EAED;
+    --color-text-secondary: #9AA3B2;
+    --color-text-muted: #6B7280;
+    --color-border: #2E3240;
+    --color-border-light: #1E2130;
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 2px 6px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.6);
   }
 
   .admin-section {
@@ -1042,18 +1057,6 @@ section {
     background-color: var(--color-bg-secondary);
   }
 
-  /* Chat */
-  .message-content {
-    background: var(--color-card-bg);
-  }
-
-  .connection-status {
-    background: #3a2e00;
-    color: #ffd54f;
-    border-top-color: #665200;
-  }
-
-  /* Input */
   .message-input-container {
     background: var(--color-card-bg);
     border-top-color: var(--color-border);
@@ -1064,7 +1067,6 @@ section {
     border-bottom-color: var(--color-border);
   }
 
-  /* Sidebar */
   .invite-item {
     background: var(--color-bg-secondary);
     border-color: var(--color-border);
@@ -1075,10 +1077,12 @@ section {
     border-top-color: var(--color-border);
   }
 
-  /* Nav drawer */
-  nav {
-    background: var(--color-card-bg);
-    box-shadow: -4px 0 16px rgba(0, 0, 0, 0.4);
+  /* Nav drawer (mobile only) */
+  @media (max-width: 768px) {
+    nav {
+      background: var(--color-card-bg);
+      box-shadow: -4px 0 16px rgba(0, 0, 0, 0.4);
+    }
   }
 }
 
