@@ -101,70 +101,42 @@
         </div>
     {:else}
         {#each formattedMessages as message (message.id)}
-            <div
-                class="message"
-                class:own={message.isOwn}
-                class:deleted={message.is_deleted}
-                class:swiped-left={message.isOwn && !message.is_deleted && editingMessageId !== message.id && swipedMessageId === message.id}
-                ontouchstart={message.isOwn && !message.is_deleted && editingMessageId !== message.id ? (e) => handleMsgTouchStart(e, message.id) : undefined}
-                ontouchend={message.isOwn && !message.is_deleted && editingMessageId !== message.id ? (e) => handleMsgTouchEnd(e, message.id) : undefined}
-            >
-                <div class="message-content">
-                    <div class="message-header">
-                        <strong>{message.sanitizedDisplayName}</strong>
-                        <span class="time">{message.formattedTime}</span>
-                    </div>
-
-                    {#if editingMessageId === message.id}
-                        <div class="edit-mode">
-                            <textarea
-                                bind:value={editContent}
-                                maxlength={MESSAGE_MAX_LENGTH}
-                                placeholder="Redigér din besked..."
-                            ></textarea>
-                            <div class="edit-actions">
-                                <button
-                                    type="button"
-                                    class="btn btn-success btn-sm"
-                                    onclick={() => saveEditMessage(message.id)}
-                                >
-                                    Gem
-                                </button>
-                                <button
-                                    type="button"
-                                    class="btn btn-secondary btn-sm"
-                                    onclick={cancelEditMessage}
-                                >
-                                    Annullér
-                                </button>
+            {#if message.isOwn && !message.is_deleted && editingMessageId !== message.id}
+                <div
+                    class="message-swipe-wrapper"
+                    class:swiped-left={swipedMessageId === message.id}
+                    ontouchstart={(e) => handleMsgTouchStart(e, message.id)}
+                    ontouchend={(e) => handleMsgTouchEnd(e, message.id)}
+                >
+                    <div class="message own">
+                        <div class="message-content">
+                            <div class="message-header">
+                                <strong>{message.sanitizedDisplayName}</strong>
+                                <span class="time">{message.formattedTime}</span>
                             </div>
+                            <div class="message-text">
+                                {message.sanitizedContent}
+                            </div>
+                            {#if message.edited_at}
+                                <div class="edited-indicator">(redigeret)</div>
+                            {/if}
                         </div>
-                    {:else}
-                        <div class="message-text" class:deleted-text={message.is_deleted}>
-                            {message.sanitizedContent}
+                        <div class="message-actions">
+                            <button
+                                class="btn btn-icon btn-scale"
+                                onclick={() => startEditMessage(message)}
+                                title="Redigér besked"
+                            >
+                                ✏️
+                            </button>
+                            <button
+                                class="btn btn-icon btn-scale"
+                                onclick={() => handleDeleteMessage(message.id)}
+                                title="Slet besked"
+                            >
+                                🗑️
+                            </button>
                         </div>
-                        {#if message.edited_at && !message.is_deleted}
-                            <div class="edited-indicator">(redigeret)</div>
-                        {/if}
-                    {/if}
-                </div>
-
-                {#if message.isOwn && !message.is_deleted && editingMessageId !== message.id}
-                    <div class="message-actions">
-                        <button
-                            class="btn btn-icon btn-scale"
-                            onclick={() => startEditMessage(message)}
-                            title="Redigér besked"
-                        >
-                            ✏️
-                        </button>
-                        <button
-                            class="btn btn-icon btn-scale"
-                            onclick={() => handleDeleteMessage(message.id)}
-                            title="Slet besked"
-                        >
-                            🗑️
-                        </button>
                     </div>
                     <div class="swipe-action-reveal">
                         <button
@@ -182,8 +154,50 @@
                             🗑️
                         </button>
                     </div>
-                {/if}
-            </div>
+                </div>
+            {:else}
+                <div class="message" class:own={message.isOwn} class:deleted={message.is_deleted}>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <strong>{message.sanitizedDisplayName}</strong>
+                            <span class="time">{message.formattedTime}</span>
+                        </div>
+
+                        {#if editingMessageId === message.id}
+                            <div class="edit-mode">
+                                <textarea
+                                    bind:value={editContent}
+                                    maxlength={MESSAGE_MAX_LENGTH}
+                                    placeholder="Redigér din besked..."
+                                ></textarea>
+                                <div class="edit-actions">
+                                    <button
+                                        type="button"
+                                        class="btn btn-success btn-sm"
+                                        onclick={() => saveEditMessage(message.id)}
+                                    >
+                                        Gem
+                                    </button>
+                                    <button
+                                        type="button"
+                                        class="btn btn-secondary btn-sm"
+                                        onclick={cancelEditMessage}
+                                    >
+                                        Annullér
+                                    </button>
+                                </div>
+                            </div>
+                        {:else}
+                            <div class="message-text" class:deleted-text={message.is_deleted}>
+                                {message.sanitizedContent}
+                            </div>
+                            {#if message.edited_at && !message.is_deleted}
+                                <div class="edited-indicator">(redigeret)</div>
+                            {/if}
+                        {/if}
+                    </div>
+                </div>
+            {/if}
         {/each}
     {/if}
 </div>

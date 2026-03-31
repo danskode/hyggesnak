@@ -1006,7 +1006,7 @@ section {
     --color-border: #444;
     --color-border-light: #333;
     --color-input-bg: #2a2a2a;
-    --color-card-bg: #2a2a2a;
+    --color-card-bg: #333333;
     --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.3);
     --shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.4);
     --color-success-bg: #1e4620;
