@@ -59,29 +59,30 @@ function generatePassword(length = 14) {
 
 function prompt(question, hidden = false) {
     return new Promise((resolve) => {
-        const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-        if (hidden) {
+        if (hidden && process.stdin.isTTY) {
             process.stdout.write(question);
             process.stdin.setRawMode(true);
-            let input = '';
             process.stdin.resume();
             process.stdin.setEncoding('utf8');
-            process.stdin.on('data', (ch) => {
+            let input = '';
+            const onData = (ch) => {
                 if (ch === '\n' || ch === '\r') {
                     process.stdin.setRawMode(false);
                     process.stdin.pause();
-                    rl.close();
+                    process.stdin.removeListener('data', onData);
                     process.stdout.write('\n');
                     resolve(input);
                 } else if (ch === '\u0003') {
                     process.exit();
-                } else if (ch === '\u007f') {
+                } else if (ch === '\u007f' || ch === '\b') {
                     input = input.slice(0, -1);
                 } else {
                     input += ch;
                 }
-            });
+            };
+            process.stdin.on('data', onData);
         } else {
+            const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
             rl.question(question, (answer) => { rl.close(); resolve(answer.trim()); });
         }
     });
@@ -121,7 +122,16 @@ async function userCreate(args) {
 
     const displayName = flags.name || username;
     const email = flags.email || `${username.toLowerCase()}@hyggesnak.local`;
-    const role = flags.admin ? 'SUPER_ADMIN' : 'USER';
+
+    let role;
+    if (flags.admin || flags.role === 'admin') {
+        role = 'SUPER_ADMIN';
+    } else if (flags.role === 'user') {
+        role = 'USER';
+    } else {
+        const roleInput = await prompt('Role [user/admin] (default: user): ');
+        role = roleInput.toLowerCase() === 'admin' ? 'SUPER_ADMIN' : 'USER';
+    }
 
     let password;
     if (flags.generate) {
@@ -250,7 +260,8 @@ Options for create / password:
   --email user@example.com   Email (default: username@hyggesnak.local)
   --password <pwd>        Set password directly (skip prompt)
   --generate              Auto-generate a secure password
-  --admin                 Create as SUPER_ADMIN (create only)
+  --role user|admin       Set role directly (skips prompt)
+  --admin                 Shorthand for --role admin
 
 Examples:
   node cli.js user create lars
