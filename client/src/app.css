@@ -250,7 +250,7 @@ nav a:hover {
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background-color: #e9ecef;
+  background-color: var(--color-border);
   border-color: var(--color-primary);
 }
 

@@ -200,7 +200,7 @@
     <div class="header-actions">
       {#if orderedList.length > 1}
         <button
-          class="btn btn-secondary btn-sm"
+          class="btn btn-secondary"
           class:btn-active={reorderMode}
           onclick={() => { reorderMode = !reorderMode; swipedId = null; }}
         >
