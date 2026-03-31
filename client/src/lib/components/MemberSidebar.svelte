@@ -1,4 +1,5 @@
 <script>
+    import './MemberSidebar.css';
     import { toast } from 'svelte-sonner';
     import { sanitizeDisplayName } from '../utils/sanitize.js';
     import { ROLES, API_ENDPOINTS } from '../utils/constants.js';
@@ -228,6 +229,3 @@
     {/if}
 </div>
 
-<style>
-    @import './MemberSidebar.css';
-</style>

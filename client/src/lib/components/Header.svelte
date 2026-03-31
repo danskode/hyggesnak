@@ -1,4 +1,5 @@
 <script>
+  import './Header.css';
   import { onDestroy } from 'svelte';
   import { Link, navigate } from 'svelte-routing';
   import { auth } from '../stores/authStore.js';
@@ -242,6 +243,3 @@
   </nav>
 </header>
 
-<style>
-  @import './Header.css';
-</style>

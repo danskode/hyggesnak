@@ -1,4 +1,5 @@
 <script>
+    import './MessageInput.css';
     import { MESSAGE_MAX_LENGTH } from '../utils/constants';
 
     let {
@@ -144,6 +145,3 @@
     </form>
 </div>
 
-<style>
-    @import './MessageInput.css';
-</style>
