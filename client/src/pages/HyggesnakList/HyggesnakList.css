@@ -1,5 +1,47 @@
 /* Global styles from app.css: .btn-*, .role-badge, .list-item, .empty-state, .content-page, .page-header, section, .card-list */
 
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.drag-handle {
+    font-size: 1.25rem;
+    color: var(--color-text-muted);
+    cursor: grab;
+    padding: 0 var(--space-2);
+    user-select: none;
+    flex-shrink: 0;
+}
+
+.drag-handle:active {
+    cursor: grabbing;
+}
+
+.swipe-wrapper.dragging {
+    opacity: 0.4;
+}
+
+.swipe-wrapper.drag-over {
+    border-top: 2px solid var(--color-primary);
+}
+
+.swipe-wrapper.reorder-mode {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    cursor: grab;
+}
+
+.swipe-wrapper.reorder-mode:active {
+    cursor: grabbing;
+}
+
+.mobile-reorder-buttons {
+    display: none;
+}
+
 .swipe-wrapper {
     position: relative;
     border-radius: var(--radius-lg);
@@ -89,7 +131,31 @@
     opacity: 1;
 }
 
+@media (min-width: 769px) {
+    .mobile-reorder-buttons {
+        display: none !important;
+    }
+}
+
 @media (max-width: 768px) {
+    .drag-handle {
+        display: none;
+    }
+
+    .mobile-reorder-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-1);
+        flex-shrink: 0;
+    }
+
+    .mobile-reorder-buttons .btn {
+        min-width: 36px;
+        min-height: 36px;
+        padding: var(--space-1);
+        font-size: 1rem;
+    }
+
     .create-link {
         display: none;
     }
