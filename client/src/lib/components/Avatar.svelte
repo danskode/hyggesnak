@@ -27,7 +27,7 @@
         color
             ? color
             : isOnline
-                ? 'var(--color-success)'
+                ? 'var(--color-avatar-online)'
                 : 'var(--color-text-muted)'
     );
 
