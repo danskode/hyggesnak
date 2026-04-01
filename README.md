@@ -6,11 +6,30 @@
 
 ---
 
+# Table of Content
+- [Hyggesnakke](#hyggesnakke)
+- [Table of Content](#table-of-content)
+  - [Run locally (development)](#run-locally-development)
+  - [Self-host on a private server (Docker + Tailscale)](#self-host-on-a-private-server-docker--tailscale)
+    - [1. Install prerequisites](#1-install-prerequisites)
+    - [2. Clone and configure](#2-clone-and-configure)
+    - [3. Build and start](#3-build-and-start)
+    - [4. Create your first users](#4-create-your-first-users)
+  - [Managing users](#managing-users)
+    - [Commands](#commands)
+    - [Non-interactive options](#non-interactive-options)
+    - [Optional: add a shortcut alias](#optional-add-a-shortcut-alias)
+  - [Updating the app](#updating-the-app)
+  - [Useful commands](#useful-commands)
+
+
+
+---
+
 ## Run locally (development)
 
 1. Clone the repo:
    ```bash
-   git clone https://github.com/danskode/hyggesnak.git && cd hyggesnak
    ```
 2. Install dependencies:
    ```bash
@@ -172,3 +191,4 @@ docker compose ps                # Check container status
 docker compose down              # Stop everything
 docker compose down -v           # Stop and remove volumes (wipes database!)
 ```
+
