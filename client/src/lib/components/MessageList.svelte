@@ -2,6 +2,13 @@
     import './MessageList.css';
     import { sanitizeMessage, sanitizeDisplayName } from '../utils/sanitize.js';
     import { MESSAGE_MAX_LENGTH } from '../utils/constants.js';
+    import GifLightbox from './GifLightbox.svelte';
+
+    let lightboxSrc = $state(null);
+
+    function openLightbox(src) {
+        lightboxSrc = src;
+    }
 
     let {
         messages = [],
@@ -36,7 +43,8 @@
             formattedTime: formatTime(msg.created_at),
             isOwn: msg.user_id === currentUserId,
             sanitizedDisplayName: sanitizeDisplayName(msg.display_name || msg.username),
-            sanitizedContent: sanitizeMessage(msg.content)
+            sanitizedContent: msg.message_type === 'gif' ? msg.content : sanitizeMessage(msg.content),
+            isGif: msg.message_type === 'gif'
         }))
     );
 
@@ -94,6 +102,8 @@
     }
 </script>
 
+<GifLightbox src={lightboxSrc} onClose={() => lightboxSrc = null} />
+
 <div class="messages" bind:this={messagesContainerRef} onclick={() => swipedMessageId = null}>
     {#if formattedMessages.length === 0}
         <div class="empty-state">
@@ -115,21 +125,36 @@
                                 <strong>{message.sanitizedDisplayName}</strong>
                                 <span class="time">{message.formattedTime}</span>
                             </div>
-                            <div class="message-text">
-                                {message.sanitizedContent}
-                            </div>
-                            {#if message.edited_at}
-                                <div class="edited-indicator">(redigeret)</div>
+                            {#if message.isGif}
+                                <div class="message-gif">
+                                    <button
+                                        type="button"
+                                        class="gif-message-btn"
+                                        onclick={() => openLightbox(message.sanitizedContent)}
+                                        title="Klik for at se GIF"
+                                    >
+                                        <img src={message.sanitizedContent} alt="GIF" loading="lazy" />
+                                    </button>
+                                </div>
+                            {:else}
+                                <div class="message-text">
+                                    {message.sanitizedContent}
+                                </div>
+                                {#if message.edited_at}
+                                    <div class="edited-indicator">(redigeret)</div>
+                                {/if}
                             {/if}
                         </div>
                         <div class="message-actions">
-                            <button
-                                class="btn btn-icon btn-scale"
-                                onclick={() => startEditMessage(message)}
-                                title="Redigér besked"
-                            >
-                                ✏️
-                            </button>
+                            {#if !message.isGif}
+                                <button
+                                    class="btn btn-icon btn-scale"
+                                    onclick={() => startEditMessage(message)}
+                                    title="Redigér besked"
+                                >
+                                    ✏️
+                                </button>
+                            {/if}
                             <button
                                 class="btn btn-icon btn-scale"
                                 onclick={() => handleDeleteMessage(message.id)}
@@ -140,13 +165,15 @@
                         </div>
                     </div>
                     <div class="swipe-action-reveal">
-                        <button
-                            class="btn btn-icon"
-                            onclick={() => { swipedMessageId = null; startEditMessage(message); }}
-                            title="Redigér besked"
-                        >
-                            ✏️
-                        </button>
+                        {#if !message.isGif}
+                            <button
+                                class="btn btn-icon"
+                                onclick={() => { swipedMessageId = null; startEditMessage(message); }}
+                                title="Redigér besked"
+                            >
+                                ✏️
+                            </button>
+                        {/if}
                         <button
                             class="btn btn-icon btn-danger"
                             onclick={() => { swipedMessageId = null; handleDeleteMessage(message.id); }}
@@ -187,6 +214,17 @@
                                         Annullér
                                     </button>
                                 </div>
+                            </div>
+                        {:else if message.isGif && !message.is_deleted}
+                            <div class="message-gif">
+                                <button
+                                    type="button"
+                                    class="gif-message-btn"
+                                    onclick={() => openLightbox(message.sanitizedContent)}
+                                    title="Klik for at se GIF"
+                                >
+                                    <img src={message.sanitizedContent} alt="GIF" loading="lazy" />
+                                </button>
                             </div>
                         {:else}
                             <div class="message-text" class:deleted-text={message.is_deleted}>

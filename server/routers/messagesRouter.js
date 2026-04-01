@@ -5,6 +5,9 @@ import db from '../database/db.js';
 import { sanitizeString } from '../utils/validators.js';
 import { encryptMessage, decryptMessage } from '../utils/crypto.js';
 
+//== Tilladte GIF CDN-domæner: Giphy + Heypster ==//
+const GIF_CDN_REGEX = /^https:\/\/(media[0-9]*\.giphy\.com|[a-zA-Z0-9.-]*heypster\.com)\//;
+
 const router = Router();
 
 //==== GET /api/hyggesnakke/:hyggesnakId/messages - Get messages for hyggesnak ====//
@@ -21,6 +24,7 @@ router.get('/hyggesnakke/:hyggesnakId/messages', authenticateToken, requireHygge
         SELECT
             m.id,
             m.content,
+            m.message_type,
             m.created_at,
             m.edited_at,
             m.is_deleted,
@@ -79,9 +83,44 @@ router.get('/hyggesnakke/:hyggesnakId/messages', authenticateToken, requireHygge
 //==== POST /api/hyggesnakke/:hyggesnakId/messages - Send new message ====//
 
 router.post('/hyggesnakke/:hyggesnakId/messages', authenticateToken, requireHyggesnakContext, (req, res) => {
-    let { content } = req.body;
+    let { content, message_type = 'text' } = req.body;
 
-    // Validate content first (before sanitization to check real length)
+    // Validate message type
+    if (!['text', 'gif'].includes(message_type)) {
+        return res.status(400).send({ message: "Ugyldig beskedtype" });
+    }
+
+    const hyggesnakId = req.params.hyggesnakId;
+    const userId = req.user.id;
+
+    if (message_type === 'gif') {
+        // For GIFs: validate URL and check gif_enabled on hyggesnak
+        if (!content || typeof content !== 'string' || content.trim().length === 0) {
+            return res.status(400).send({ message: "GIF URL mangler" });
+        }
+
+        const gifUrl = content.trim();
+
+        if (!GIF_CDN_REGEX.test(gifUrl)) {
+            return res.status(400).send({ message: "Ugyldig GIF URL" });
+        }
+
+        return db.get('SELECT gif_enabled FROM hyggesnakke WHERE id = ?', [hyggesnakId], (err, hyggesnak) => {
+            if (err) {
+                console.error('Database error checking gif_enabled:', err);
+                return res.status(500).send({ message: "Serverfejl" });
+            }
+
+            if (!hyggesnak || !hyggesnak.gif_enabled) {
+                return res.status(403).send({ message: "GIFs er ikke aktiveret i denne hyggesnak" });
+            }
+
+            const encryptedContent = encryptMessage(gifUrl, hyggesnakId);
+            insertMessage(req, res, hyggesnakId, userId, encryptedContent, 'gif', gifUrl);
+        });
+    }
+
+    // Text message validation
     if (!content || content.trim().length === 0) {
         return res.status(400).send({
             message: "Beskeden må ikke være tom"
@@ -97,17 +136,17 @@ router.post('/hyggesnakke/:hyggesnakId/messages', authenticateToken, requireHygg
     // Sanitize content to prevent XSS (removes < > and control characters)
     content = sanitizeString(content.trim());
 
-    const hyggesnakId = req.params.hyggesnakId;
-    const userId = req.user.id;
-
     const encryptedContent = encryptMessage(content, hyggesnakId);
+    insertMessage(req, res, hyggesnakId, userId, encryptedContent, 'text', content);
+});
 
+function insertMessage(req, res, hyggesnakId, userId, encryptedContent, message_type, plainContent) {
     const query = `
-        INSERT INTO messages (hyggesnak_id, user_id, content)
-        VALUES (?, ?, ?)
+        INSERT INTO messages (hyggesnak_id, user_id, content, message_type)
+        VALUES (?, ?, ?, ?)
     `;
 
-    db.run(query, [hyggesnakId, userId, encryptedContent], function (err) {
+    db.run(query, [hyggesnakId, userId, encryptedContent, message_type], function (err) {
         if (err) {
             console.error('Database error creating message:', err);
             return res.status(500).send({ message: "Serverfejl ved oprettelse af besked" });
@@ -120,6 +159,7 @@ router.post('/hyggesnakke/:hyggesnakId/messages', authenticateToken, requireHygg
             SELECT
                 m.id,
                 m.content,
+                m.message_type,
                 m.created_at,
                 m.edited_at,
                 m.is_deleted,
@@ -183,7 +223,7 @@ router.post('/hyggesnakke/:hyggesnakId/messages', authenticateToken, requireHygg
             });
         });
     });
-});
+}
 
 //==== PUT /api/messages/:messageId - Edit own message ====//
 
@@ -210,7 +250,7 @@ router.put('/messages/:messageId', authenticateToken, (req, res) => {
 
     // First, check if message exists and belongs to user
     db.get(
-        'SELECT id, user_id, hyggesnak_id FROM messages WHERE id = ? AND is_deleted = 0',
+        'SELECT id, user_id, hyggesnak_id, message_type FROM messages WHERE id = ? AND is_deleted = 0',
         [messageId],
         (err, message) => {
             if (err) {
@@ -220,6 +260,10 @@ router.put('/messages/:messageId', authenticateToken, (req, res) => {
 
             if (!message) {
                 return res.status(404).send({ message: "Besked ikke fundet" });
+            }
+
+            if (message.message_type === 'gif') {
+                return res.status(403).send({ message: "GIF beskeder kan ikke redigeres" });
             }
 
             if (message.user_id !== userId) {
@@ -246,6 +290,7 @@ router.put('/messages/:messageId', authenticateToken, (req, res) => {
                     SELECT
                         m.id,
                         m.content,
+                        m.message_type,
                         m.created_at,
                         m.edited_at,
                         m.is_deleted,

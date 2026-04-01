@@ -1,0 +1,21 @@
+.gif-lightbox-dialog {
+    background: transparent;
+    border: none;
+    padding: 0;
+    max-width: 90vw;
+    max-height: 90dvh;
+    outline: none;
+}
+
+.gif-lightbox-dialog::backdrop {
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(8px);
+}
+
+.lightbox-gif {
+    max-width: 90vw;
+    max-height: 85dvh;
+    border-radius: var(--radius-xl);
+    display: block;
+    object-fit: contain;
+}

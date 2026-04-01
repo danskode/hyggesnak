@@ -17,7 +17,14 @@ app.use(express.json());
 
 //==== Security headers & Cors ====//
 
-app.use(helmet());
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+            "img-src": ["'self'", "media.giphy.com", "media0.giphy.com", "media1.giphy.com", "media2.giphy.com", "media3.giphy.com", "media4.giphy.com", "*.heypster.com", "data:"]
+        }
+    }
+}));
 
 // CORS config
 
@@ -50,6 +57,9 @@ app.use('/api', membersRouter);
 
 import messagesRouter from './routers/messagesRouter.js';
 app.use('/api', messagesRouter);
+
+import gifsRouter from './routers/gifsRouter.js';
+app.use('/api', gifsRouter);
 
 import networkRouter from './routers/networkRouter.js';
 app.use('/api/network', networkRouter);

@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS hyggesnakke (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT UNIQUE NOT NULL COLLATE NOCASE,
     display_name TEXT NOT NULL,
+    gif_enabled BOOLEAN DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -44,7 +45,8 @@ CREATE TABLE IF NOT EXISTS messages (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     hyggesnak_id INTEGER NOT NULL,
     user_id INTEGER NOT NULL,
-    content TEXT NOT NULL CHECK(length(content) <= 2000 AND length(content) > 0),
+    content TEXT NOT NULL CHECK(length(content) > 0),
+    message_type TEXT NOT NULL DEFAULT 'text' CHECK(message_type IN ('text', 'gif')),
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     edited_at DATETIME DEFAULT NULL,
     is_deleted BOOLEAN DEFAULT 0,

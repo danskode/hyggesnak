@@ -101,6 +101,14 @@ const invitationResponseLimiter = rateLimit({
     legacyHeaders: false
 });
 
+const gifSearchLimiter = rateLimit({
+    windowMs: 1 * 60 * 1000, // 1 minute
+    max: 60, // 60 GIF searches per minute
+    message: { message: "For mange GIF søgninger. Prøv igen om et minut." },
+    standardHeaders: true,
+    legacyHeaders: false
+});
+
 export {
     loginLimiter,
     forgotPasswordLimiter,
@@ -113,5 +121,6 @@ export {
     networkCodeGenerateLimiter,
     networkConnectLimiter,
     hyggesnakInviteLimiter,
-    invitationResponseLimiter
+    invitationResponseLimiter,
+    gifSearchLimiter
 };

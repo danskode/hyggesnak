@@ -16,6 +16,7 @@ router.get('/hyggesnakke', authenticateToken, membersReadLimiter, (req, res) => 
             h.id,
             h.name,
             h.display_name,
+            h.gif_enabled,
             h.created_at,
             hm.role as user_role,
             hm.joined_at,
@@ -39,7 +40,7 @@ router.get('/hyggesnakke', authenticateToken, membersReadLimiter, (req, res) => 
 
 router.post('/hyggesnakke', authenticateToken, membersCreateLimiter, async (req, res) => {
     try {
-        let { name, display_name } = req.body;
+        let { name, display_name, gif_enabled = false } = req.body;
 
         // Sanitize inputs
         name = sanitizeString(name);
@@ -69,8 +70,8 @@ router.post('/hyggesnakke', authenticateToken, membersCreateLimiter, async (req,
             let hyggesnakId;
             try {
                 const result = await dbRun(
-                    'INSERT INTO hyggesnakke (name, display_name) VALUES (?, ?)',
-                    [normalizedName, display_name]
+                    'INSERT INTO hyggesnakke (name, display_name, gif_enabled) VALUES (?, ?, ?)',
+                    [normalizedName, display_name, gif_enabled ? 1 : 0]
                 );
                 hyggesnakId = result.lastID;
             } catch (err) {
@@ -92,6 +93,7 @@ router.post('/hyggesnakke', authenticateToken, membersCreateLimiter, async (req,
                     h.id,
                     h.name,
                     h.display_name,
+                    h.gif_enabled,
                     h.created_at,
                     'OWNER' as user_role,
                     1 as member_count
@@ -123,6 +125,7 @@ router.get('/hyggesnakke/:hyggesnakId', authenticateToken, requireHyggesnakConte
             h.id,
             h.name,
             h.display_name,
+            h.gif_enabled,
             h.created_at,
             (SELECT COUNT(*) FROM hyggesnak_memberships WHERE hyggesnak_id = h.id) as member_count,
             (SELECT COUNT(*) FROM hyggesnak_memberships WHERE hyggesnak_id = h.id AND role = 'ADMIN') as admin_count

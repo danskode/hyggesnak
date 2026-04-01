@@ -17,7 +17,7 @@ export function validateEnv() {
     }
 
     // Warnings for optional but recommended variables
-    const recommended = ['RESEND_API_KEY', 'CLIENT_URL'];
+    const recommended = ['RESEND_API_KEY', 'CLIENT_URL', 'GIPHY_API_KEY'];
     const missingRecommended = [];
 
     for (const key of recommended) {

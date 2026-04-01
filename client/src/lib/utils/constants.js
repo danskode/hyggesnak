@@ -82,7 +82,11 @@ export const API_ENDPOINTS = {
     // Admin
     ADMIN_USERS: '/api/admin/users',
     ADMIN_HYGGESNAKKE: '/api/admin/hyggesnakke',
-    ADMIN_STATS: '/api/admin/stats'
+    ADMIN_STATS: '/api/admin/stats',
+
+    // GIFs
+    GIF_TRENDING: '/api/gifs/trending',
+    GIF_SEARCH: (q) => `/api/gifs/search?q=${encodeURIComponent(q)}`
 };
 
 // Socket events

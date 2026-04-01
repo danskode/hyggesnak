@@ -9,6 +9,7 @@
 
   let name = $state('');
   let display_name = $state('');
+  let gif_enabled = $state(false);
   let creating = $state(false);
 
   async function handleSubmit(event) {
@@ -32,7 +33,8 @@
     try {
       const result = await apiPost(API_ENDPOINTS.HYGGESNAKKE, {
         name: name.toLowerCase().trim(),
-        display_name: display_name.trim()
+        display_name: display_name.trim(),
+        gif_enabled
       });
 
       const newHyggesnak = result.data;
@@ -94,6 +96,14 @@
         maxlength="100"
         placeholder="fx: Familien Hansen 👨‍👩‍👧‍👦"
       />
+    </div>
+
+    <div class="form-group">
+      <label class="toggle-label">
+        <input type="checkbox" bind:checked={gif_enabled} />
+        <span>Tillad GIFs i denne hyggesnak</span>
+      </label>
+      <span class="hint">Giver medlemmer mulighed for at sende GIFs i chatten</span>
     </div>
 
       <div class="form-actions">

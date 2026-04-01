@@ -218,3 +218,35 @@
 }
 
 /* Global .btn-success and .btn-secondary styles apply */
+
+/* GIF message styling */
+.message-gif {
+    max-width: 240px;
+}
+
+.gif-message-btn {
+    padding: 0;
+    border: none;
+    cursor: zoom-in;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    display: block;
+    background: none;
+    transition: opacity var(--transition-fast);
+}
+
+.gif-message-btn:hover {
+    opacity: 0.9;
+}
+
+.gif-message-btn img {
+    width: 100%;
+    display: block;
+    border-radius: var(--radius-lg);
+}
+
+@media (max-width: 768px) {
+    .message-gif {
+        max-width: 180px;
+    }
+}

@@ -1,14 +1,17 @@
 <script>
     import './MessageInput.css';
     import { MESSAGE_MAX_LENGTH } from '../utils/constants';
+    import GifPicker from './GifPicker.svelte';
 
     let {
         value = '',
         onSend = () => {},
+        onSendGif = () => {},
         onTyping = () => {},
         onStopTyping = () => {},
         sending = false,
         disabled = false,
+        gifEnabled = false,
         typingUsers = [],
         autofocus = false
     } = $props();
@@ -129,6 +132,10 @@
         />
 
         <div class="input-footer">
+            {#if gifEnabled}
+                <GifPicker onSelectGif={onSendGif} {disabled} />
+            {/if}
+
             <span class="char-count" class:warning={isNearLimit} class:error={isOverLimit}>
                 {charCount} / {MESSAGE_MAX_LENGTH}
             </span>

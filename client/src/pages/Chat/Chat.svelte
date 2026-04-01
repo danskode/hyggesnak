@@ -202,6 +202,26 @@
         }
     }
 
+    async function sendGif(gifUrl) {
+        if (sending) return;
+
+        sending = true;
+
+        try {
+            const result = await apiPost(
+                `${API_ENDPOINTS.HYGGESNAKKE}/${hyggesnakId}/messages`,
+                { content: gifUrl, message_type: 'gif' }
+            );
+
+            messages = [...messages, result.data];
+            scrollToBottom();
+        } catch (err) {
+            console.error(err);
+        } finally {
+            sending = false;
+        }
+    }
+
     async function editMessage(messageId, content) {
         try {
             const result = await apiPut(
@@ -321,10 +341,12 @@
                 <!-- Message Input -->
                 <MessageInput
                     onSend={sendMessage}
+                    onSendGif={sendGif}
                     onTyping={handleTyping}
                     onStopTyping={handleStopTyping}
                     {sending}
                     disabled={!socket.isConnected}
+                    gifEnabled={!!hyggesnak?.gif_enabled}
                     {typingUsers}
                     autofocus={isMobile}
                 />

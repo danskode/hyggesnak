@@ -42,6 +42,7 @@
 /* Animation is now global in app.css */
 
 .message-input {
+    max-width: none;
     padding: var(--space-4);
     display: flex;
     flex-direction: column;
