@@ -67,17 +67,20 @@
 }
 
 html {
-  overflow-x: clip;
+  overflow-x: hidden;
   touch-action: pan-y;
+  width: 100%;
 }
 
 body {
   margin: 0;
   padding: 0;
+  width: 100%;
+  max-width: 100%;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  overflow-x: clip;
+  overflow-x: hidden;
 }
 
 #app {
@@ -562,6 +565,8 @@ input::placeholder {
 @media (max-width: 768px) {
   #app {
     padding: 0;
+    width: 100%;
+    max-width: 100%;
   }
 
   h1 {
