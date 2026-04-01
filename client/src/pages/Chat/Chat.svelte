@@ -255,11 +255,18 @@
     }
 
     function scrollToBottom() {
-        if (messagesContainer) {
-            setTimeout(() => {
-                messagesContainer.scrollTop = messagesContainer.scrollHeight;
-            }, 50);
-        }
+        if (!messagesContainer) return;
+        setTimeout(() => {
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            // Scroll again after any unloaded images finish loading (e.g. GIFs)
+            messagesContainer.querySelectorAll('img').forEach(img => {
+                if (!img.complete) {
+                    img.addEventListener('load', () => {
+                        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                    }, { once: true });
+                }
+            });
+        }, 50);
     }
 
     async function removeMember(memberId) {
