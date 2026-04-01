@@ -14,6 +14,9 @@ services:
       INIT_ADMIN_PASSWORD: ${INIT_ADMIN_PASSWORD:-}
       INIT_ADMIN_EMAIL: ${INIT_ADMIN_EMAIL:-}
       INIT_ADMIN_DISPLAY_NAME: ${INIT_ADMIN_DISPLAY_NAME:-}
+      GIF_PROVIDER: ${GIF_PROVIDER:-giphy}
+      GIPHY_API_KEY: ${GIPHY_API_KEY:-}
+      HEYPSTER_API_KEY: ${HEYPSTER_API_KEY:-}
     volumes:
       - db_data:/app/database
     restart: unless-stopped
