@@ -11,6 +11,7 @@
 - [Table of Content](#table-of-content)
   - [Run locally (development)](#run-locally-development)
   - [Self-host on a private server (Docker + Tailscale)](#self-host-on-a-private-server-docker--tailscale)
+    - [0. Hardening the server](#0-hardening-the-server)
     - [1. Install prerequisites](#1-install-prerequisites)
     - [2. Clone and configure](#2-clone-and-configure)
     - [3. Build and start](#3-build-and-start)
@@ -54,7 +55,84 @@ App runs at `http://localhost:5173`. Demo users: `mor`, `far`, `lillebror` — p
 
 ## Self-host on a private server (Docker + Tailscale)
 
-Run Hyggesnak privately for your family on a home server or VPS. Access it securely from any device via Tailscale — no port forwarding, no public exposure.
+Run Hyggesnak privately for your family on a home server or VPS. Access it securely from any device via Tailscale — no port forwarding, no public exposure. Safety first!
+
+### 0. Hardening the server
+
+Before deploying Hyggesnak, it's strongly recommended to harden your Ubuntu server to reduce risks and protect your data:
+
+- **Keep the system updated**
+   ```bash
+   sudo apt update && sudo apt upgrade -y
+   ```
+
+- **Create a non-root user**
+   ```bash
+   adduser hyggesnak
+   usermod -aG sudo hyggesnak
+   ```
+
+- **Disable root SSH login**
+   - Edit `/etc/ssh/sshd_config` and set:  
+      ```
+      PermitRootLogin no
+      ```
+   - Restart SSH:
+      ```bash
+      sudo systemctl restart ssh
+      ```
+
+- **Use SSH keys, disable password auth**
+   - Generate a key on your local machine:
+      ```bash
+      ssh-keygen
+      ```
+   - Copy it to the server:
+      ```bash
+      ssh-copy-id hyggesnak@<server-ip>
+      ```
+   - Edit `/etc/ssh/sshd_config` and set:  
+      ```
+      PasswordAuthentication no
+      ```
+   - Restart SSH.
+
+- **Set up a firewall (UFW)**
+   ```bash
+   sudo ufw enable
+   sudo ufw status
+   ```
+
+- **Restrict all ports except Tailscale**
+   - After Tailscale is running, block all incoming connections except via the Tailscale network interface:
+      ```bash
+      sudo ufw default deny incoming
+      sudo ufw allow in on tailscale0
+      # Allow SSH only via Tailscale interface for extra security:
+      sudo ufw allow in on tailscale0 to any port 22
+      sudo ufw enable
+      sudo ufw status
+      ```
+   - **Note:** This restricts SSH access to only devices on your Tailscale network. If you need SSH from other networks, adjust the rule accordingly––but why take the risk?
+   - This ensures only devices on your Tailscale network can access the server and app.
+
+- **Install fail2ban to block brute-force attacks**
+   ```bash
+   sudo apt install fail2ban -y
+   sudo systemctl enable --now fail2ban
+   ```
+
+- **Keep Docker secure**
+   - Only trusted users in the `docker` group.
+   - Keep Docker and images updated.
+
+- **Monitor logs**
+   - Use `journalctl`, `docker compose logs`, or set up log monitoring.
+
+- **Regularly back up your `.env` and database files.**
+
+These steps are not strictly required, but they are highly recommended for anyone self-hosting to help protect your server and data from common threats.
+
 
 ### 1. Install prerequisites
 
@@ -134,7 +212,8 @@ docker compose exec server node cli.js user delete <username>
 
 ### Non-interactive options
 
-Useful for scripts or when you want to skip prompts:
+Useful for scripts or
+when you want to skip prompts:
 
 ```bash
 # Create admin with auto-generated password (prints it to terminal)
