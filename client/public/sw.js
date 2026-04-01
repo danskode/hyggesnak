@@ -18,6 +18,11 @@ self.addEventListener('push', (event) => {
         data: payload.data || {}
     };
 
+    // Set badge on PWA icon (iOS 16.4+ / Android)
+    if ('setAppBadge' in navigator) {
+        navigator.setAppBadge(1).catch(() => {});
+    }
+
     event.waitUntil(self.registration.showNotification(title, options));
 });
 

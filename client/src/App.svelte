@@ -16,6 +16,17 @@
   import Footer from './lib/components/Footer.svelte';
   import PushPermission from './lib/components/PushPermission.svelte';
   import { auth } from './lib/stores/authStore.js';
+  import { totalUnread } from './lib/stores/unreadStore.js';
+
+  // Sync iOS PWA icon badge with unread message count
+  $effect(() => {
+    if (!('setAppBadge' in navigator)) return;
+    if ($totalUnread > 0) {
+      navigator.setAppBadge($totalUnread).catch(() => {});
+    } else {
+      navigator.clearAppBadge().catch(() => {});
+    }
+  });
 </script>
 
 <Toaster position="bottom-right"

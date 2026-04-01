@@ -5,6 +5,7 @@
   import { get } from 'svelte/store';
 
   let visible = $state(false);
+  let blocked = $state(false);
 
   function dismissedKey() {
     const userId = get(auth)?.id;
@@ -15,18 +16,27 @@
     if (!isPushSupported()) return;
     if (localStorage.getItem(dismissedKey())) return;
 
+    if (Notification.permission === 'denied') {
+      blocked = true;
+      return;
+    }
+
     const already = await isPushSubscribed();
     if (!already) visible = true;
   });
 
   async function enable() {
     visible = false;
-    await subscribeToPush();
+    const result = await subscribeToPush();
+    if (result.reason === 'denied') {
+      blocked = true;
+    }
   }
 
   function dismiss() {
     localStorage.setItem(dismissedKey(), '1');
     visible = false;
+    blocked = false;
   }
 </script>
 
@@ -36,6 +46,13 @@
     <div class="push-prompt-actions">
       <button class="btn btn-primary btn-sm" onclick={enable}>Ja tak</button>
       <button class="btn btn-ghost btn-sm" onclick={dismiss}>Nej tak</button>
+    </div>
+  </div>
+{:else if blocked}
+  <div class="push-prompt card">
+    <p>Notifikationer er blokeret i din browser. Tillad dem i browserindstillingerne for at modtage beskeder.</p>
+    <div class="push-prompt-actions">
+      <button class="btn btn-ghost btn-sm" onclick={dismiss}>Luk</button>
     </div>
   </div>
 {/if}
