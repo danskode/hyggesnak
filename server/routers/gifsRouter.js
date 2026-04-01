@@ -11,12 +11,12 @@ const providers = {
     giphy: {
         isConfigured: () => !!config.giphyApiKey,
         async trending() {
-            const url = `https://api.giphy.com/v1/gifs/trending?api_key=${config.giphyApiKey}&limit=12&rating=g`;
+            const url = `https://api.giphy.com/v1/gifs/trending?api_key=${config.giphyApiKey}&limit=6&rating=g`;
             const data = await fetchJson(url, 'Giphy');
             return (data.data || []).map(mapGiphyGif);
         },
         async search(q) {
-            const url = `https://api.giphy.com/v1/gifs/search?api_key=${config.giphyApiKey}&q=${encodeURIComponent(q)}&limit=12&rating=g`;
+            const url = `https://api.giphy.com/v1/gifs/search?api_key=${config.giphyApiKey}&q=${encodeURIComponent(q)}&limit=6&rating=g`;
             const data = await fetchJson(url, 'Giphy');
             return (data.data || []).map(mapGiphyGif);
         }
@@ -24,12 +24,12 @@ const providers = {
     heypster: {
         isConfigured: () => !!config.heypsterApiKey,
         async trending() {
-            const url = `https://api.heypster.com/v1/featured?key=${config.heypsterApiKey}&limit=12&media_filter=gif`;
+            const url = `https://api.heypster.com/v1/featured?key=${config.heypsterApiKey}&limit=6&media_filter=gif`;
             const data = await fetchJson(url, 'Heypster');
             return (data.results || []).map(mapHeypsterGif);
         },
         async search(q) {
-            const url = `https://api.heypster.com/v1/search?key=${config.heypsterApiKey}&q=${encodeURIComponent(q)}&limit=12&media_filter=gif`;
+            const url = `https://api.heypster.com/v1/search?key=${config.heypsterApiKey}&q=${encodeURIComponent(q)}&limit=6&media_filter=gif`;
             const data = await fetchJson(url, 'Heypster');
             return (data.results || []).map(mapHeypsterGif);
         }
