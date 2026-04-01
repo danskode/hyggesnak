@@ -115,7 +115,6 @@
                     placeholder="Søg GIFs..."
                     bind:value={searchQuery}
                     oninput={handleSearchInput}
-                    autofocus
                 />
             </div>
 
