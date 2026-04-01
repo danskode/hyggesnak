@@ -83,10 +83,12 @@
         if (isOpen) {
             document.addEventListener('keydown', handleKeydown);
             document.addEventListener('click', handleOutsideClick);
+            document.body.style.overflow = 'hidden';
         }
         return () => {
             document.removeEventListener('keydown', handleKeydown);
             document.removeEventListener('click', handleOutsideClick);
+            document.body.style.overflow = '';
         };
     });
 
