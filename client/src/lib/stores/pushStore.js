@@ -88,6 +88,27 @@ export async function unsubscribeFromPush() {
     }
 }
 
+// Re-register existing browser subscription under the current logged-in user.
+// Called on login so the subscription follows whoever is logged in on this device.
+export async function refreshPushSubscription() {
+    if (!isPushSupported()) return;
+    try {
+        const registration = await navigator.serviceWorker.ready;
+        const subscription = await registration.pushManager.getSubscription();
+        if (!subscription) return;
+
+        const { endpoint, keys } = subscription.toJSON();
+        const headers = await getAuthHeaders();
+        await fetch(`${API_BASE}/push/subscribe`, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({ endpoint, keys })
+        }).catch(() => {});
+    } catch {
+        // Silent — push is non-critical
+    }
+}
+
 // Check if the browser currently has an active push subscription
 export async function isPushSubscribed() {
     if (!isPushSupported()) return false;

@@ -4,6 +4,7 @@
     import { navigate, Link } from 'svelte-routing';
     import { apiPost } from '../../lib/api/api.js';
     import { API_ENDPOINTS } from '../../lib/utils/constants.js';
+    import { refreshPushSubscription } from '../../lib/stores/pushStore.js';
     import './Login.css';
 
     let username = $state('');
@@ -21,6 +22,9 @@
 
             // Save user data and token in authStore
             auth.login(result.data);
+
+            // Re-register existing push subscription under the new user
+            refreshPushSubscription();
 
             toast.success(`Velkommen, ${result.data.username}!`);
 
