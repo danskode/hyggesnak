@@ -1,14 +1,19 @@
 <script>
   import { onMount } from 'svelte';
   import { isPushSupported, isPushSubscribed, subscribeToPush } from '../stores/pushStore.js';
-
-  const DISMISSED_KEY = 'push_prompt_dismissed';
+  import { auth } from '../stores/authStore.js';
+  import { get } from 'svelte/store';
 
   let visible = $state(false);
 
+  function dismissedKey() {
+    const userId = get(auth)?.id;
+    return `push_prompt_dismissed_${userId}`;
+  }
+
   onMount(async () => {
     if (!isPushSupported()) return;
-    if (localStorage.getItem(DISMISSED_KEY)) return;
+    if (localStorage.getItem(dismissedKey())) return;
 
     const already = await isPushSubscribed();
     if (!already) visible = true;
@@ -20,7 +25,7 @@
   }
 
   function dismiss() {
-    localStorage.setItem(DISMISSED_KEY, '1');
+    localStorage.setItem(dismissedKey(), '1');
     visible = false;
   }
 </script>
