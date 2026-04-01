@@ -4,6 +4,7 @@ import { requireHyggesnakContext } from '../middleware/hyggesnakContextMiddlewar
 import db from '../database/db.js';
 import { sanitizeString } from '../utils/validators.js';
 import { encryptMessage, decryptMessage } from '../utils/crypto.js';
+import { sendPushToUser, isUserConnected } from '../services/pushService.js';
 
 //== Tilladte GIF CDN-domæner: Giphy + Heypster ==//
 const GIF_CDN_REGEX = /^https:\/\/(media[0-9]*\.giphy\.com|[a-zA-Z0-9.-]*heypster\.com)\//;
@@ -211,6 +212,18 @@ function insertMessage(req, res, hyggesnakId, userId, encryptedContent, message_
                                         if (socket.userId === member.user_id && !roomSockets.has(socketId)) {
                                             socket.emit('unread-message', { hyggesnakId });
                                         }
+                                    }
+                                    // Send push to members with no socket connection at all
+                                    if (!isUserConnected(io, member.user_id)) {
+                                        const pushBody = message_type === 'gif'
+                                            ? 'Sendte en GIF'
+                                            : plainContent.slice(0, 60);
+                                        sendPushToUser(
+                                            member.user_id,
+                                            `Ny besked fra ${req.user.display_name || req.user.username}`,
+                                            pushBody,
+                                            { url: '/hyggesnakke' }
+                                        );
                                     }
                                 });
                             }

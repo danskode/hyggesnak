@@ -7,6 +7,7 @@ import {
 } from '../middleware/rateLimitersMiddleware.js';
 import * as networkService from '../services/networkService.js';
 import { emitToUser } from '../socket/socketHandlers.js';
+import { sendPushToUser } from '../services/pushService.js';
 
 const router = Router();
 
@@ -103,6 +104,14 @@ router.post('/connect', networkConnectLimiter, async (req, res, next) => {
                 }
             });
         }
+
+        // Push notification regardless of online status (user may have app closed)
+        sendPushToUser(
+            result.toUser.id,
+            'Ny netværksinvitation',
+            `${req.user.display_name || req.user.username} vil forbindes med dig`,
+            { url: '/network' }
+        );
 
         res.status(201).send({
             message: `Venneanmodning sendt til ${result.toUser.display_name || result.toUser.username}`,

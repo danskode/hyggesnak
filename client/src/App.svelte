@@ -14,6 +14,8 @@
   import AdminRoute from './pages/Admin/Admin.svelte';
   import Header from './lib/components/Header.svelte';
   import Footer from './lib/components/Footer.svelte';
+  import PushPermission from './lib/components/PushPermission.svelte';
+  import { auth } from './lib/stores/authStore.js';
 </script>
 
 <Toaster position="bottom-right"
@@ -71,4 +73,8 @@
   </main>
 
   <Footer />
+
+  {#if $auth}
+    <PushPermission />
+  {/if}
 </Router>

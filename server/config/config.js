@@ -16,6 +16,11 @@ export const config = {
     giphyApiKey: process.env.GIPHY_API_KEY,
     heypsterApiKey: process.env.HEYPSTER_API_KEY,
 
+    // Web Push (VAPID)
+    vapidPublicKey: process.env.VAPID_PUBLIC_KEY,
+    vapidPrivateKey: process.env.VAPID_PRIVATE_KEY,
+    vapidSubject: process.env.VAPID_SUBJECT || 'mailto:admin@example.com',
+
     // Bcrypt
     saltRounds: 10,
 

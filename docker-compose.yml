@@ -17,6 +17,9 @@ services:
       GIF_PROVIDER: ${GIF_PROVIDER:-giphy}
       GIPHY_API_KEY: ${GIPHY_API_KEY:-}
       HEYPSTER_API_KEY: ${HEYPSTER_API_KEY:-}
+      VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY:-}
+      VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY:-}
+      VAPID_SUBJECT: ${VAPID_SUBJECT:-}
     volumes:
       - db_data:/app/database
     restart: unless-stopped

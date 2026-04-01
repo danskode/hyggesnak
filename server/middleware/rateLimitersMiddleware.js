@@ -109,6 +109,14 @@ const gifSearchLimiter = rateLimit({
     legacyHeaders: false
 });
 
+const pushSubscribeLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000, // 1 hour
+    max: 10, // Max 10 subscription changes per hour per user
+    message: { message: "For mange push subscription forsøg. Prøv igen om 1 time." },
+    standardHeaders: true,
+    legacyHeaders: false
+});
+
 export {
     loginLimiter,
     forgotPasswordLimiter,
@@ -122,5 +130,6 @@ export {
     networkConnectLimiter,
     hyggesnakInviteLimiter,
     invitationResponseLimiter,
-    gifSearchLimiter
+    gifSearchLimiter,
+    pushSubscribeLimiter
 };

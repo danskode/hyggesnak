@@ -162,3 +162,19 @@ ON network_invitations(to_user_id, from_user_id) WHERE status = 'PENDING';
 -- Partial index for pending hyggesnak invitations
 CREATE INDEX IF NOT EXISTS idx_hyggesnak_invitations_pending
 ON hyggesnak_invitations(invited_user_id, hyggesnak_id) WHERE status = 'PENDING';
+
+-- ============================================
+-- 8. Push Subscriptions Table
+-- ============================================
+CREATE TABLE IF NOT EXISTS push_subscriptions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    endpoint TEXT NOT NULL,
+    p256dh TEXT NOT NULL,
+    auth TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    UNIQUE(endpoint)
+);
+
+CREATE INDEX IF NOT EXISTS idx_push_subscriptions_user ON push_subscriptions(user_id);

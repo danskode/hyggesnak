@@ -70,6 +70,9 @@ app.use('/api', hyggesnakInvitationRouter);
 import adminRouter from './routers/adminRouter.js';
 app.use('/api/admin', adminRouter);
 
+import pushRouter from './routers/pushRouter.js';
+app.use('/api', pushRouter);
+
 //===== Error Handler =====//
 
 import { errorHandler } from './middleware/errorHandler.js';

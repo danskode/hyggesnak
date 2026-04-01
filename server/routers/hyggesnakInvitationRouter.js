@@ -4,6 +4,7 @@ import { requireHyggesnakContext, requireHyggesnakOwner } from '../middleware/hy
 import { hyggesnakInviteLimiter, invitationResponseLimiter } from '../middleware/rateLimitersMiddleware.js';
 import * as hyggesnakInvitationService from '../services/hyggesnakInvitationService.js';
 import { emitToUser } from '../socket/socketHandlers.js';
+import { sendPushToUser } from '../services/pushService.js';
 
 const router = Router();
 
@@ -51,6 +52,14 @@ router.post('/hyggesnakke/:hyggesnakId/invite',
                     }
                 });
             }
+
+            // Push notification regardless of online status
+            sendPushToUser(
+                userId,
+                `Invitation til ${result.hyggesnak.display_name}`,
+                `${req.user.display_name || req.user.username} inviterer dig`,
+                { url: '/hyggesnakke' }
+            );
 
             res.status(201).send({
                 message: `Invitation sendt til ${result.invitedUser.display_name || result.invitedUser.username}`,
