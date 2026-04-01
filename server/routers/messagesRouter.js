@@ -208,13 +208,19 @@ function insertMessage(req, res, hyggesnakId, userId, encryptedContent, message_
                                 // Emit to each member who is NOT in the room
                                 const sockets = io.sockets.sockets;
                                 members.forEach(member => {
+                                    // Check if this member is actively in the chat room
+                                    let isInRoom = false;
                                     for (const [socketId, socket] of sockets) {
                                         if (socket.userId === member.user_id && !roomSockets.has(socketId)) {
                                             socket.emit('unread-message', { hyggesnakId });
                                         }
+                                        if (socket.userId === member.user_id && roomSockets.has(socketId)) {
+                                            isInRoom = true;
+                                        }
                                     }
-                                    // Send push to members with no socket connection at all
-                                    if (!isUserConnected(io, member.user_id)) {
+                                    // Send push to anyone not actively viewing this chat
+                                    // (covers both offline users and those on a different page)
+                                    if (!isInRoom) {
                                         const pushBody = message_type === 'gif'
                                             ? 'Sendte en GIF'
                                             : plainContent.slice(0, 60);
