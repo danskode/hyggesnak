@@ -6,6 +6,7 @@
     import { currentHyggesnak, hyggesnakke } from '../../lib/stores/hyggesnakStore.js';
     import { unreadCounts } from '../../lib/stores/unreadStore.js';
     import { chatContext } from '../../lib/stores/chatContextStore.js';
+    import { messageCache } from '../../lib/stores/messageCacheStore.js';
     import { useSocket } from '../../lib/composables/useSocket.js';
     import { apiGet, apiPost, apiPut, apiDelete } from '../../lib/api/api.js';
     import { API_ENDPOINTS } from '../../lib/utils/constants.js';
@@ -34,6 +35,7 @@
         onNewMessage: (message) => {
             // Don't add duplicate if it's from current user (already added optimistically)
             if (message.user_id !== $auth.id) {
+                messageCache.append(hyggesnakId, message);
                 messages = [...messages, message];
                 scrollToBottom();
                 // Mark as read immediately since user is actively viewing this chat
@@ -41,12 +43,14 @@
             }
         },
         onMessageEdited: (editedMessage) => {
+            messageCache.update(hyggesnakId, editedMessage);
             messages = messages.map(msg =>
                 msg.id === editedMessage.id ? editedMessage : msg
             );
         },
         onMessageDeleted: (messageId) => {
             const numericMessageId = parseInt(messageId, 10);
+            messageCache.softDelete(hyggesnakId, numericMessageId);
             messages = messages.map(msg => {
                 if (msg.id === numericMessageId) {
                     return { ...msg, is_deleted: true, content: '(Beskeden er slettet)' };
@@ -165,15 +169,45 @@
     }
 
     async function loadMessages() {
-        try {
-            const result = await apiGet(`${API_ENDPOINTS.HYGGESNAKKE}/${hyggesnakId}/messages?limit=50`);
-            // Process messages to show [Slettet] for deleted messages
-            messages = result.data.map(msg => {
-                if (msg.is_deleted) {
-                    return { ...msg, content: '(Beskeden er slettet)' };
+        const cached = messageCache.get(hyggesnakId);
+
+        if (cached) {
+            // Show cached messages instantly — no loading spinner
+            messages = cached.messages;
+            loading = false;
+
+            // Background sync: fetch only messages newer than the cache
+            try {
+                const result = await apiGet(
+                    `${API_ENDPOINTS.HYGGESNAK_MESSAGES(hyggesnakId)}?after_id=${cached.newestId}&limit=100`
+                );
+                if (result.data.length > 0) {
+                    const existingIds = new Set(messages.map(m => m.id));
+                    const fresh = result.data
+                        .filter(m => !existingIds.has(m.id))
+                        .map(m => m.is_deleted ? { ...m, content: '(Beskeden er slettet)' } : m);
+
+                    if (fresh.length > 0) {
+                        fresh.forEach(m => messageCache.append(hyggesnakId, m));
+                        messages = [...messages, ...fresh];
+                        scrollToBottom();
+                    }
                 }
-                return msg;
-            }).reverse(); // Reverse to show oldest first
+            } catch (err) {
+                console.error('Fejl ved synkronisering af nye beskeder:', err);
+            }
+            return;
+        }
+
+        // No cache — fetch fresh
+        try {
+            const result = await apiGet(`${API_ENDPOINTS.HYGGESNAK_MESSAGES(hyggesnakId)}?limit=50`);
+            const processed = result.data
+                .map(msg => msg.is_deleted ? { ...msg, content: '(Beskeden er slettet)' } : msg)
+                .reverse(); // API returnerer DESC, vi viser ASC
+
+            messageCache.set(hyggesnakId, processed, result.hasMore);
+            messages = processed;
         } catch (err) {
             console.error(err);
         } finally {
@@ -192,7 +226,7 @@
                 { content }
             );
 
-            // Add message
+            messageCache.append(hyggesnakId, result.data);
             messages = [...messages, result.data];
             scrollToBottom();
         } catch (err) {
@@ -213,6 +247,7 @@
                 { content: gifUrl, message_type: 'gif' }
             );
 
+            messageCache.append(hyggesnakId, result.data);
             messages = [...messages, result.data];
             scrollToBottom();
         } catch (err) {
@@ -229,7 +264,7 @@
                 { content }
             );
 
-            // Update message locally
+            messageCache.update(hyggesnakId, result.data);
             messages = messages.map(msg =>
                 msg.id === messageId ? result.data : msg
             );
@@ -243,7 +278,7 @@
         try {
             await apiDelete(`/api/messages/${messageId}`);
 
-            // Update message locally (soft delete)
+            messageCache.softDelete(hyggesnakId, messageId);
             messages = messages.map(msg =>
                 msg.id === messageId ? { ...msg, is_deleted: true, content: '(slettet besked)' } : msg
             );

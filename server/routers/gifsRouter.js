@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { authenticateToken } from '../middleware/authMiddleware.js';
 import { gifSearchLimiter } from '../middleware/rateLimitersMiddleware.js';
 import { config } from '../config/config.js';
+import { cachedTrending, cachedSearch } from '../utils/gifCache.js';
 
 const router = Router();
 
@@ -80,7 +81,7 @@ router.get('/gifs/trending', authenticateToken, gifSearchLimiter, async (req, re
     }
 
     try {
-        const gifs = await provider.trending();
+        const gifs = await cachedTrending(config.gifProvider, () => provider.trending());
         res.send({ data: gifs });
     } catch (err) {
         console.error('Error fetching trending GIFs:', err);
@@ -107,7 +108,7 @@ router.get('/gifs/search', authenticateToken, gifSearchLimiter, async (req, res)
     }
 
     try {
-        const gifs = await provider.search(q.trim());
+        const gifs = await cachedSearch(config.gifProvider, q.trim(), () => provider.search(q.trim()));
         res.send({ data: gifs });
     } catch (err) {
         console.error('Error searching GIFs:', err);

@@ -1,6 +1,7 @@
 import { get } from 'svelte/store';
 import { persistentStore } from './persistentStore.js';
 import { hyggesnakke, currentHyggesnak } from './hyggesnakStore.js';
+import { messageCache } from './messageCacheStore.js';
 
 //============== Create persistent auth store ==================//
 
@@ -19,6 +20,7 @@ export const auth = {
         // Clear hyggesnak data on logout
         hyggesnakke.clear();
         currentHyggesnak.clear();
+        messageCache.clear();
     },
 
     getToken: () => {

@@ -20,6 +20,7 @@
     "express-rate-limit": "^8.2.1",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
+    "lru-cache": "^11.2.7",
     "resend": "^6.5.2",
     "socket.io": "^4.8.1",
     "sqlite3": "^5.1.7",
